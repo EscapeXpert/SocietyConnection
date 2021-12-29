@@ -1,0 +1,30 @@
+{
+  "name": "societyconnection",
+  "version": "1.0.0",
+  "description": "동아리 홈페이지입니다.",
+  "main": "app.js",
+  "scripts": {
+    "test": "nodemon app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/psh3253/SocietyConnection.git"
+  },
+  "author": "Astar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/psh3253/SocietyConnection/issues"
+  },
+  "homepage": "https://github.com/psh3253/SocietyConnection#readme",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.12.4",
+    "sequelize-cli": "^6.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
