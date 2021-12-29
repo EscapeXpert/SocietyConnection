@@ -17,14 +17,6 @@ module.exports = class Reply_comment extends Sequelize.Model {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.NOW,
-            },
-            creator_id: {
-                type: Sequelize.STRING(15),
-                allowNull: false,
-            },
-            comment_id: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
             }
         }, {
             sequelize,
@@ -37,6 +29,8 @@ module.exports = class Reply_comment extends Sequelize.Model {
         });
     }
 
-
-
+    static associate(db) {
+        db.Reply_comment.belongsTo(db.User, { foreignKey: 'creator_id', sourceKey: 'id'});
+        db.Reply_comment.belongsTo(db.Comment, {foreignKey: 'comment_id', sourceKey: 'id'});
+    }
 };
