@@ -20,10 +20,10 @@ module.exports = class Comment extends Sequelize.Model {
             }
         }, {
             sequelize,
-            timestamps: true,
+            timestamps: false,
             underscored: true,
             modelName: 'Comment',
-            tableName: 'comments',
+            tableName: 'comment',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });
@@ -32,6 +32,6 @@ module.exports = class Comment extends Sequelize.Model {
     static associate(db) {
         db.Comment.belongsTo(db.User, { foreignKey: 'creator_id', targetKey: 'id'});
         db.Comment.belongsTo(db.Post, { foreignKey: 'post_id', targetKey: 'id'});
-        db.Comment.hasMany(db.Reply_comment, {foreignKey: 'comment_id', sourceKey: 'id'});
+        db.Comment.hasMany(db.ReplyComment, {foreignKey: 'comment_id', sourceKey: 'id'});
     }
 };

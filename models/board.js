@@ -25,10 +25,10 @@ module.exports = class Board extends Sequelize.Model {
             },
         }, {
             sequelize,
-            //timestamps: true,
+            timestamps: false,
             underscored: true,
             modelName: 'Board',
-            tableName: 'boards',
+            tableName: 'board',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });

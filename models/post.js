@@ -34,10 +34,10 @@ module.exports = class Post extends Sequelize.Model {
             }
         }, {
             sequelize,
-            timestamps: true,
+            timestamps: false,
             underscored: true,
             modelName: 'Post',
-            tableName: 'posts',
+            tableName: 'post',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });
@@ -45,7 +45,7 @@ module.exports = class Post extends Sequelize.Model {
 
     static associate(db) {
         db.Post.hasMany(db.Comment, { foreignKey: 'post_id', sourceKey: 'id'});
-        db.Post.hasMany(db.Post_file, { foreignKey: 'post_id', sourceKey: 'id'});
+        db.Post.hasMany(db.PostFile, { foreignKey: 'post_id', sourceKey: 'id'});
         db.Post.belongsToMany(db.User, {foreignKey: 'post_id', through: 'Like'});
         db.Post.belongsTo(db.User, {foreignKey: 'creator_id', targetKey: 'id'});
         db.Post.belongsTo(db.Board, {foreignKey: 'board_id', targetKey: 'id'});

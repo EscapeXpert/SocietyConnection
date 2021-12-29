@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-module.exports = class Post_file extends Sequelize.Model {
+module.exports = class PostFile extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
             file_path: {
@@ -9,17 +9,17 @@ module.exports = class Post_file extends Sequelize.Model {
             }
         }, {
             sequelize,
-            //timestamps: true,
+            timestamps: false,
             underscored: true,
-            modelName: 'Post_file',
-            tableName: 'post_files',
+            modelName: 'PostFile',
+            tableName: 'post_file',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });
     }
 
     static associate(db) {
-        db.Post_file.belongsTo(db.Post, { foreignKey: 'post_id', targetKey: 'id'});
+        db.PostFile.belongsTo(db.Post, { foreignKey: 'post_id', targetKey: 'id'});
     }
 
 };

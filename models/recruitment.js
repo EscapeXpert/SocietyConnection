@@ -42,10 +42,10 @@ module.exports = class Recruitment extends Sequelize.Model {
             }
         }, {
             sequelize,
-            timestamps: true,
+            timestamps: false,
             underscored: true,
             modelName: 'Recruitment',
-            tableName: 'recruitments',
+            tableName: 'recruitment',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });

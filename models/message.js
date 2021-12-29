@@ -19,10 +19,10 @@ module.exports = class Message extends Sequelize.Model {
             }
         }, {
             sequelize,
-            timestamps: true,
+            timestamps: false,
             underscored: true,
             modelName: 'Message',
-            tableName: 'messages',
+            tableName: 'message',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });
