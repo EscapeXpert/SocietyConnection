@@ -4,7 +4,7 @@
   "description": "동아리 홈페이지입니다.",
   "main": "app.js",
   "scripts": {
-    "test": "nodemon app"
+    "start": "nodemon app"
   },
   "repository": {
     "type": "git",
