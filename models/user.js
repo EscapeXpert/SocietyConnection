@@ -4,27 +4,26 @@ module.exports = class User extends Sequelize.Model {
     static init(sequelize){
         return super.init({
             id: {
-                type: Sequelize.STRING(15),
+                type: Sequelize.STRING(30),
                 allowNull: false,
                 primaryKey: true,
             },
             password: {
                 type: Sequelize.STRING(15),
-                allowNull: false,
+                allowNull: true,
             },
             sns_id: {
                 type: Sequelize.STRING(30),
-                allowNull: false,
+                allowNull: true,
             },
             login_type: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.STRING(15),
                 allowNull: false,
-                defaultValue: 0,
+                defaultValue: 'local',
             },
             name: {
               type: Sequelize.STRING(15),
-              allowNull: false,
-              unique: true,
+              allowNull: false
             },
             introduce: {
                 type: Sequelize.STRING(200),
@@ -41,10 +40,10 @@ module.exports = class User extends Sequelize.Model {
             }
         }, {
             sequelize,
-            //timestamps: true,
+            timestamps: false,
             underscored: true,
             modelName: 'User',
-            tableName: 'users',
+            tableName: 'user',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });
@@ -55,7 +54,7 @@ module.exports = class User extends Sequelize.Model {
         db.User.hasMany(db.Message, { foreignKey: 'receiver_id', sourceKey: 'id'});
         db.User.hasMany(db.Comment, { foreignKey: 'creator_id', sourceKey: 'id'});
         db.User.hasMany(db.Post, { foreignKey: 'creator_id', sourceKey: 'id'});
-        db.User.hasMany(db.Reply_comment, { foreignKey: 'creator_id', sourceKey: 'id'});
+        db.User.hasMany(db.ReplyComment, { foreignKey: 'creator_id', sourceKey: 'id'});
         db.User.hasMany(db.Applicant, { foreignKey: 'user_id', sourceKey: 'id'});
         db.User.hasMany(db.Recruitment, { foreignKey: 'creator_id', sourceKey: 'id'});
         db.User.belongsToMany(db.Post, {

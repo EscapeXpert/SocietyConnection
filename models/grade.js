@@ -15,10 +15,10 @@ module.exports = class Grade extends Sequelize.Model {
             }
         }, {
             sequelize,
-            //timestamps: true,
+            timestamps: false,
             underscored: true,
             modelName: 'Grade',
-            tableName: 'grades',
+            tableName: 'grade',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });

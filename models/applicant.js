@@ -10,10 +10,10 @@ module.exports = class Applicant extends Sequelize.Model {
             }
         }, {
             sequelize,
-            //timestamps: true,
+            timestamps: false,
             underscored: true,
             modelName: 'Applicant',
-            tableName: 'applicants',
+            tableName: 'applicant',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });

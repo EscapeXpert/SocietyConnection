@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-module.exports = class Reply_comment extends Sequelize.Model {
+module.exports = class ReplyComment extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
             id: {
@@ -20,17 +20,17 @@ module.exports = class Reply_comment extends Sequelize.Model {
             }
         }, {
             sequelize,
-            timestamps: true,
+            timestamps: false,
             underscored: true,
-            modelName: 'Reply_comment',
-            tableName: 'reply_comments',
+            modelName: 'ReplyComment',
+            tableName: 'reply_comment',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });
     }
 
     static associate(db) {
-        db.Reply_comment.belongsTo(db.User, { foreignKey: 'creator_id', sourceKey: 'id'});
-        db.Reply_comment.belongsTo(db.Comment, {foreignKey: 'comment_id', sourceKey: 'id'});
+        db.ReplyComment.belongsTo(db.User, { foreignKey: 'creator_id', sourceKey: 'id'});
+        db.ReplyComment.belongsTo(db.Comment, {foreignKey: 'comment_id', sourceKey: 'id'});
     }
 };
