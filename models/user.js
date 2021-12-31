@@ -21,9 +21,22 @@ module.exports = class User extends Sequelize.Model {
                 allowNull: false,
                 defaultValue: 'local',
             },
+            nickname: {
+                type: Sequelize.STRING(15),
+                allowNull: false,
+                unique: true
+            },
             name: {
-              type: Sequelize.STRING(15),
-              allowNull: false
+                type: Sequelize.STRING(15),
+                allowNull: false
+            },
+            birth_date: {
+                type: Sequelize.DATE,
+                allowNull: false
+            },
+            gender: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false
             },
             introduce: {
                 type: Sequelize.STRING(200),

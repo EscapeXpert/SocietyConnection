@@ -23,6 +23,10 @@ module.exports = class Board extends Sequelize.Model {
                 allowNull: false,
                 defaultValue: 1,
             },
+            board_type: {
+                type: Sequelize.STRING(15),
+                allowNull: false
+            }
         }, {
             sequelize,
             timestamps: false,

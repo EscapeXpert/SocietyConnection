@@ -7,6 +7,11 @@ module.exports = class Applicant extends Sequelize.Model {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
+            },
+            message: {
+                type: Sequelize.TEXT,
+                allowNull: false,
+                defaultValue: "신청합니다."
             }
         }, {
             sequelize,
