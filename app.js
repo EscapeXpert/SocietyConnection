@@ -3,7 +3,9 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const session = require('express-session');
 const morgan = require('morgan');
+const dotenv = require('dotenv');
 
+dotenv.config();
 const boardRouter = require('./routes/board');
 const {sequelize} = require('./models');
 
@@ -27,6 +29,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(session({
     resave: false,
     saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET,
     cookie: {
         httpOnly: true,
         secure: false

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        <% %>
+    </title>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>조회수</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let i = 0; i < post.size(); i++) { %>
+        <tr>
+            <td><%=post[i].id%></td>
+            <td><%=post[i].title%></td>
+            <td><%=post[i].nickname%></td>
+            <td><%=post[i].created_at%></td>
+            <td><%=post[i].view_count%></td>
+        </tr>
+    <% }%>
+    </tbody>
+</table>
+</body>
+</html>

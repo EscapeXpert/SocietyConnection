@@ -1,39 +1,39 @@
 const express = require('express');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
-const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
+const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const User = require('../models/user');
 
 const router = express.Router();
 
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
-    const { id, password, sns_id, nickname, name,birth_date,gender,introduce,profile_image,grade } = req.body;
+    const {id, password, sns_id, nickname, name, birth_date, gender, introduce, profile_image, grade} = req.body;
     try {
-        let exUser = await User.findOne({ where: { id } });
+        let exUser = await User.findOne({where: {id}});
         if (exUser) {
             return res.redirect('/join?error=exist');
         }
-        if(!password){
+        if (!password) {
             return res.redirect('/join?error=exist');
         }
 
-        if(!nickname){
+        if (!nickname) {
             return res.redirect('/join?error=exist');
         }
-        exUser = await User.findOne({ where: { nickname } });
+        exUser = await User.findOne({where: {nickname}});
         if (exUser) {
             return res.redirect('/join?error=exist');
         }
-        if(!name){
+        if (!name) {
             return res.redirect('/join?error=exist');
         }
-        if(!birth_date){
+        if (!birth_date) {
             return res.redirect('/join?error=exist');
         }
-        if(!gender){
+        if (!gender) {
             return res.redirect('/join?error=exist');
         }
-        if(!grade){
+        if (!grade) {
             return res.redirect('/join?error=exist');
         }
         const hash = await bcrypt.hash(password, 12);
