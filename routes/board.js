@@ -24,13 +24,13 @@ router.get('/:board_id', async (req, res, next) => {
     const board_type = req.query.board_type;
     const page = req.query.page;
     try {
-        const board_name = Board.findOne({
+        const board = await Board.findOne({
             attributes: ['name'],
             where: {
-                board_id: board_id
+                id: board_id
             }
-        })
-        const posts = Post.findAll({
+        });
+        const posts = await Post.findAll({
             include: {
                 model: User,
                 attributes: ['nickname']
@@ -41,10 +41,10 @@ router.get('/:board_id', async (req, res, next) => {
             order: [['id', 'ASC']]
         });
         res.render("board", {
-                title: board_name,
+                title: board.name,
                 posts: posts
             }
-        )
+        );
     } catch (err) {
         console.error(err);
         next(err);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>
-        <% %>
+        <%= title %>
     </title>
 </head>
 <body>
@@ -18,15 +18,16 @@
     </tr>
     </thead>
     <tbody>
-    <% for(let i = 0; i < post.size(); i++) { %>
+    <% for(var post of posts) { %>
+        <% console.log(post);%>
         <tr>
-            <td><%=post[i].id%></td>
-            <td><%=post[i].title%></td>
-            <td><%=post[i].nickname%></td>
-            <td><%=post[i].created_at%></td>
-            <td><%=post[i].view_count%></td>
+            <td><%= post.id %></td>
+            <td><%= post.title %></td>
+            <td><%= post.nickname %></td>
+            <td><%= post.created_at %></td>
+            <td><%= post.view_count %></td>
         </tr>
-    <% }%>
+    <% } %>
     </tbody>
 </table>
 </body>
