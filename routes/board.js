@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const postRouter = require('../routes/post');
+const {Post, User, Board} = require('../models');
 
 router.use('/post', postRouter)
 
@@ -18,10 +19,36 @@ router.post('/:board_id/write', async (req, res) => {
     const creator_id = req.user.id;
 })
 
-router.get('/:board_id', async (req, res) => {
+router.get('/:board_id', async (req, res, next) => {
     const board_id = req.params.board_id;
     const board_type = req.query.board_type;
     const page = req.query.page;
+    try {
+        const board_name = Board.findOne({
+            attributes: ['name'],
+            where: {
+                board_id: board_id
+            }
+        })
+        const posts = Post.findAll({
+            include: {
+                model: User,
+                attributes: ['nickname']
+            },
+            where: {
+                board_id: board_id
+            },
+            order: [['id', 'ASC']]
+        });
+        res.render("board", {
+                title: board_name,
+                posts: posts
+            }
+        )
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
 });
 
 module.exports = router;

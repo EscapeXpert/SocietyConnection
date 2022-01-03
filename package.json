@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "cookie-parser": "^1.4.6",
+    "dotenv": "^10.0.0",
     "nodemon": "^2.0.15"
   }
 }
