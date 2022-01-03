@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
 
+const boardRouter = require('./routes/board');
 const {sequelize} = require('./models');
 
 const app = express();
@@ -20,6 +21,8 @@ app.use(morgan('dev'))
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}))
+
+app.use('/board', boardRouter);
 
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
