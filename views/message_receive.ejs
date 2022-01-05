@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %>의 수신함</title>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>내용</th>
+        <th>날짜</th>
+        <th>읽음</th>
+        <th>보낸 사람</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(var message of messages) { %>
+        <tr>
+            <td><%= message.message %></td>
+            <% const date = new Date(message.created_at) %>
+            <% const new_date = new Date() %>
+            <% if(new_date.getFullYear() !== date.getFullYear()) { %>
+                <td><%= date.toISOString().slice(0, 10) + " " + date.toISOString().slice(11, 16) %></td>
+            <% } else if(new_date.getDate() === date.getDate()){ %>
+                <td><%= date.toISOString().slice(11, 16) %></td>
+            <% } else { %>
+                <td><%= date.toISOString().slice(5, 10) + " " + date.toISOString().slice(11, 16) %></td>
+            <% } %>
+            <td><%= message.is_read %></td>
+            <td><%= message.nickname %></td>
+
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+</body>
+</html>
