@@ -7,7 +7,7 @@ const User = require('../models/user');
 const router = express.Router();
 
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
-    const {id, password, sns_id, nickname, name, birth_date, gender, introduce, profile_image, grade} = req.body;
+    const {id, password,verify_password, sns_id, nickname, name, birth_date, gender, introduce, profile_image} = req.body;
     try {
         let exUser = await User.findOne({where: {id}});
         if (exUser) {
@@ -16,7 +16,9 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
         if (!password) {
             return res.redirect('/join?error=exist');
         }
-
+        if (password!=verify_password) {
+            return res.redirect('/join?error=exist');
+        }
         if (!nickname) {
             return res.redirect('/join?error=exist');
         }
@@ -35,9 +37,6 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
         if (!gender) {
             return res.redirect('/join?error=exist');
         }
-        if (!grade) {
-            return res.redirect('/join?error=exist');
-        }
         const hash = await bcrypt.hash(password, 12);
         await User.create({
             id,
@@ -48,8 +47,7 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
             birth_date,
             gender,
             introduce,
-            profile_image,
-            grade
+            profile_image
         });
         return res.redirect('/');
     } catch (error) {
