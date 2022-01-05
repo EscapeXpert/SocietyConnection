@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= post.title %>></title>
+</head>
+<body>
+<a href="/board/<%= board.board_id %>"><%= board.name %></a>
+<div>
+    <p><%= post.nickname %></p>
+    <p><%= post.grade %></p>
+    <% if(post.creator_id !== user_id) { %>
+        <a href="/message/write?target_nickname=<%= post.nickname %>"></a>
+    <% } %>
+</div>
+<div>
+    <h3><%= post.title %></h3>
+    <p><%= post.content %></p>
+</div>
+</body>
+</html>
