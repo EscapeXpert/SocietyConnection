@@ -7,7 +7,7 @@
     </title>
 </head>
 <body>
-<table>
+<table >
     <thead>
     <tr>
         <th>번호</th>
@@ -18,13 +18,13 @@
     </tr>
     </thead>
     <tbody>
-    <% for(var post of posts) { %>
-        <% console.log(post);%>
+    <% for(let post of posts) { %>
         <tr>
             <td><%= post.id %></td>
             <td><%= post.title %></td>
             <td><%= post.nickname %></td>
-            <td><%= post.created_at %></td>
+            <% const date = new Date(post.created_at) %>
+            <td><%= date.toISOString().slice(0, 10) %></td>
             <td><%= post.view_count %></td>
         </tr>
     <% } %>
