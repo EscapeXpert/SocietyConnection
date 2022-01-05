@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>
-        <%= title %>
+        <%= board.name %>
     </title>
 </head>
 <body>
-<table >
+<table>
     <thead>
     <tr>
         <th>번호</th>
@@ -15,20 +15,29 @@
         <th>작성자</th>
         <th>작성일</th>
         <th>조회수</th>
+        <th>추천수</th>
     </tr>
     </thead>
     <tbody>
     <% for(let post of posts) { %>
         <tr>
             <td><%= post.id %></td>
-            <td><%= post.title %></td>
+            <td><a href="/board/<%= board.id %>/post/<%= post.id %>?board_type=<%= board.board %>"><%= post.title %></a>
+            </td>
             <td><%= post.nickname %></td>
             <% const date = new Date(post.created_at) %>
-            <td><%= date.toISOString().slice(0, 10) %></td>
+            <% const current_date = new Date() %>
+            <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                <td><%= date.toISOString().slice(11, 16) %></td>
+            <% } else { %>
+                <td><%= date.toISOString().slice(0, 10) %></td>
+            <% } %>
             <td><%= post.view_count %></td>
+            <td><%= post.like %></td>
         </tr>
     <% } %>
     </tbody>
 </table>
+<a href="/board/<%= board.id %>/write">글쓰기</a>
 </body>
 </html>

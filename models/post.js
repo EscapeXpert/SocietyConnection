@@ -44,9 +44,9 @@ module.exports = class Post extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Post.hasMany(db.Comment, { foreignKey: 'post_id', sourceKey: 'id'});
-        db.Post.hasMany(db.PostFile, { foreignKey: 'post_id', sourceKey: 'id'});
-        db.Post.belongsToMany(db.User, {foreignKey: 'post_id', through: 'Like'});
+        db.Post.hasMany(db.Comment, {foreignKey: 'post_id', sourceKey: 'id'});
+        db.Post.hasMany(db.PostFile, {foreignKey: 'post_id', sourceKey: 'id'});
+        db.Post.belongsToMany(db.User, {foreignKey: 'post_id', through: 'Like', timestamps: false});
         db.Post.belongsTo(db.User, {foreignKey: 'creator_id', targetKey: 'id'});
         db.Post.belongsTo(db.Board, {foreignKey: 'board_id', targetKey: 'id'});
     }
