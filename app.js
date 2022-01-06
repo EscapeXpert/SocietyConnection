@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const boardRouter = require('./routes/board');
 const messageRouter = require('./routes/message');
+const postRouter = require('./routes/post');
 const {sequelize} = require('./models');
 
 const app = express();
@@ -39,6 +40,7 @@ app.use(session({
 
 app.use('/board', boardRouter);
 app.use('/message', messageRouter);
+app.use('/post', postRouter);
 
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);

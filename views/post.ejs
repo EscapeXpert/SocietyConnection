@@ -2,20 +2,24 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title><%= post.title %>></title>
+    <title><%= post.title %></title>
 </head>
 <body>
-<a href="/board/<%= board.board_id %>"><%= board.name %></a>
+<a href="/board/<%= board.id %>"><%= board.name %></a>
 <div>
     <p><%= post.nickname %></p>
     <p><%= post.grade %></p>
     <% if(post.creator_id !== user_id) { %>
-        <a href="/message/write?target_nickname=<%= post.nickname %>"></a>
+        <a href='#'
+           onclick="window.open('/message/write?target_nickname=<%= post.nickname %>','<%= post.nickname %>>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
     <% } %>
 </div>
 <div>
     <h3><%= post.title %></h3>
-    <p><%= post.content %></p>
+    <% const contents = post.content.split('\n') %>
+    <% for(var content of contents) { %>
+        <p><%= content %></p>
+    <% } %>
 </div>
 </body>
 </html>
