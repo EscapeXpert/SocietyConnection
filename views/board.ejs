@@ -22,7 +22,7 @@
     <% for(let post of posts) { %>
         <tr>
             <td><%= post.id %></td>
-            <td><a href="/board/<%= board.id %>/post/<%= post.id %>?board_type=<%= board.board %>"><%= post.title %></a>
+            <td><a href="/post/<%= post.id %>"><%= post.title %></a>
             </td>
             <td><%= post.nickname %></td>
             <% const date = new Date(post.created_at) %>

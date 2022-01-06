@@ -44,22 +44,21 @@ router.post('/:post_id/apply', async (req, res) => {
 
 router.get('/:post_id', async (req, res, next) => {
     const post_id = req.params.post_id;
-    const board_id = req.query.board_id;
     //const user_id = req.user.id;
     const user_id = 'psh3253';
     try {
-        const post = await sequelize.query(`SELECT post.id, post.title, post.content, user.nickname, user.grade, post.created_at, post.view_count, (SELECT count(*) FROM "like" WHERE post_id = post.id) "like" FROM post LEFT JOIN user ON post.creator_id = user.id WHERE post.id = '${post_id}'`, {
+        const post = await sequelize.query('SELECT post.id, post.title, post.content, post.created_at, post.view_count, post.board_id, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, user.nickname, user.grade FROM post LEFT JOIN user ON post.creator_id = user.id WHERE post.id = ' + post_id, {
             type: QueryTypes.SELECT
         });
 
-        const board = Board.findOne({
+        const board = await Board.findOne({
             attributes: ['id', 'name', 'board_type'],
             where: {
-                id: board_id
+                id: post[0].board_id
             }
         });
         res.render('post', {
-            post: post,
+            post: post[0],
             board: board,
             user_id: user_id
         });

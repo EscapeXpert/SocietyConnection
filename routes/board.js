@@ -1,10 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const postRouter = require('../routes/post');
 const {sequelize, Post, Board} = require('../models');
 const {QueryTypes} = require('sequelize');
-
-router.use('board/1/post', postRouter);
 
 router.get('/:board_id/write', async (req, res, next) => {
     const board_id = req.params.board_id;
