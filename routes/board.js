@@ -74,4 +74,3 @@ router.get('/:board_id', async (req, res, next) => {
 });
 
 module.exports = router;
-
