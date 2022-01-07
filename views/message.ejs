@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= message.title %></title>
+</head>
+<body>
+<% if(type === "send") { %>
+    <a href="/message/send">목록</a>
+<% } else { %>
+    <a href="/message/receive">목록</a>
+    <a href="/message/write?target_nickname=<%= message.sender_id %>">답장</a>
+<% } %>
+<div>
+    <h3><%= message.title %></h3>
+    <tr>
+        <td><%= message.message %></td>
+    </tr>
+</div>
+<a href="/message/<%= message.id %>/delete">삭제</a>
+</body>
+</html>

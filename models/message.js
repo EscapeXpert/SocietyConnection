@@ -3,6 +3,10 @@ const Sequelize = require('sequelize');
 module.exports = class Message extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
+            title:{
+                type: Sequelize.STRING(50),
+                allowNull: false,
+            },
             message: {
                 type: Sequelize.STRING(100),
                 allowNull: false,
@@ -16,6 +20,16 @@ module.exports = class Message extends Sequelize.Model {
                 type: Sequelize.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.NOW,
+            },
+            is_sender_delete: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
+            },
+            is_receiver_delete:{
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
             }
         }, {
             sequelize,
