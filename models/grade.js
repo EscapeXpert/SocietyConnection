@@ -23,5 +23,7 @@ module.exports = class Grade extends Sequelize.Model {
             collate: 'utf8mb4_general_ci',
         });
     }
-
+    static associate(db) {
+        db.Grade.hasMany(db.User, {foreignKey: 'grade_id', sourceKey: 'id'})
+    }
 };

@@ -40,6 +40,40 @@ router.get('/:post_id/apply', async (req, res) => {
 router.post('/:post_id/apply', async (req, res) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
+});
+
+router.get('/:post_id/like', async (req, res, next) => {
+    const post_id = req.params.post_id;
+    console.log(post_id);
+    //const user_id = req.user.id;
+    const user_id = "psh3253";
+    try {
+        const is_like = await sequelize.models.Like.findOne({
+            where: {
+                post_id: post_id,
+                user_id: user_id
+            }
+        });
+        if(is_like == null)
+        {
+            console.log(post_id);
+            await sequelize.models.Like.create({
+                post_id: post_id,
+                user_id: user_id
+            });
+        } else {
+            await sequelize.models.Like.destroy({
+                where: {
+                    post_id: post_id,
+                    user_id: user_id
+                }
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+
 })
 
 router.get('/:post_id', async (req, res, next) => {
@@ -47,7 +81,7 @@ router.get('/:post_id', async (req, res, next) => {
     //const user_id = req.user.id;
     const user_id = 'psh3253';
     try {
-        const post = await sequelize.query('SELECT post.id, post.title, post.content, post.created_at, post.view_count, post.board_id, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, user.nickname, user.grade FROM post LEFT JOIN user ON post.creator_id = user.id WHERE post.id = ' + post_id, {
+        const post = await sequelize.query('SELECT post.id, post.title, post.content, post.created_at, post.creator_id, post.view_count, post.board_id, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, user.nickname, (SELECT name FROM grade WHERE id = user.grade) `grade` FROM post LEFT JOIN user ON post.creator_id = user.id WHERE post.id = ' + post_id, {
             type: QueryTypes.SELECT
         });
 
@@ -57,10 +91,25 @@ router.get('/:post_id', async (req, res, next) => {
                 id: post[0].board_id
             }
         });
+
+        const is_like = await sequelize.models.Like.findOne({
+            where: {
+                post_id: post_id,
+                user_id: user_id
+            }
+        });
+
+        await Post.update({view_count: post[0].view_count + 1}, {
+            where: {
+                id: post_id
+            }
+        });
+
         res.render('post', {
             post: post[0],
             board: board,
-            user_id: user_id
+            user_id: user_id,
+            is_like: is_like
         });
     } catch (err) {
         console.error(err);
