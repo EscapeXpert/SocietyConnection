@@ -5,7 +5,7 @@ const {QueryTypes} = require('sequelize');
 
 router.get('/write', async(req, res)=>{
    const user_id = "bcd";
-   const target_nickname = "req.query.target_nickname";
+   const target_nickname = req.query.target_nickname;
 
    res.render("message_write", {
       target_nickname: target_nickname
