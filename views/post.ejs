@@ -20,6 +20,16 @@
     <% for(var content of contents) { %>
         <p><%= content %></p>
     <% } %>
+    <div>
+        <a href="/post/<%= post.id %>/like">
+            <% if(is_like == null) { %>
+                <img src="/public/icon/red-empty-heart.svg" width="16" height="16" alt="">
+            <% } else { %>
+                <img src="/public/icon/red-heart.svg" width="16" height="16" alt="">
+            <% } %>
+        </a>
+        <p>좋아요 <%= post.like %></p>
+    </div>
 </div>
 </body>
 </html>
