@@ -8,7 +8,7 @@
 <table>
     <thead>
     <tr>
-        <th>내용</th>
+        <th>제목</th>
         <th>날짜</th>
         <th>읽음</th>
         <th>받는 사람</th>
@@ -17,7 +17,9 @@
     <tbody>
     <% for(var message of messages) { %>
         <tr>
-            <td><%= message.message %></td>
+            <td>
+                <a href="/message/<%=message.id%>?type=send"><%=message.title%></a>
+            </td>
             <% const date = new Date(message.created_at) %>
             <% const new_date = new Date() %>
             <% if(new_date.getFullYear() !== date.getFullYear()) { %>
@@ -27,12 +29,20 @@
             <% } else { %>
                 <td><%= date.toISOString().slice(5, 10) + " " + date.toISOString().slice(11, 16) %></td>
             <% } %>
-            <td><%= message.is_read %></td>
+            <% if(message.is_read == false) { %>
+                <td>읽지 않음</td>
+            <% } else { %>
+                <td>읽음</td>
+            <% } %>
             <td><%= message.nickname %></td>
 
         </tr>
     <% } %>
     </tbody>
 </table>
+<div>
+    <a href='#'
+       onclick="window.open('/message/write','message','status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지 보내기</a>
+</div>
 </body>
 </html>

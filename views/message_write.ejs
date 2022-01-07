@@ -9,7 +9,7 @@
     <% if(target_nickname != null) { %>
         <div>
             <label for="target_nickname">받는 사람 : <%= target_nickname %></label>
-            <input type="hidden" name="target_nickname" id="target_nickname" value="<%=target_nickname%>">
+            <input type="hidden" name="target_nickname" id="target_nickname" value="<%= target_nickname %>">
         </div>
     <% } else { %>
         <div>
@@ -18,12 +18,17 @@
         </div>
     <% } %>
     <div>
+        <label for="title"></label>
+        <input type="text" name="title" id="title" placeholder="제목" maxlength="50" required>
+    </div>
+
+    <div>
         <label for="message"></label>
         <textarea rows="10" cols="50" name="message" id="message" placeholder="내용을 입력하세요." maxlength="1000"
                   required></textarea>
     </div>
     <div>
-        <input type="submit" value="등록">
+        <input type="submit" value="보내기">
     </div>
 </form>
 </body>
