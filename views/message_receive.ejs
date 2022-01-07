@@ -5,7 +5,11 @@
     <title><%= title %>의 수신함</title>
 </head>
 <body>
-<a href="/message/receive?filter=is_not_read">안읽은 쪽지</a>
+<% if(filter === "is_not_read") { %>
+    <a href="/message/receive">수신함 목록</a>
+<% } else { %>
+    <a href="/message/receive?filter=is_not_read">안읽은 쪽지</a>
+<% } %>
 <table>
     <thead>
     <tr>
