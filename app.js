@@ -1,15 +1,21 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const passport = require('passport');
 const session = require('express-session');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 
 dotenv.config();
+const passportConfig = require('./passport');
 const boardRouter = require('./routes/board');
 const messageRouter = require('./routes/message');
 const postRouter = require('./routes/post');
+const authRouter = require('./routes/auth');
+const mainRouter = require('./routes/main');
 const {sequelize} = require('./models');
+
+passportConfig();
 
 const app = express();
 app.set('port', process.env.PORT || 3001);
@@ -37,10 +43,13 @@ app.use(session({
         secure: false
     }
 }));
-
+app.use(passport.initialize());
+app.use(passport.session());
 app.use('/board', boardRouter);
 app.use('/message', messageRouter);
 app.use('/post', postRouter);
+app.use('/auth',authRouter);
+app.use('/',mainRouter);
 
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);

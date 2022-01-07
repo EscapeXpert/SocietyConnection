@@ -9,7 +9,7 @@ module.exports = class User extends Sequelize.Model {
                 primaryKey: true,
             },
             password: {
-                type: Sequelize.STRING(15),
+                type: Sequelize.STRING(255),
                 allowNull: true,
             },
             sns_id: {
@@ -28,15 +28,15 @@ module.exports = class User extends Sequelize.Model {
             },
             name: {
                 type: Sequelize.STRING(15),
-                allowNull: false
+                allowNull: true
             },
             birth_date: {
                 type: Sequelize.DATE,
-                allowNull: false
+                allowNull: true
             },
             gender: {
                 type: Sequelize.BOOLEAN,
-                allowNull: false
+                allowNull: true
             },
             introduce: {
                 type: Sequelize.STRING(200),
