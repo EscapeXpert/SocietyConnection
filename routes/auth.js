@@ -7,10 +7,9 @@ const bcrypt = require("bcrypt");
 const router = express.Router();
 
 
-router.get('/join', isNotLoggedIn, (req, res) => {
+router.get('/join', isNotLoggedIn, async(req, res) => {
     res.render('join', { title: '회원가입' });
 });
-
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
 
     const {id, password,verify_password,  nickname} = req.body;
@@ -40,7 +39,6 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
         }
 
         const hash = await bcrypt.hash(password, 12);
-        console.log(hash.length);
         await User.create({
             id,
             password: hash,
@@ -53,7 +51,7 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/login', isNotLoggedIn, (req, res, next) => {
+router.post('/login', isNotLoggedIn, async(req, res, next) => {
     passport.authenticate('local', (authError, user, info) => {
         if (authError) {
             console.error(authError);
@@ -71,8 +69,8 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
         });
     })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
 });
-router.get('/logout', isLoggedIn, (req, res) => {
-    console.log("logout@@@@@@@@@@@@");
+
+router.get('/logout', isLoggedIn, async(req, res) => {
     req.logout();
     req.session.destroy();
     res.redirect('/');
