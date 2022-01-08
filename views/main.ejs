@@ -6,13 +6,13 @@
 </head>
 <body>
 <div id="main">
-    <% if(Session.passport){ %>
+    <% if(User){ %>
         <div>
-            <label for="id">아이디</label>
-            <label for="id"><%= Session.passport.user %></label>
+            <label for="id">닉네임</label>
+            <label for="id"><%= User.nickname %></label>
         </div>
         <a href="/auth/logout">로그아웃</a>
-        <button id="register_button" type="submit">프로필</button>
+        <a href="/profile">프로필</a>
     <% }else{ %>
         <form id="main-form" action="/auth/login" method="post">
             <div>
@@ -24,6 +24,7 @@
                 <input id="password" name="password" type="password" maxlength="15" required>
             </div>
             <button id="login" type="submit">로그인</button>
+            <a href="/auth/join">회원가입</a>
         </form>
     <% } %>
 </div>

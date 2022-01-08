@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= User.nickname + " " + title %></title>
+</head>
+<body>
+<div id="profile">
+    <div>
+        <label for="id">아이디</label>
+        <label for="id"><%= User.id %></label>
+    </div>
+    <div>
+        <label for="sns_id">sns_id</label>
+        <label for="sns_id"><%= User.sns_id %></label>
+    </div>
+    <div>
+        <label for="nickname">닉네임</label>
+        <label for="nickname"><%= User.nickname %></label>
+    </div>
+    <div>
+        <label for="name">이름</label>
+        <label for="name"><%= User.name %></label>
+    </div>
+    <div>
+        <label for="birth_date">생년월일</label>
+        <label for="birth_date"><%= User.birth_date %></label>
+    </div>
+    <div>
+        <label for="gender">성별</label>
+        <% if(User.gender){ %>
+            <label for="gender">남성</label>
+        <% }else{ %>
+            <label for="gender">여성</label>
+        <% } %>
+    </div>
+    <div>
+        <label for="introduce">자기소개</label>
+        <label for="introduce"><%= User.introduce %></label>
+    </div>
+    <div>
+        <a href="/profile/change_password">비밀번호 변경</a>
+        <a href="/profile/edit">프로필 수정</a>
+    </div>
+</div>
+</body>
+</html>
