@@ -75,6 +75,6 @@ module.exports = class User extends Sequelize.Model {
             through: 'Like',
             timestamps: false
         });
-        db.User.belongsTo(db.Grade, {foreignKey: 'grade', targetKey: 'id'});
+        //db.User.belongsTo(db.Grade, {foreignKey: 'grade', targetKey: 'id'});
     }
 };
