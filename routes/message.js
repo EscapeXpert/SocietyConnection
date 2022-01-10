@@ -97,30 +97,30 @@ router.get('/receive', async(req, res, next) => {
    }
 });
 
-router.get('/:message_id/delete', async(req, res, next)=>{
-   const message_id = req.params.message_id;
+router.post('/delete', async(req, res, next)=>{
+   const message_ids = req.body.message_ids;
    const user_id = "psh3253";
    //const user_id = req.user.id;
+   console.log(message_ids);
    try{
-      const message = await Message.findOne({
-         attributes: ['sender_id', 'receiver_id', 'is_sender_delete', 'is_receiver_delete'],
-         where: {id: message_id}
-      });
+      for(let message_id of message_ids) {
+         const message = await Message.findOne({
+            attributes: ['sender_id', 'receiver_id', 'is_sender_delete', 'is_receiver_delete'],
+            where: {id: message_id}
+         });
 
-      if(user_id === message.receiver_id && user_id === message.sender_id){
-         await Message.destroy({where: {id:message_id}});
+         if (user_id === message.receiver_id && user_id === message.sender_id) {
+            await Message.destroy({where: {id: message_id}});
+         } else if (user_id === message.receiver_id) {
+            await Message.update({is_receiver_delete: true}, {where: {id: message_id}});
+            if (message.is_sender_delete === true)
+               await Message.destroy({where: {id: message_id}});
+         } else if (user_id === message.sender_id) {
+            await Message.update({is_sender_delete: true}, {where: {id: message_id}});
+            if (message.is_receiver_delete === true)
+               await Message.destroy({where: {id: message_id}});
+         }
       }
-      else if(user_id === message.receiver_id){
-         await Message.update({is_receiver_delete: true}, {where: {id: message_id}});
-         if(message.is_sender_delete === true)
-            await Message.destroy({where: {id:message_id}});
-      }
-      else if(user_id === message.sender_id){
-         await Message.update({is_sender_delete: true}, {where: {id: message_id}});
-         if(message.is_receiver_delete === true)
-            await Message.destroy({where: {id:message_id}});
-      }
-
 
    } catch(err){
       console.error(err);
@@ -137,16 +137,20 @@ router.get('/:message_id', async(req, res, next)=>{
          type: QueryTypes.SELECT
       });
 
+      const sender_nickname = await User.findOne({
+         attributes: ['nickname'],
+         where: {id: message[0].sender_id}
+      });
+
       await Message.update({is_read: true}, {
          where: {
             receiver_id: user_id,
             id: message_id
          }
       });
-
       res.render("message", {
          message: message[0],
-         message_id: message_id,
+         sender_nickname: sender_nickname.nickname,
          type: type
       });
 
