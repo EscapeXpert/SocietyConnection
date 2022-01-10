@@ -7,7 +7,14 @@
 <body>
 <a href="/board/<%= board.id %>"><%= board.name %></a>
 <div>
-    <p><%= post.nickname %></p>
+    <% if(post.creator_id === user_id) { %>
+        <a href="#" id="modify">수정</a>
+        <a href="#" id="delete">삭제</a>
+    <% } %>
+</div>
+<div>
+    <!-- 프로필 사진-->
+    <a href="/profile/<%= post.nickname %>"><%= post.nickname %></a>
     <p><%= post.grade %></p>
     <% if(post.creator_id !== user_id) { %>
         <a href='#'
@@ -15,13 +22,15 @@
     <% } %>
 </div>
 <div>
-    <h3><%= post.title %></h3>
-    <% const contents = post.content.split('\n') %>
-    <% for(var content of contents) { %>
-        <p><%= content %></p>
-    <% } %>
     <div>
-        <a href="/post/<%= post.id %>/like">
+        <h3><%= post.title %></h3>
+        <% const contents = post.content.split('\n') %>
+        <% for(var content of contents) { %>
+            <p><%= content %></p>
+        <% } %>
+    </div>
+    <div>
+        <a href="#" id="like">
             <% if(is_like == null) { %>
                 <img src="/public/icon/red-empty-heart.svg" width="16" height="16" alt="">
             <% } else { %>
@@ -30,6 +39,32 @@
         </a>
         <p>좋아요 <%= post.like %></p>
     </div>
+    <div>
+        <ul>
+            <% for(var user of like_users) { %>
+                <li>
+                    <!-- 프로필 사진-->
+                    <a href="/profile/<%= user.nickname %>"><%= user.nickname %></a>
+                </li>
+            <% } %>
+        </ul>
+    </div>
 </div>
+<input type="hidden" id="post_id" name="post_id" value="<%= post.id %>">
 </body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    const like_tag = document.querySelector('#like');
+    const post_id = document.querySelector('#post_id').value;
+    like_tag.addEventListener('click', async function () {
+        await axios.post(`/post/${post_id}/like`)
+            .then((response) => {
+                console.log(response)
+                location.reload();
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    });
+</script>
 </html>

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board} = require('../models');
+const {sequelize, Post, Board, User} = require('../models');
 const {QueryTypes} = require('sequelize');
 
 router.post('/:post_id/delete', async (req, res) => {
@@ -42,9 +42,8 @@ router.post('/:post_id/apply', async (req, res) => {
     const user_id = req.user.id;
 });
 
-router.get('/:post_id/like', async (req, res, next) => {
+router.post('/:post_id/like', async (req, res, next) => {
     const post_id = req.params.post_id;
-    console.log(post_id);
     //const user_id = req.user.id;
     const user_id = "psh3253";
     try {
@@ -69,6 +68,7 @@ router.get('/:post_id/like', async (req, res, next) => {
                 }
             });
         }
+        res.send('success');
     } catch (err) {
         console.error(err);
         next(err);
@@ -105,11 +105,16 @@ router.get('/:post_id', async (req, res, next) => {
             }
         });
 
+        const like_users = await sequelize.query('SELECT user.nickname FROM `like` LEFT JOIN `user` ON user.id = `like`.user_id WHERE post_id = ' + post_id, {
+            type: QueryTypes.SELECT
+        });
+
         res.render('post', {
             post: post[0],
             board: board,
             user_id: user_id,
-            is_like: is_like
+            is_like: is_like,
+            like_users: like_users
         });
     } catch (err) {
         console.error(err);
