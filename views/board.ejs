@@ -38,6 +38,14 @@
     <% } %>
     </tbody>
 </table>
+<div>
+    <% const current_page = parseInt(page) %>
+    <% const temp = current_page - parseInt(page) % 10 %>
+    <% console.log(temp)%>
+    <% for(let i = temp + 1; i <= temp+10; i++) { %>
+    <a href="/board/<%= board.id %>?page=<%= i %>"><%= i %></a>
+    <% } %>
+</div>
 <a href="/board/<%= board.id %>/write">글쓰기</a>
 </body>
 </html>

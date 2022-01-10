@@ -48,6 +48,7 @@ router.post('/:board_id/write', async (req, res, next) => {
 router.get('/:board_id', async (req, res, next) => {
     const board_id = req.params.board_id;
     const page = req.query.page;
+    const start_post_number = page * 10 - 10;
     try {
         const board = await Board.findOne({
             attributes: ['id', 'board_type', 'name'],
@@ -56,12 +57,13 @@ router.get('/:board_id', async (req, res, next) => {
             }
         });
         if (board.board_type === 'general') {
-            const posts = await sequelize.query('SELECT post.id, post.title, user.nickname, post.created_at, post.view_count, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like` FROM `post` LEFT JOIN `user` ON post.creator_id = user.id', {
+            const posts = await sequelize.query('SELECT post.id, post.title, user.nickname, post.created_at, post.view_count, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like` FROM `post` LEFT JOIN `user` ON post.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10',  {
                 type: QueryTypes.SELECT
             });
             res.render('board', {
                     board: board,
                     posts: posts,
+                    page: page
                 }
             );
         } else if (board.board_type === 'recruitment') {
