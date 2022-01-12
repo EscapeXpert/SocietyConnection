@@ -39,6 +39,13 @@
         <label for="introduce"><%= User.introduce %></label>
     </div>
     <div>
+        <label for="profile_image">profile_image</label>
+        <label for="profile_image"><%= User.profile_image %></label>
+    </div>
+    <div>
+        <img id="img-preview" src=<%= User.profile_image %>  width="250" alt="미리보기">
+    </div>
+    <div>
         <a href="/profile/change_password">비밀번호 변경</a>
         <a href="/profile/edit">프로필 수정</a>
     </div>
