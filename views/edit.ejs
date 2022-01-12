@@ -37,14 +37,35 @@
             <label for="introduce">자기소개</label>
             <input id="introduce" name="introduce" type="text" max="200" required value="<%= User.introduce %>">
         </div>
-        <!--
-        <div>
-            <label for="profile_image">profile_image</label>
-            <input id="profile_image" name="profile_image" type="text" maxlength="15" required >
+        <div class="img-preview">
+            <img id="img-preview" src="" style="display: none;" width="250" alt="미리보기">
+            <input id="img-url" type="hidden" name="profile_image">
         </div>
-        -->
+        <div>
+            <label id="img-label" for="img">사진 업로드</label>
+            <input id="img" name="img" type="file" accept="image/*">
+        </div>
         <button id="edit_button" type="submit">수정</button>
     </form>
 </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    if (document.getElementById('img')) {
+        document.getElementById('img').addEventListener('change', function (e) {
+            const formData = new FormData();
+            console.log(this, this.files);
+            formData.append('img', this.files[0]);
+            axios.post('/profile/edit/img', formData)
+                .then((res) => {
+                    document.getElementById('img-url').value = res.data.url;
+                    document.getElementById('img-preview').src = res.data.url;
+                    document.getElementById('img-preview').style.display = 'inline';
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        });
+    }
+</script>
 </html>
