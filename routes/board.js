@@ -37,6 +37,7 @@ router.post('/:board_id/write', async (req, res, next) => {
                 board_id: board_id,
                 creator_id: creator_id
             });
+
         }
         res.redirect(`/board/${board_id}`);
     } catch (err) {
@@ -56,6 +57,11 @@ router.get('/:board_id', async (req, res, next) => {
                 id: board_id
             }
         });
+        const post_count = await Post.count({
+            where: {
+                board_id: board_id
+            }
+        });
         if (board.board_type === 'general') {
             const posts = await sequelize.query('SELECT post.id, post.title, user.nickname, post.created_at, post.view_count, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, (SELECT count(*) FROM comment WHERE post_id = post.id) comment FROM `post` LEFT JOIN `user` ON post.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10',  {
                 type: QueryTypes.SELECT
@@ -63,6 +69,7 @@ router.get('/:board_id', async (req, res, next) => {
             res.render('board', {
                     board: board,
                     posts: posts,
+                    post_count: post_count,
                     page: page
                 }
             );
