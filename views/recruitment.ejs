@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= recruitment.title %></title>
+</head>
+<body>
+<a href="/board/<%= board.id %>"><%= board.name %></a>
+<div>
+    <% if(recruitment.creator_id === user.id) { %>
+        <a href="/recruitment/<%= recruitment.id %>/modify?board_type=<%= board.board_type %>" id="modify">수정</a>
+        <a href="#" id="delete">삭제</a>
+    <% } %>
+</div>
+<div>
+    <!-- 프로필 사진-->
+    <a href="/profile/<%= recruitment.nickname %>"><%= recruitment.nickname %></a>
+    <span><%= recruitment.grade %></span>
+    <% if(recruitment.creator_id !== user.id) { %>
+        <a href='#'
+           onclick="window.open('/message/write?target_nickname=<%= recruitment.nickname %>', '<%= recruitment.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300'); return false">쪽지</a>
+    <% } %>
+</div>
+<div>
+    <div>
+        <h3><%= recruitment.title %></h3>
+        <% const contents = recruitment.content.split('\n') %>
+        <% for(var content of contents) { %>
+            <p><%= content %></p>
+        <% } %>
+    </div>
+    <div>
+        <a href="#" id="like">
+            <% if (is_like == null) { %>
+                <img src="/public/icon/red-empty-heart.svg" width="16" height="16" alt="">
+            <% } else { %>
+                <img src="/public/icon/red-heart.svg" width="16" height="16" alt="">
+            <% } %>
+        </a>
+        <a href="#" id="go_like_list">좋아요 <%= recruitment.like %></a>
+        <a href="#" id="go_comment_list">댓글 <%= recruitment.comment %></a>
+    </div>
+    <div id="like_list" class="like_list" style="display: none">
+        <ul>
+            <% for(let like_user of like_list) { %>
+                <li>
+                    <!-- 프로필 사진-->
+                    <a href="/profile/<%= like_user.nickname %>"><%= like_user.nickname %></a>
+                </li>
+            <% } %>
+        </ul>
+    </div>
+    <div id="comment_list" class="comment_list" style="display: block">
+        <h3>댓글</h3>
+        <ul>
+            <% for(let comment of comment_list) { %>
+                <li id="<%= comment.id %>">
+                    <!-- 프로필 사진-->
+                    <a href="/profile/<%= comment.User.nickname %>"><%= comment.User.nickname %></a>
+                    <p><%= comment.content %></p>
+                    <% const date = new Date(comment.created_at) %>
+                    <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+                    <a href="#" id="reply_comment">답글</a>
+                    <% if(user.id === comment.creator_id) { %>
+                        <a href="#" id="comment_delete">삭제</a>
+                    <% } %>
+                </li>
+            <% } %>
+        </ul>
+        <p><%= user.nickname %></p>
+        <form action="/recruitment/<%=recruitment.id%>/comment/write" method="post">
+            <label for="comment_content"></label>
+            <textarea name="comment_content" id="comment_content" placeholder="댓글을 남겨보세요." rows="5" cols="50" style="resize: none"></textarea>
+            <input type="submit" value="등록">
+        </form>
+    </div>
+</div>
+
+<input type="hidden" id="recruitment_id" name="recruitment_id" value="<%=recruitment.id%>">
+<input type="hidden" id="board_id" name="board_id" value="<%=board.id%>">
+</body>
+</html>
