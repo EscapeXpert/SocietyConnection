@@ -37,7 +37,6 @@ router.post('/:board_id/write', async (req, res, next) => {
                 board_id: board_id,
                 creator_id: creator_id
             });
-
         }
         res.redirect(`/board/${board_id}`);
     } catch (err) {
