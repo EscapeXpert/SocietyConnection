@@ -171,8 +171,7 @@ router.post('/:post_id/comment/write', async (req, res, next) => {
             creator_id: user_id,
             post_id: post_id
         });
-        res.redirect(`/post/${post_id}#comment_list`);
-
+        res.send('success');
     } catch (err) {
         console.error(err);
         next(err);
