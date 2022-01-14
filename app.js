@@ -11,6 +11,7 @@ const passportConfig = require('./passport');
 const boardRouter = require('./routes/board');
 const messageRouter = require('./routes/message');
 const postRouter = require('./routes/post');
+const recruitmentRouter = require('./routes/recruitment');
 const authRouter = require('./routes/auth');
 const mainRouter = require('./routes/main');
 const profileRouter = require('./routes/profile');
@@ -32,6 +33,7 @@ sequelize.sync({force: false})
 
 app.use(morgan('dev'))
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/img', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}))
 app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -49,6 +51,7 @@ app.use(passport.session());
 app.use('/board', boardRouter);
 app.use('/message', messageRouter);
 app.use('/post', postRouter);
+app.use('/recruitment', recruitmentRouter);
 app.use('/auth',authRouter);
 app.use('/',mainRouter);
 app.use('/profile',profileRouter);

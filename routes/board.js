@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board} = require('../models');
+const {sequelize, Post, Board, Recruitment} = require('../models');
 const {QueryTypes} = require('sequelize');
 
 router.get('/:board_id/write', async (req, res, next) => {
@@ -12,9 +12,16 @@ router.get('/:board_id/write', async (req, res, next) => {
                 id: board_id
             }
         });
-        res.render('post_write', {
-            board: board
-        })
+        if(board.board_type === 'general') {
+            res.render('post_write', {
+                board: board
+            });
+        }
+        else if(board.board_type === 'recruitment'){
+            res.render('recruitment_write', {
+                board: board
+            });
+        }
     } catch (err) {
         console.error(err);
         next(err);
@@ -38,6 +45,14 @@ router.post('/:board_id/write', async (req, res, next) => {
                 creator_id: creator_id
             });
         }
+        else if(board_type === 'recruitment'){
+            await Recruitment.create({
+                title: title,
+                content: content,
+                board_id: board_id,
+                creator_id: creator_id
+            });
+        }
         res.redirect(`/board/${board_id}`);
     } catch (err) {
         console.error(err);
@@ -47,7 +62,8 @@ router.post('/:board_id/write', async (req, res, next) => {
 
 router.get('/:board_id', async (req, res, next) => {
     const board_id = req.params.board_id;
-    const page = req.query.page;
+    const page = req.query.page || 1;
+    const start_post_number = page * 10 - 10;
     try {
         const board = await Board.findOne({
             attributes: ['id', 'board_type', 'name'],
@@ -55,17 +71,40 @@ router.get('/:board_id', async (req, res, next) => {
                 id: board_id
             }
         });
+
+        const post_count = await Post.count({
+            where: {
+                board_id: board_id
+            }
+        });
+
+        const recruitment_count = await Recruitment.count({
+            where: {
+                board_id: board_id
+            }
+        });
+
         if (board.board_type === 'general') {
-            const posts = await sequelize.query('SELECT post.id, post.title, user.nickname, post.created_at, post.view_count, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like` FROM `post` LEFT JOIN `user` ON post.creator_id = user.id', {
+            const posts = await sequelize.query('SELECT post.id, post.title, user.nickname, post.created_at, post.view_count, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, (SELECT count(*) FROM comment WHERE post_id = post.id) comment FROM `post` LEFT JOIN `user` ON post.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10',  {
                 type: QueryTypes.SELECT
             });
             res.render('board', {
                     board: board,
                     posts: posts,
+                    post_count: post_count,
+                    page: page
                 }
             );
         } else if (board.board_type === 'recruitment') {
-
+            const recruitments = await sequelize.query('SELECT recruitment.id, recruitment.title, user.nickname, recruitment.created_at, recruitment.view_count, (SELECT count(*) FROM `like` WHERE post_id = recruitment.id) `like`, (SELECT count(*) FROM comment WHERE post_id = recruitment.id) comment FROM `recruitment` LEFT JOIN `user` ON recruitment.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10', {
+                type: QueryTypes.SELECT
+            });
+            res.render('board', {
+                board: board,
+                recruitments: recruitments,
+                recruitment_count: recruitment_count,
+                page: page
+            });
         }
     } catch (err) {
         console.error(err);

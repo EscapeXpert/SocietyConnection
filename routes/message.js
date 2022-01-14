@@ -41,7 +41,7 @@ router.post('/write', async(req, res, next) => {
             sender_id: sender_id,
          });
 
-         res.send("<script>window.close();</script > ");
+         res.send("<script>window.opener.location.reload(); window.close();</script > ");
       }
    } catch(err){
       console.error(err);
@@ -50,20 +50,30 @@ router.post('/write', async(req, res, next) => {
 });
 
 router.get('/send', async(req, res, next) => {
-   const page = req.query.page;
+   const page = req.query.page || 1;
    const user_id = "psh3253";
+   const start_message_number = page * 10 - 10;
    try{
       const user = await User.findOne({
          attributes: ['nickname'],
          where: {id: user_id}
       });
 
-      const message = await sequelize.query(`SELECT message.id, title, message, is_read, created_at, user.nickname FROM message LEFT JOIN user ON message.receiver_id = user.id WHERE message.sender_id = '${user_id}' AND message.is_sender_delete = FALSE ORDER BY created_at DESC`,{
+      const message_count = await Message.count({
+         where: {
+            sender_id: user_id,
+            is_sender_delete: false,
+         }
+      });
+
+      const message = await sequelize.query(`SELECT message.id, title, message, is_read, created_at, user.nickname FROM message LEFT JOIN user ON message.receiver_id = user.id WHERE message.sender_id = '${user_id}' AND message.is_sender_delete = FALSE ORDER BY created_at DESC LIMIT ` + start_message_number.toString() + `, 10`,{
          type: QueryTypes.SELECT
       });
       res.render("message_send", {
          title: user.nickname,
-         messages: message
+         messages: message,
+         page: page,
+         message_count: message_count
       });
    } catch(err){
       console.error(err);
@@ -72,8 +82,10 @@ router.get('/send', async(req, res, next) => {
 });
 
 router.get('/receive', async(req, res, next) => {
-   const page = req.query.page;
+   const page = req.query.page || 1;
    const filter = req.query.filter;
+   const start_message_number = page * 10 - 10;
+
    console.log(filter);
    const user_id = "psh3253";
    try{
@@ -82,14 +94,23 @@ router.get('/receive', async(req, res, next) => {
          where: {id: user_id}
       });
 
-      const messages = await sequelize.query(`SELECT message.id, message, title, is_read, created_at, user.nickname FROM message LEFT JOIN user ON message.sender_id = user.id WHERE message.receiver_id = '${user_id}' AND message.is_receiver_delete = FALSE ORDER BY created_at DESC`,{
+      const message_count = await Message.count({
+         where: {
+            receiver_id: user_id,
+            is_receiver_delete: false,
+         }
+      });
+
+      const messages = await sequelize.query(`SELECT message.id, message, title, is_read, created_at, user.nickname FROM message LEFT JOIN user ON message.sender_id = user.id WHERE message.receiver_id = '${user_id}' AND message.is_receiver_delete = FALSE ORDER BY created_at DESC LIMIT ` + start_message_number.toString() + `, 10`,{
           type: QueryTypes.SELECT
       });
 
       res.render("message_receive", {
          title: user.nickname,
          messages : messages,
-         filter: filter
+         filter: filter,
+         page: page,
+         message_count: message_count
       });
    } catch(err){
       console.error(err);
@@ -97,30 +118,35 @@ router.get('/receive', async(req, res, next) => {
    }
 });
 
-router.get('/:message_id/delete', async(req, res, next)=>{
-   const message_id = req.params.message_id;
+router.post('/delete', async(req, res, next)=>{
+   const message_ids = req.body.message_ids;
    const user_id = "psh3253";
    //const user_id = req.user.id;
+   console.log(message_ids);
    try{
-      const message = await Message.findOne({
-         attributes: ['sender_id', 'receiver_id', 'is_sender_delete', 'is_receiver_delete'],
-         where: {id: message_id}
-      });
+      for(let message_id of message_ids) {
+         const message = await Message.findOne({
+            attributes: ['sender_id', 'receiver_id', 'is_sender_delete', 'is_receiver_delete'],
+            where: {id: message_id}
+         });
 
-      if(user_id === message.receiver_id && user_id === message.sender_id){
-         await Message.destroy({where: {id:message_id}});
+         if (user_id === message.receiver_id && user_id === message.sender_id) {
+            await Message.destroy({where: {id: message_id}});
+            res.send('success');
+         } else if (user_id === message.receiver_id) {
+            await Message.update({is_receiver_delete: true}, {where: {id: message_id}});
+            if (message.is_sender_delete === true)
+               await Message.destroy({where: {id: message_id}});
+            res.send('success');
+         } else if (user_id === message.sender_id) {
+            await Message.update({is_sender_delete: true}, {where: {id: message_id}});
+            if (message.is_receiver_delete === true)
+               await Message.destroy({where: {id: message_id}});
+            res.send('success');
+         } else {
+            res.send('not creator');
+         }
       }
-      else if(user_id === message.receiver_id){
-         await Message.update({is_receiver_delete: true}, {where: {id: message_id}});
-         if(message.is_sender_delete === true)
-            await Message.destroy({where: {id:message_id}});
-      }
-      else if(user_id === message.sender_id){
-         await Message.update({is_sender_delete: true}, {where: {id: message_id}});
-         if(message.is_receiver_delete === true)
-            await Message.destroy({where: {id:message_id}});
-      }
-
 
    } catch(err){
       console.error(err);
@@ -137,16 +163,20 @@ router.get('/:message_id', async(req, res, next)=>{
          type: QueryTypes.SELECT
       });
 
+      const sender_nickname = await User.findOne({
+         attributes: ['nickname'],
+         where: {id: message[0].sender_id}
+      });
+
       await Message.update({is_read: true}, {
          where: {
             receiver_id: user_id,
             id: message_id
          }
       });
-
       res.render("message", {
          message: message[0],
-         message_id: message_id,
+         sender_nickname: sender_nickname.nickname,
          type: type
       });
 

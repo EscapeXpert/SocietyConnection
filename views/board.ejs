@@ -19,25 +19,75 @@
     </tr>
     </thead>
     <tbody>
-    <% for(let post of posts) { %>
-        <tr>
-            <td><%= post.id %></td>
-            <td><a href="/post/<%= post.id %>"><%= post.title %></a>
-            </td>
-            <td><%= post.nickname %></td>
-            <% const date = new Date(post.created_at) %>
-            <% const current_date = new Date() %>
-            <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
-                <td><%= date.toISOString().slice(11, 16) %></td>
-            <% } else { %>
-                <td><%= date.toISOString().slice(0, 10) %></td>
-            <% } %>
-            <td><%= post.view_count %></td>
-            <td><%= post.like %></td>
-        </tr>
+    <% if(board.board_type === 'general') { %>
+        <% for(let post of posts) { %>
+            <tr>
+                <td><%= post.id %></td>
+                <td>
+                    <div class="title">
+                        <a href="/post/<%= post.id %>"><%= post.title %></a>
+                        <% if(post.comment > 0) { %>
+                            <a href="/post/<%= post.id %>/#comment_list">[<%= post.comment %>]</a>
+                        <% } %>
+                    </div>
+                </td>
+                <td><%= post.nickname %></td>
+                <% const date = new Date(post.created_at) %>
+                <% const current_date = new Date() %>
+                <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                    <td><%= date.toISOString().slice(11, 16) %></td>
+                <% } else { %>
+                    <td><%= date.toISOString().slice(0, 10) %></td>
+                <% } %>
+                <td><%= post.view_count %></td>
+                <td><%= post.like %></td>
+            </tr>
+        <% } %>
+    <% } else if(board.board_type === 'recruitment') { %>
+        <% for(let recruitment of recruitments) { %>
+            <tr>
+                <td><%= recruitment.id %></td>
+                <td>
+                    <div class="title">
+                        <a href="/recruitment/<%= recruitment.id %>"><%= recruitment.title %></a>
+                        <% if(recruitment.comment > 0) { %>
+                            <a href="/recruitment/<%= recruitment.id %>/#comment_list">[<%= recruitment.comment %>]</a>
+                        <% } %>
+                    </div>
+                </td>
+                <td><%= recruitment.nickname %></td>
+                <% const date = new Date(recruitment.created_at) %>
+                <% const current_date = new Date() %>
+                <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                    <td><%= date.toISOString().slice(11, 16) %></td>
+                <% } else { %>
+                    <td><%= date.toISOString().slice(0, 10) %></td>
+                <% } %>
+                <td><%= recruitment.view_count %></td>
+                <td><%= recruitment.like %></td>
+            </tr>
+        <% } %>
     <% } %>
     </tbody>
 </table>
+<div>
+    <% let max_page %>
+    <% if(board.board_type === 'general') { %>
+        <% max_page = parseInt(parseInt(post_count / 10) + Math.ceil((post_count % 10) / 10)) %>
+    <% } else if(board.board_type === 'recruitment') { %>
+        <% max_page = parseInt(parseInt(recruitment_count / 10) + Math.ceil((recruitment_count % 10) / 10)) %>
+    <% } %>
+    <% const start_page = Math.floor((parseInt(page) - 1) / 10) * 10 + 1 %>
+    <% if (start_page != 1) { %>
+        <a href="/board/<%= board.id %>?page=<%= start_page - 10 %>">이전</a>
+    <% } %>
+    <% for(let i = start_page; (i < start_page + 10) && i <= max_page; i++) { %>
+        <a href="/board/<%= board.id %>?page=<%= i %>"><%= i %></a>
+    <% } %>
+    <% if ((start_page + 10) <= max_page) { %>
+        <a href="/board/<%= board.id %>?page=<%= start_page + 10 %>">다음</a>
+    <% } %>
+</div>
 <a href="/board/<%= board.id %>/write">글쓰기</a>
 </body>
 </html>

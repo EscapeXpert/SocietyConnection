@@ -9,14 +9,26 @@
     <a href="/message/send">목록</a>
 <% } else { %>
     <a href="/message/receive">목록</a>
-    <a href="/message/write?target_nickname=<%= message.sender_id %>">답장</a>
+    <a href='#'
+       onclick="window.open('/message/write?target_nickname=<%= sender_nickname %>','<%= sender_nickname %>>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">답장</a>
 <% } %>
 <div>
+    <input type="hidden" id="message_id" name="message_id" value="<%=message.id%>">
     <h3><%= message.title %></h3>
-    <tr>
-        <td><%= message.message %></td>
-    </tr>
+    <p><%= message.message %></p>
 </div>
-<a href="/message/<%= message.id %>/delete">삭제</a>
+<a href="#" id="delete">삭제</a>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    delete_tag = document.querySelector("#delete");
+    delete_tag.addEventListener('click', function () {
+        const message_ids = [];
+        message_ids.push(document.querySelector("#message_id").getAttribute("value"));
+        axios.post('/message/delete', {
+            message_ids: message_ids
+        });
+    });
+</script>
 </body>
+
 </html>

@@ -5,44 +5,87 @@
     <title><%= title %>의 발신함</title>
 </head>
 <body>
-<table>
-    <thead>
-    <tr>
-        <th>제목</th>
-        <th>날짜</th>
-        <th>읽음</th>
-        <th>받는 사람</th>
-    </tr>
-    </thead>
-    <tbody>
+<a href="/message/receive">받은 쪽지함</a>
+<div>
+    <ul>
+    <li>
+        <span>체크</span>
+        <span>제목</span>
+        <span>날짜</span>
+        <span>읽음</span>
+        <span>받는 사람</span>
+    </li>
+    </ul>
+</div>
+
+<div>
+    <ol>
     <% for(var message of messages) { %>
-        <tr>
-            <td>
-                <a href="/message/<%=message.id%>?type=send"><%=message.title%></a>
-            </td>
+        <li>
+            <span>
+                <input type="checkbox" id="check" name="check" value="<%= message.id %>">
+            </span>
+            <span><a href="/message/<%=message.id%>?type=send"><%=message.title%></a></span>
             <% const date = new Date(message.created_at) %>
             <% const new_date = new Date() %>
             <% if(new_date.getFullYear() !== date.getFullYear()) { %>
-                <td><%= date.toISOString().slice(0, 10) + " " + date.toISOString().slice(11, 16) %></td>
+                <span><%= date.toISOString().slice(0, 10) + " " + date.toISOString().slice(11, 16) %></span>
             <% } else if(new_date.getDate() === date.getDate()){ %>
-                <td><%= date.toISOString().slice(11, 16) %></td>
+                <span><%= date.toISOString().slice(11, 16) %></span>
             <% } else { %>
-                <td><%= date.toISOString().slice(5, 10) + " " + date.toISOString().slice(11, 16) %></td>
+                <span><%= date.toISOString().slice(5, 10) + " " + date.toISOString().slice(11, 16) %></span>
             <% } %>
             <% if(message.is_read == false) { %>
-                <td>읽지 않음</td>
+                <span>읽지 않음</span>
             <% } else { %>
-                <td>읽음</td>
+                <span>읽음</span>
             <% } %>
-            <td><%= message.nickname %></td>
-
-        </tr>
+            <span><%= message.nickname %></span>
+        </li>
     <% } %>
-    </tbody>
-</table>
+    </ol>
+</div>
+<div>
+    <% const max_page = parseInt(parseInt(message_count / 10) + Math.ceil((message_count % 10)/10))%>
+    <% const start_page = Math.floor((parseInt(page) - 1) / 10) * 10 + 1 %>
+    <% if (start_page != 1) { %>
+        <a href="/message/send?page=<%= start_page - 10 %>">이전</a>
+    <% } %>
+    <% for(let i = start_page; (i < start_page + 10) && i <= max_page; i++) { %>
+        <a href="/message/send?page=<%= i %>"><%= i %></a>
+    <% } %>
+    <% if ((start_page + 10) <= max_page) { %>
+        <a href="/message/send?page=<%= start_page + 10 %>">다음</a>
+    <% } %>
+</div>
 <div>
     <a href='#'
        onclick="window.open('/message/write','message','status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지 보내기</a>
+    <a href="#" id="delete">삭제</a>
 </div>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    delete_tag = document.querySelector("#delete")
+    delete_tag.addEventListener('click', async function () {
+        const checked = document.querySelectorAll("input#check:checked");
+        const message_ids = [];
+        for(let i of checked)
+        {
+            message_ids.push(i.getAttribute("value"))
+        }
+        await axios.post('/message/delete', {
+            message_ids: message_ids
+        }).then((response) => {
+            if(response.data === 'success'){
+                location.href = '/message/send/?page=<%=page%>';
+            } else if(response.data === 'not creator'){
+                alert("자신의 쪽지만 삭제하실 수 있습니다.");
+            }
+        })
+        .catch((err)=>{
+            console.error(err);
+        });
+    });
+</script>
 </body>
 </html>
