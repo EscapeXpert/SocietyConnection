@@ -60,7 +60,7 @@
                     <p><%= comment.content %></p>
                     <% const date = new Date(comment.created_at) %>
                     <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
-                    <a href="">답글</a>
+                    <a href="#" id="reply_comment">답글</a>
                     <% if(user.id === comment.creator_id) { %>
                         <a href="#" id="comment_delete">삭제</a>
                     <% } %>
@@ -68,7 +68,7 @@
             <% } %>
         </ul>
         <p><%= user.nickname %></p>
-        <form action="/post/<%= post.id%>>/comment/write" method="post">
+        <form action="/post/<%= post.id%>/comment/write" method="post">
             <label for="comment_content"></label>
             <textarea name="comment_content" id="comment_content" placeholder="댓글을 남겨보세요." rows="5" cols="50"
                       style="resize: none"></textarea>
@@ -149,6 +149,19 @@
                 .catch((err) => {
                     console.error(err);
                 })
+        })
+    });
+
+    const reply_comment_tags = document.querySelectorAll('#reply_comment');
+    reply_comment_tags.forEach(reply_comment_tag => {
+        reply_comment_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            const comment_id = reply_comment_tag.parentElement.id;
+            let new_li = document.createElement('li');
+            let reply_comment_form_tag = document.createComment('form');
+            reply_comment_form_tag.action = `/post/${post_id}/comment/${comment_id}/reply_comment/write`
+            reply_comment_form_tag.method = 'post'
+
         })
     })
 </script>

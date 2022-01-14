@@ -26,7 +26,7 @@
                 <div class="title">
                     <a href="/post/<%= post.id %>"><%= post.title %></a>
                     <% if(post.comment > 0) { %>
-                        <a href="/post/<%= post.id %>/#comment">[<%= post.comment %>]</a>
+                        <a href="/post/<%= post.id %>/#comment_list">[<%= post.comment %>]</a>
                     <% } %>
                 </div>
             </td>
@@ -49,7 +49,7 @@
     <% if (start_page != 1) { %>
         <a href="/board/<%= board.id %>?page=<%= start_page - 10 %>">이전</a>
     <% } %>
-    <% for(let i = start_page; i < start_page + 10; i++) { %>
+    <% for(let i = start_page; i < post_count / 10 + 1; i++) { %>
         <a href="/board/<%= board.id %>?page=<%= i %>"><%= i %></a>
     <% } %>
     <a href="/board/<%= board.id %>?page=<%= start_page + 10 %>">다음</a>

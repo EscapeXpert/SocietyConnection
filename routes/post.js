@@ -152,7 +152,7 @@ router.post('/:post_id/comment/:comment_id/delete', async (req, res, next) => {
             });
             res.send('success');
         } else {
-            res.send('no creator');
+            res.send('not creator');
         }
     } catch (err) {
         console.error(err);
@@ -162,13 +162,17 @@ router.post('/:post_id/comment/:comment_id/delete', async (req, res, next) => {
 
 router.post('/:post_id/comment/write', async (req, res, next) => {
     const post_id = req.params.post_id;
-    const content = req.body.content;
+    const content = req.body.comment_content;
     //const user_id = req.user.id;
     const user_id = "psh3253";
     try {
         await Comment.create({
-            content: content
-        })
+            content: content,
+            creator_id: user_id,
+            post_id: post_id
+        });
+        res.redirect(`/post/${post_id}#comment_list`);
+
     } catch (err) {
         console.error(err);
         next(err);
