@@ -41,7 +41,7 @@ router.post('/write', async(req, res, next) => {
             sender_id: sender_id,
          });
 
-         res.send("<script>window.close();</script > ");
+         res.send("<script>window.opener.location.reload(); window.close();</script > ");
       }
    } catch(err){
       console.error(err);
