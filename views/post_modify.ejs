@@ -5,9 +5,9 @@
     <title>게시글 수정</title>
 </head>
 <body>
-<% if(board_type === 'general') { %>
+<% if(board.board_type === 'general') { %>
     <form action="/post/<%= post.id %>/modify" method="post">
-        <input type="hidden" name="board_type" id="board_type" value="<%= board_type %>">
+        <input type="hidden" name="board_id" id="board_id" value="<%= board.id %>">
         <div>
             <label for="title"></label>
             <input type="text" name="title" id="title" placeholder="제목을 입력해 주세요." maxlength="100"
@@ -22,7 +22,7 @@
             <input type="submit" value="등록">
         </div>
     </form>
-<% } else if(board_type === 'recruitment') { %>
+<% } else if(board.board_type === 'recruitment') { %>
 
 <% } %>
 </body>

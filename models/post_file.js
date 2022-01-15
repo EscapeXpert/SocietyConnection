@@ -20,6 +20,7 @@ module.exports = class PostFile extends Sequelize.Model {
 
     static associate(db) {
         db.PostFile.belongsTo(db.Post, { foreignKey: 'post_id', targetKey: 'id'});
+        db.PostFile.belongsTo(db.Board, { foreignKey: 'board_id', targetKey: 'id'});
     }
 
 };

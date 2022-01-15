@@ -25,9 +25,9 @@
                 <td><%= post.id %></td>
                 <td>
                     <div class="title">
-                        <a href="/post/<%= post.id %>"><%= post.title %></a>
+                        <a href="/post/<%= post.id %>?board_id=<%=board.id%>"><%= post.title %></a>
                         <% if(post.comment > 0) { %>
-                            <a href="/post/<%= post.id %>/#comment_list">[<%= post.comment %>]</a>
+                            <a href="/post/<%= post.id %>?board_id=<%=board.id%>#commnet_list">[<%= post.comment %>]</a>
                         <% } %>
                     </div>
                 </td>

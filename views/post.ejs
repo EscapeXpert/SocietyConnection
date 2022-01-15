@@ -8,7 +8,7 @@
 <a href="/board/<%= board.id %>"><%= board.name %></a>
 <div>
     <% if(post.creator_id === user.id) { %>
-        <a href="/post/<%= post.id %>/modify?board_type=<%= board.board_type %>" id="modify">수정</a>
+        <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
         <a href="#" id="delete">삭제</a>
     <% } %>
 </div>
@@ -37,15 +37,15 @@
                 <img src="/public/icon/red-heart.svg" width="16" height="16" alt="">
             <% } %>
         </a>
-        <a href="#" id="go_like_list">좋아요 <%= post.like %></a>
-        <a href="#" id="go_comment_list">댓글 <%= post.comment %></a>
+        <a href="#" id="go_like_list">좋아요 <%= like_list.length %></a>
+        <a href="#" id="go_comment_list">댓글 <%= comment_list.length %></a>
     </div>
     <div id="like_list" class="like_list" style="display: none">
         <ul>
             <% for(let like_user of like_list) { %>
                 <li>
                     <!-- 프로필 사진-->
-                    <a href="/profile/<%= like_user.nickname %>"><%= like_user.nickname %></a>
+                    <a href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
                 </li>
             <% } %>
         </ul>
@@ -60,7 +60,7 @@
                     <p><%= comment.content %></p>
                     <% const date = new Date(comment.created_at) %>
                     <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
-                    <a href="#" id="reply_comment">답글</a>
+                    <a href="#" id="open_reply_comment">답글</a>
                     <% if(user.id === comment.creator_id) { %>
                         <a href="#" id="comment_delete">삭제</a>
                     <% } %>
@@ -81,13 +81,14 @@
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    const is_open_reply_comment = false;
     const like_tag = document.querySelector('#like');
     const post_id = document.querySelector('#post_id').value;
     const board_id = document.querySelector('#board_id').value;
     like_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        await axios.post(`/post/${post_id}/like`)
+        await axios.post(`/post/${post_id}/like`, {
+            board_id: board_id
+        })
             .then((response) => {
                 if (response.data === 'success') {
                     location.reload();
@@ -101,7 +102,9 @@
     const delete_tag = document.querySelector('#delete');
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        await axios.post(`/post/${post_id}/delete`)
+        await axios.post(`/post/${post_id}/delete`, {
+            board_id: board_id
+        })
             .then((response) => {
                 if (response.data === 'success') {
                     location.href = `/board/${board_id}`;
@@ -156,6 +159,7 @@
         event.preventDefault();
         const comment_content = document.querySelector('#comment_content').value;
         axios.post(`/post/${post_id}/comment/write`, {
+            board_id: board_id,
             comment_content: comment_content
         })
             .then((response) => {
@@ -165,41 +169,35 @@
             })
     })
 
-    const reply_comment_tags = document.querySelectorAll('#reply_comment');
-    reply_comment_tags.forEach(reply_comment_tag => {
-        reply_comment_tag.addEventListener('click', async function (event) {
+    let is_open_reply_comment = false;
+    const reply_comment_tags = document.querySelectorAll('#open_reply_comment');
+    reply_comment_tags.forEach(open_reply_comment_tag => {
+        open_reply_comment_tag.addEventListener('click', function (event) {
             event.preventDefault();
-            const comment_id = reply_comment_tag.parentElement.id;
+            if (is_open_reply_comment) {
+                const reply_comment_tag = document.querySelector('#reply_comment');
+                reply_comment_tag.remove();
+            }
+            const comment_id = open_reply_comment_tag.parentElement.id;
             let new_li_tag = document.createElement('li');
-            let reply_comment_label_tag = document.createElement('label');
-            reply_comment_label_tag.for = 'reply_comment_content';
-            new_li_tag.appendChild(reply_comment_label_tag);
-            let reply_comment_area_tag = document.createElement('textarea');
-            reply_comment_area_tag.name = 'reply_comment_content';
-            reply_comment_area_tag.id = 'reply_comment_content';
-            reply_comment_area_tag.placeholder = '답글을 남겨주세요'
-            reply_comment_area_tag.rows = 5;
-            reply_comment_area_tag.columns = 50;
-            reply_comment_area_tag.style = 'resize: none';
-            new_li_tag.appendChild(reply_comment_area_tag);
-            let reply_comment_button_box_tag = document.createElement('div')
-            reply_comment_button_box_tag.className = 'reply_comment_button_box';
-            new_li_tag.appendChild(reply_comment_button_box_tag);
-            let reply_comment_close_tag = document.createElement('a');
-            reply_comment_close_tag.href = '#'
-            reply_comment_close_tag.id = 'reply_comment_close'
-            reply_comment_close_tag.innerText = '취소'
+            new_li_tag.id = 'reply_comment';
+            new_li_tag.innerHTML = '' +
+                '<label for="reply_comment_content"></label>' +
+                '<textarea name="reply_comment_content" id="reply_comment_content" placeholder="답글을 남겨주세요." rows="5" cols="50" style="resize: none" "></textarea>' +
+                '<div class="reply_comment_button_box">' +
+                '<a href="#" id="reply_comment_close">취소</a>' +
+                '<a href="#" id="submit_reply_comment">등록</a>' +
+                '</div>';
+            open_reply_comment_tag.parentElement.appendChild(new_li_tag)
+
+            const reply_comment_close_tag = document.querySelector('#reply_comment_close');
             reply_comment_close_tag.addEventListener('click', function (event) {
                 event.preventDefault();
                 new_li_tag.remove();
+                is_open_reply_comment = false;
             });
-            reply_comment_button_box_tag.appendChild(reply_comment_close_tag);
-            let reply_comment_input_tag = document.createElement('a');
-            reply_comment_input_tag.href = `/post/${post_id}/comment/${comment_id}/reply_comment/write`;
-            reply_comment_input_tag.innerText = '등록'
-            reply_comment_button_box_tag.appendChild(reply_comment_input_tag);
-            reply_comment_tag.parentElement.appendChild(new_li_tag)
-        })
-    })
+            is_open_reply_comment = true;
+        });
+    });
 </script>
 </html>

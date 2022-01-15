@@ -9,6 +9,7 @@ const PostFile = require('./post_file');
 const Recruitment = require('./recruitment');
 const ReplyComment = require('./reply_comment');
 const User = require('./user');
+const Like = require('./like');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config.json')[env];
 const db = {};
@@ -17,16 +18,17 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 
 db.sequelize = sequelize;
 
-db.Applicant = Applicant
-db.Board = Board
-db.Comment = Comment
-db.Grade = Grade
-db.Message = Message
-db.Post = Post
-db.PostFile = PostFile
-db.Recruitment = Recruitment
-db.ReplyComment = ReplyComment
-db.User = User
+db.Applicant = Applicant;
+db.Board = Board;
+db.Comment = Comment;
+db.Grade = Grade;
+db.Message = Message;
+db.Post = Post;
+db.PostFile = PostFile;
+db.Recruitment = Recruitment;
+db.ReplyComment = ReplyComment;
+db.User = User;
+db.Like = Like;
 
 Applicant.init(sequelize);
 Board.init(sequelize);
@@ -38,6 +40,7 @@ PostFile.init(sequelize);
 Recruitment.init(sequelize);
 ReplyComment.init(sequelize);
 User.init(sequelize);
+Like.init(sequelize);
 
 Applicant.associate(db);
 Board.associate(db);
@@ -48,5 +51,6 @@ PostFile.associate(db);
 Recruitment.associate(db);
 ReplyComment.associate(db);
 User.associate(db);
+Like.associate(db);
 
 module.exports = db;
