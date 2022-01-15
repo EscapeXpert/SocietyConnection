@@ -5,9 +5,7 @@
     <title>게시글 쓰기</title>
 </head>
 <body>
-<% if(board.board_type === 'general') { %>
     <form action="/board/<%= board.id %>/write" method="post">
-        <input type="hidden" name="board_type" id="board_type" value="<%= board.board_type %>">
         <div>
             <label for="title"></label>
             <input type="text" name="title" id="title" placeholder="제목을 입력해 주세요." maxlength="100" required>
@@ -17,12 +15,13 @@
             <textarea rows="10" cols="50" style="resize: none" name="content" id="content" placeholder="내용을 입력하세요." maxlength="1000"
                       required></textarea>
         </div>
+        <!-- 첨부파일 및 이미지-->
+        <% if(board.board_type === 'recruitment') {%>
+            <!-- deadline -->
+        <% } %>
         <div>
             <input type="submit" value="등록">
         </div>
     </form>
-<% } else if(board.board_type === 'recruitment') { %>
-
-<% } %>
 </body>
 </html>

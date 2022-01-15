@@ -8,7 +8,7 @@
 <a href="/board/<%= board.id %>"><%= board.name %></a>
 <div>
     <% if(post.creator_id === user.id) { %>
-        <a href="/post/<%= post.id %>/modify?board_type=<%= board.board_type %>" id="modify">수정</a>
+        <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
         <a href="#" id="delete">삭제</a>
     <% } %>
 </div>
@@ -37,15 +37,15 @@
                 <img src="/public/icon/red-heart.svg" width="16" height="16" alt="">
             <% } %>
         </a>
-        <a href="#" id="go_like_list">좋아요 <%= post.like %></a>
-        <a href="#" id="go_comment_list">댓글 <%= post.comment %></a>
+        <a href="#" id="go_like_list">좋아요 <%= like_list.length %></a>
+        <a href="#" id="go_comment_list">댓글 <%= comment_list.length %></a>
     </div>
     <div id="like_list" class="like_list" style="display: none">
         <ul>
             <% for(let like_user of like_list) { %>
                 <li>
                     <!-- 프로필 사진-->
-                    <a href="/profile/<%= like_user.nickname %>"><%= like_user.nickname %></a>
+                    <a href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
                 </li>
             <% } %>
         </ul>
@@ -86,7 +86,9 @@
     const board_id = document.querySelector('#board_id').value;
     like_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        await axios.post(`/post/${post_id}/like`)
+        await axios.post(`/post/${post_id}/like`, {
+            board_id: board_id
+        })
             .then((response) => {
                 if (response.data === 'success') {
                     location.reload();
@@ -100,7 +102,9 @@
     const delete_tag = document.querySelector('#delete');
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        await axios.post(`/post/${post_id}/delete`)
+        await axios.post(`/post/${post_id}/delete`, {
+            board_id: board_id
+        })
             .then((response) => {
                 if (response.data === 'success') {
                     location.href = `/board/${board_id}`;
@@ -155,6 +159,7 @@
         event.preventDefault();
         const comment_content = document.querySelector('#comment_content').value;
         axios.post(`/post/${post_id}/comment/write`, {
+            board_id: board_id,
             comment_content: comment_content
         })
             .then((response) => {

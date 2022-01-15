@@ -1,3 +1,4 @@
+USE societyconnection;
 INSERT INTO grade(id, name) VALUES (1, '이병');
 INSERT INTO grade(id, name) VALUES (2, '일병');
 INSERT INTO grade(id, name) VALUES (3, '상병');

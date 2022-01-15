@@ -1,28 +1,60 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board, User, Comment} = require('../models');
-const {QueryTypes} = require('sequelize');
+const {sequelize, Post, Board, User, Comment, Like, Recruitment} = require('../models');
 
 router.post('/:post_id/delete', async (req, res, next) => {
     const post_id = req.params.post_id;
+    const board_id = req.body.board_id;
     //const user_id = req.user.id;
     const user_id = "psh3253"
     try {
-        const post = await Post.findOne({
-            attributes: ['creator_id'],
+        const board = await Board.findOne({
+            attributes: ['board_type'],
             where: {
-                id: post_id
+                id: board_id
             }
         });
-        if (post.creator_id === user_id) {
-            await Post.destroy({
+        if(board.board_type === 'general')
+        {
+            const post = await Post.findOne({
+                attributes: ['creator_id'],
                 where: {
-                    id: post_id
+                    id: post_id,
+                    board_id: board_id
                 }
             });
-            res.send('success');
-        } else {
-            res.send('not creator');
+            if (post.creator_id === user_id) {
+                await Post.destroy({
+                    where: {
+                        id: post_id,
+                        board_id: board_id
+                    }
+                });
+                res.send('success');
+            } else {
+                res.send('not creator');
+            }
+        }
+        else if(board.board_type === 'recruitment')
+        {
+            const post = await Recruitment.findOne({
+                attributes: ['creator_id'],
+                where: {
+                    id: post_id,
+                    board_id: board_id
+                }
+            });
+            if (post.creator_id === user_id) {
+                await Recruitment.destroy({
+                    where: {
+                        id: post_id,
+                        board_id: board_id
+                    }
+                });
+                res.send('success');
+            } else {
+                res.send('not creator');
+            }
         }
     } catch (err) {
         console.error(err);
@@ -32,19 +64,26 @@ router.post('/:post_id/delete', async (req, res, next) => {
 
 router.get('/:post_id/modify', async (req, res, next) => {
     const post_id = req.params.post_id;
-    const board_type = req.query.board_type;
+    const board_id = req.query.board_id;
     //const user_id = req.user.id;
     const user_id = "psh3253";
 
     try {
+        const board = await Board.findOne({
+            attributes: ['id', 'board_type'],
+            where: {
+                id: board_id
+            }
+        });
         const post = await Post.findOne({
             attributes: ['id', 'title', 'content'],
             where: {
-                id: post_id
+                id: post_id,
+                board_id: board_id
             }
         });
         res.render('post_modify', {
-            board_type: board_type,
+            board: board,
             post: post
         });
     } catch (err) {
@@ -55,23 +94,31 @@ router.get('/:post_id/modify', async (req, res, next) => {
 
 router.post('/:post_id/modify', async (req, res, next) => {
     const post_id = req.params.post_id;
-    const board_type = req.body.board_type;
+    const board_id = req.body.board_id;
     const title = req.body.title;
     const content = req.body.content;
     //const user_id = req.user.id;
+    const user_id = "psh3253";
 
     try {
-        if (board_type === 'general') {
+        const board = await Board.findOne({
+            attributes: ['board_type'],
+            where: {
+                id: board_id
+            }
+        });
+        if (board.board_type === 'general') {
             await Post.update({
                 title: title,
                 content: content
             }, {
                 where: {
-                    id: post_id
+                    id: post_id,
+                    board_id: board_id
                 }
             });
-            res.redirect(`/post/${post_id}`);
-        } else if (board_type === 'recruitment') {
+            res.redirect(`/post/${post_id}?board_id=${board_id}`);
+        } else if (board.board_type === 'recruitment') {
 
         }
     } catch (err) {
@@ -102,26 +149,29 @@ router.post('/:post_id/apply', async (req, res) => {
 
 router.post('/:post_id/like', async (req, res, next) => {
     const post_id = req.params.post_id;
+    const board_id = req.body.board_id;
     //const user_id = req.user.id;
     const user_id = "psh3253";
     try {
-        const is_like = await sequelize.models.Like.findOne({
+        const is_like = await Like.findOne({
             where: {
                 post_id: post_id,
-                user_id: user_id
+                user_id: user_id,
+                board_id: board_id
             }
         });
         if (is_like == null) {
-            console.log(post_id);
-            await sequelize.models.Like.create({
+            await Like.create({
                 post_id: post_id,
-                user_id: user_id
+                user_id: user_id,
+                board_id: board_id
             });
         } else {
-            await sequelize.models.Like.destroy({
+            await Like.destroy({
                 where: {
                     post_id: post_id,
-                    user_id: user_id
+                    user_id: user_id,
+                    board_id: board_id
                 }
             });
         }
@@ -162,6 +212,7 @@ router.post('/:post_id/comment/:comment_id/delete', async (req, res, next) => {
 
 router.post('/:post_id/comment/write', async (req, res, next) => {
     const post_id = req.params.post_id;
+    const board_id = req.body.board_id;
     const content = req.body.comment_content;
     //const user_id = req.user.id;
     const user_id = "psh3253";
@@ -169,7 +220,8 @@ router.post('/:post_id/comment/write', async (req, res, next) => {
         await Comment.create({
             content: content,
             creator_id: user_id,
-            post_id: post_id
+            post_id: post_id,
+            board_id: board_id
         });
         res.send('success');
     } catch (err) {
@@ -180,49 +232,70 @@ router.post('/:post_id/comment/write', async (req, res, next) => {
 
 router.get('/:post_id', async (req, res, next) => {
     const post_id = req.params.post_id;
+    const board_id = req.query.board_id;
     //const user_id = req.user.id;
     const user_id = 'psh3253';
     try {
-
+        const board = await Board.findOne({
+            attributes: ['id', 'name', 'board_type'],
+            where: {
+                id: board_id
+            }
+        });
         const user = await User.findOne({
             attributes: ['id', 'nickname'],
             where: {
                 id: user_id
             }
         });
+        let post;
+        if (board.board_type === 'general') {
+            //post = await sequelize.query('SELECT post.id, post.title, post.content, post.created_at, post.creator_id, post.view_count, post.board_id, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, (SELECT count(*) FROM `comment` WHERE post_id = post.id) comment, user.nickname, (SELECT name FROM grade WHERE id = user.grade) `grade` FROM post LEFT JOIN user ON post.creator_id = user.id WHERE post.id = ' + post_id, {
+            //    type: QueryTypes.SELECT
+            //});
+            post = await Post.findOne({
+                attributes: ['id', 'title', 'content', 'created_at', 'creator_id', 'view_count', 'board_id', [
+                    sequelize.literal('(SELECT name FROM grade WHERE id = user.grade)'), 'grade'
+                ]],
+                where: {
+                    id: post_id
+                },
+                include: {
+                    model: User,
+                    attributes: ['nickname']
+                }
+            })
+            await Post.update({view_count: post.view_count + 1}, {
+                where: {
+                    id: post_id,
+                }
+            });
+        } else if (board.board_type === 'recruitment') {
 
-        const post = await sequelize.query('SELECT post.id, post.title, post.content, post.created_at, post.creator_id, post.view_count, post.board_id, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, (SELECT count(*) FROM `comment` WHERE post_id = post.id) comment, user.nickname, (SELECT name FROM grade WHERE id = user.grade) `grade` FROM post LEFT JOIN user ON post.creator_id = user.id WHERE post.id = ' + post_id, {
-            type: QueryTypes.SELECT
-        });
-
-        const board = await Board.findOne({
-            attributes: ['id', 'name', 'board_type'],
-            where: {
-                id: post[0].board_id
-            }
-        });
-
+        }
         const is_like = await sequelize.models.Like.findOne({
             where: {
                 post_id: post_id,
-                user_id: user_id
+                user_id: user_id,
+                board_id: board_id
             }
         });
-
-        await Post.update({view_count: post[0].view_count + 1}, {
+        const like_list = await Like.findAll({
+            attributes: [],
             where: {
-                id: post_id
+                post_id: post_id,
+                board_id: board_id
+            },
+            include: {
+                model: User,
+                attributes: ['nickname'],
             }
         });
-
-        const like_list = await sequelize.query('SELECT user.nickname FROM `like` LEFT JOIN `user` ON user.id = `like`.user_id WHERE post_id = ' + post_id, {
-            type: QueryTypes.SELECT
-        });
-
         const comment_list = await Comment.findAll({
             attributes: ['id', 'content', 'created_at', 'creator_id'],
             where: {
                 post_id: post_id,
+                board_id: board_id,
             },
             include: {
                 model: User,
@@ -230,7 +303,7 @@ router.get('/:post_id', async (req, res, next) => {
             }
         });
         res.render('post', {
-            post: post[0],
+            post: post,
             board: board,
             user: user,
             is_like: is_like,
