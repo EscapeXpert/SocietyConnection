@@ -70,11 +70,7 @@ module.exports = class User extends Sequelize.Model {
         db.User.hasMany(db.ReplyComment, {foreignKey: 'creator_id', sourceKey: 'id'});
         db.User.hasMany(db.Applicant, {foreignKey: 'user_id', sourceKey: 'id'});
         db.User.hasMany(db.Recruitment, {foreignKey: 'creator_id', sourceKey: 'id'});
-        db.User.belongsToMany(db.Post, {
-            foreignKey: 'user_id',
-            through: 'Like',
-            timestamps: false
-        });
+        db.User.hasMany(db.Like, {foreignKey: 'user_id', sourceKey: 'id'});
         db.User.belongsTo(db.Grade, {foreignKey: 'grade', targetKey: 'id'});
     }
 };
