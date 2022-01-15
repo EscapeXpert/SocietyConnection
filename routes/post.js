@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board, User, Comment, Like, Recruitment} = require('../models');
+const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment} = require('../models');
 
 router.post('/:post_id/delete', async (req, res, next) => {
     const post_id = req.params.post_id;
@@ -14,8 +14,7 @@ router.post('/:post_id/delete', async (req, res, next) => {
                 id: board_id
             }
         });
-        if(board.board_type === 'general')
-        {
+        if (board.board_type === 'general') {
             const post = await Post.findOne({
                 attributes: ['creator_id'],
                 where: {
@@ -34,9 +33,7 @@ router.post('/:post_id/delete', async (req, res, next) => {
             } else {
                 res.send('not creator');
             }
-        }
-        else if(board.board_type === 'recruitment')
-        {
+        } else if (board.board_type === 'recruitment') {
             const post = await Recruitment.findOne({
                 attributes: ['creator_id'],
                 where: {
@@ -175,6 +172,24 @@ router.post('/:post_id/like', async (req, res, next) => {
                 }
             });
         }
+        res.send('success');
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+router.post('/:post_id/comment/:comment_id/reply_comment/write', async (req, res, next) => {
+    const comment_id = req.params.comment_id;
+    const reply_comment_content = req.body.reply_comment_content;
+    //const user_id = req.user.id;
+    const user_id = 'psh3253'
+    try {
+        await ReplyComment.create({
+            content: reply_comment_content,
+            comment_id: comment_id,
+            creator_id: user_id
+        });
         res.send('success');
     } catch (err) {
         console.error(err);
