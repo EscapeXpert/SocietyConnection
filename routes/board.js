@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board, Recruitment} = require('../models');
+const {sequelize, Post, Board, Recruitment, User} = require('../models');
 const {QueryTypes} = require('sequelize');
 
 router.get('/:board_id/write', async (req, res, next) => {
@@ -71,8 +71,21 @@ router.get('/:board_id', async (req, res, next) => {
             }
         });
         if (board.board_type === 'general') {
-            const posts = await sequelize.query('SELECT post.id, post.title, user.nickname, post.created_at, post.view_count, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, (SELECT count(*) FROM comment WHERE post_id = post.id) comment FROM `post` LEFT JOIN `user` ON post.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10', {
-                type: QueryTypes.SELECT
+            const posts = await Post.findAll({
+                attributes: ['id', 'title', 'created_at', 'view_count', [
+                    sequelize.literal('(SELECT count(*) FROM `like` WHERE `board_id` = ' + board_id + ' AND `post_id` = `post`.`id`)'), 'like'
+                ], [
+                    sequelize.literal('(SELECT count(*) FROM `comment` WHERE `board_id` = ' + board_id + ' AND `post_id` = `post`.`id`)'), 'comment'
+                ]],
+                where: {
+                    board_id: board_id
+                },
+                include: [{
+                    model: User,
+                    attributes: ['nickname']
+                }],
+                offset: start_post_number,
+                limit: 10,
             });
             const post_count = await Post.count({
                 where: {
