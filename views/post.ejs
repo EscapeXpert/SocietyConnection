@@ -165,7 +165,7 @@
                 })
                 .catch((err) => {
                     console.error(err);
-                })
+                });
         })
     });
     const submit_comment_tag = document.querySelector('#submit_comment');
@@ -181,6 +181,9 @@
                     location.reload();
                 }
             })
+            .catch((err) => {
+                console.error(err);
+            });
     })
 
     let is_open_reply_comment = false;
@@ -209,6 +212,23 @@
                 event.preventDefault();
                 new_li_tag.remove();
                 is_open_reply_comment = false;
+            });
+
+            const submit_reply_commit_tag = document.querySelector('#submit_reply_comment');
+            submit_reply_commit_tag.addEventListener('click', async function (event) {
+                event.preventDefault();
+                const content = document.querySelector('#reply_comment_content').value;
+                axios.post(`/post/${post_id}/comment/${comment_id}/reply_comment/write`, {
+                    reply_comment_content: content
+                })
+                    .then((response) => {
+                        if (response.data === 'success') {
+                            location.reload();
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
             });
             is_open_reply_comment = true;
         });

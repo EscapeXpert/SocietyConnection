@@ -3,6 +3,7 @@ const passport = require('passport');
 const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const axios = require("axios");
 
 const router = express.Router();
 
@@ -71,6 +72,21 @@ router.post('/login', isNotLoggedIn, async(req, res, next) => {
 });
 
 router.get('/logout', isLoggedIn, async(req, res) => {
+    if(req.user.login_type==='kakao'){
+        try {
+            const ACCESS_TOKEN = req.user.accessToken;
+            let logout = await axios({
+                method:'post',
+                url:'https://kapi.kakao.com/v1/user/unlink',
+                headers:{
+                    'Authorization': `Bearer ${ACCESS_TOKEN}`
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            res.json(error);
+        }
+    }
     req.logout();
     req.session.destroy();
     res.redirect('/');

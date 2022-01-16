@@ -38,17 +38,31 @@
         <label for="introduce">자기소개</label>
         <label for="introduce"><%= User.introduce %></label>
     </div>
-    <div>
-        <label for="profile_image">profile_image</label>
-        <label for="profile_image"><%= User.profile_image %></label>
-    </div>
-    <div>
-        <img id="img-preview" src=<%= User.profile_image %>  width="250" alt="미리보기">
-    </div>
-    <div>
-        <a href="/profile/change_password">비밀번호 변경</a>
-        <a href="/profile/edit">프로필 수정</a>
-    </div>
+    <% if(User.profile_image){ %>
+        <div>
+            <label for="profile_image">profile_image</label>
+        </div>
+        <div>
+            <img id="img-preview" src=<%= User.profile_image %>  width="250" alt="미리보기">
+        </div>
+    <% } %>
+    <% if(User.nickname == req_User.nickname){ %>
+        <div>
+            <a href="/profile/<%= User.nickname %>/change_password">비밀번호 변경</a>
+            <a href="/profile/<%= User.nickname %>/edit">프로필 수정</a>
+            <a href="/message/receive">쪽지함</a>
+        </div>
+        <% if(User_List){ %>
+            <div>
+                <label>다른 사용자 프로필 목록</label>
+            </div>
+            <% for(let list_of_user of User_List) { %>
+                <div>
+                    <a href="/profile/<%= list_of_user.dataValues.nickname %>"><%= list_of_user.dataValues.nickname %></a>
+                </div>
+            <% } %>
+        <% } %>
+    <% } %>
 </div>
 </body>
 </html>
