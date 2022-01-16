@@ -157,6 +157,7 @@ router.post('/delete', async(req, res, next)=>{
 router.get('/:message_id', async(req, res, next)=>{
    const message_id = req.params.message_id;
    const type = req.query.type;
+   // const user_id = req.user.id;
    const user_id = "psh3253";
    try{
       const message = await sequelize.query('SELECT * FROM `message` WHERE message.id = `${message_id}` AND (message.sender_id = `${user_id}` OR message.receiver_id = `${user_id}`)',{

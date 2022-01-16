@@ -49,7 +49,7 @@ router.post('/:board_id/write', async (req, res, next) => {
                 content: content,
                 board_id: board_id,
                 creator_id: creator_id,
-                deadline: deadline,
+                deadline: deadline
             });
         }
         res.redirect(`/board/${board_id}`);

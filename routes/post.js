@@ -11,7 +11,7 @@ router.post('/:post_id/delete', async (req, res, next) => {
         const board = await Board.findOne({
             attributes: ['board_type'],
             where: {
-                id: board_id
+                id: board_id,
             }
         });
         if (board.board_type === 'general') {
