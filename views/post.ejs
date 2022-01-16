@@ -8,7 +8,12 @@
 <a href="/board/<%= board.id %>"><%= board.name %></a>
 <div>
     <% if(post.creator_id === user.id) { %>
-        <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
+        <% if(board.board_type === 'general') { %>
+            <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
+        <% } else if(board.board_type === 'recruitment') { %>
+            <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>?deadline=<%= post.deadline %>"
+               id="modify">수정</a>
+        <% } %>
         <a href="#" id="delete">삭제</a>
     <% } %>
 </div>
@@ -27,6 +32,10 @@
         <% const contents = post.content.split('\n') %>
         <% for(var content of contents) { %>
             <p><%= content %></p>
+        <% } %>
+        <% if(board.board_type === 'recruitment') { %>
+        <% const deadline = post.deadline.toISOString()%>
+            <span><%= deadline%></span>
         <% } %>
     </div>
     <div>
@@ -75,6 +84,9 @@
             <a href="#" id="submit_comment">등록</a>
         </div>
     </div>
+</div>
+<div class="">
+
 </div>
 <input type="hidden" id="post_id" name="post_id" value="<%= post.id %>">
 <input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
@@ -141,11 +153,13 @@
         comment_delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
             const comment_id = comment_delete_tag.parentElement.id;
-            await axios.post(`/post/${post_id}/comment/${comment_id}/delete`)
+            await axios.post(`/post/${post_id}/comment/${comment_id}/delete`, {
+                board_id: board_id
+            })
                 .then((response) => {
                     if (response.data === 'success') {
                         location.reload();
-                    } else if (response.data === 'no creator') {
+                    } else if (response.data === 'not creator') {
                         alert("자신의 댓글만 삭제할 수 있습니다.");
                     }
                 })
@@ -185,7 +199,7 @@
                 '<label for="reply_comment_content"></label>' +
                 '<textarea name="reply_comment_content" id="reply_comment_content" placeholder="답글을 남겨주세요." rows="5" cols="50" style="resize: none" "></textarea>' +
                 '<div class="reply_comment_button_box">' +
-                '<a href="#" id="reply_comment_close">취소</a>' +
+                '<a href="#" id="reply_comment_close">취소 </a>' +
                 '<a href="#" id="submit_reply_comment">등록</a>' +
                 '</div>';
             open_reply_comment_tag.parentElement.appendChild(new_li_tag)

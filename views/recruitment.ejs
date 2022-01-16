@@ -68,15 +68,109 @@
             <% } %>
         </ul>
         <p><%= user.nickname %></p>
-        <form action="/recruitment/<%=recruitment.id%>/comment/write" method="post">
+        <form action="/recruitment/<%= recruitment.id %>/comment/write" method="post">
             <label for="comment_content"></label>
-            <textarea name="comment_content" id="comment_content" placeholder="댓글을 남겨보세요." rows="5" cols="50" style="resize: none"></textarea>
+            <textarea name="comment_content" id="comment_content" placeholder="댓글을 남겨보세요." rows="5" cols="50"
+                      style="resize: none"></textarea>
             <input type="submit" value="등록">
         </form>
     </div>
 </div>
 
-<input type="hidden" id="recruitment_id" name="recruitment_id" value="<%=recruitment.id%>">
-<input type="hidden" id="board_id" name="board_id" value="<%=board.id%>">
+<input type="hidden" id="recruitment_id" name="recruitment_id" value="<%= recruitment.id %>">
+<input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
 </body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    const is_open_reply_comment = false;
+    const like_tag = document.querySelector('#like');
+    const recruitment_id = document.querySelector('#recruitment_id').value;
+    const board_id = document.querySelector('#board_id').value;
+    like_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await axios.post(`/recruitment/${recruitment_id}/like`)
+            .then((response) => {
+                if (response.data === 'success') {
+                    location.reload();
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    });
+
+    const delete_tag = document.querySelector('#delete');
+    delete_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await axios.post(`/recruitment/${recruitment_id}/delete`)
+            .then((response) => {
+                if (response.data === 'success') {
+                    location.href = `/board/${board_id}`;
+                } else if (response.data === 'not creator') {
+                    alert("자신의 게시글만 삭제하실 수 있습니다.");
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    });
+
+    let is_show_comment = true;
+    const like_list_tag = document.querySelector('#go_like_list');
+    like_list_tag.addEventListener('click', function (event) {
+        event.preventDefault();
+        if (is_show_comment) {
+            document.querySelector('.like_list').style.display = 'block';
+            document.querySelector('.comment_list').style.display = 'none';
+            is_show_comment = false;
+        }
+    });
+
+    const comment_list_tag = document.querySelector('#go_comment_list');
+    comment_list_tag.addEventListener('click', function (event) {
+        event.preventDefault();
+        if (!is_show_comment) {
+            document.querySelector('.like_list').style.display = 'none';
+            document.querySelector('.comment_list').style.display = 'block';
+            is_show_comment = true;
+        }
+    });
+
+    const comment_delete_tags = document.querySelectorAll('#comment_delete');
+    comment_delete_tags.forEach(comment_delete_tag => {
+        comment_delete_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            const comment_id = comment_delete_tag.parentElement.id;
+            await axios.post(`/recruitment/${recruitment_id}/comment/${comment_id}/delete`)
+                .then((response) => {
+                    if (response.data === 'success') {
+                        location.reload();
+                    } else if (response.data === 'not creator') {
+                        alert("자신의 댓글만 삭제할 수 있습니다.");
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        })
+    });
+
+    const submit_comment_tag = document.querySelector('#submit_comment');
+    submit_comment_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        const comment_content = document.querySelector('#comment_content').value;
+        axios.post(`/recruitment/${recruitment_id}/comment/write`, {
+            comment_content: comment_content
+        })
+            .then((response) => {
+                if (response.data === 'success') {
+                    location.reload();
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    });
+
+</script>
 </html>
