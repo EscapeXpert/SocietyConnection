@@ -17,7 +17,17 @@
         </div>
         <!-- 첨부파일 및 이미지-->
         <% if(board.board_type === 'recruitment') {%>
-            <!-- deadline -->
+            <div>
+                <label for="deadline"></label>
+                <% const date = new Date() %>
+                <% console.log(date)%>
+                <% const now = new Date().toISOString() %>
+                <% const max = new Date()%>
+                <% console.log(now) %>
+                <% max.setFullYear(max.getFullYear()+1)%>
+                <% max.toISOString()%>
+                <input type="datetime-local" name="deadline" id="deadline" min="<%= now %>" max="<%= max + max %>" value="<%= now %>">
+            </div>
         <% } %>
         <div>
             <input type="submit" value="등록">

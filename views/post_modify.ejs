@@ -5,7 +5,6 @@
     <title>게시글 수정</title>
 </head>
 <body>
-<% if(board.board_type === 'general') { %>
     <form action="/post/<%= post.id %>/modify" method="post">
         <input type="hidden" name="board_id" id="board_id" value="<%= board.id %>">
         <div>
@@ -18,12 +17,16 @@
             <textarea rows="10" cols="50" style="resize: none" name="content" id="content" placeholder="내용을 입력하세요." maxlength="1000"
                       required><%= post.content %></textarea>
         </div>
+        <% if(board.board_type === 'recruitment') { %>
+            <div>
+                <label for="deadline"></label>
+                <% console.log(123) %>
+                <input type="date" name="deadline" id="deadline" value="<%= post.deadline%> required">
+            </div>
+        <% } %>
         <div>
             <input type="submit" value="등록">
         </div>
     </form>
-<% } else if(board.board_type === 'recruitment') { %>
-
-<% } %>
 </body>
 </html>

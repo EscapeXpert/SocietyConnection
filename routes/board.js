@@ -12,16 +12,9 @@ router.get('/:board_id/write', async (req, res, next) => {
                 id: board_id
             }
         });
-        if(board.board_type === 'general') {
-            res.render('post_write', {
-                board: board
-            });
-        }
-        else if(board.board_type === 'recruitment'){
-            res.render('recruitment_write', {
-                board: board
-            });
-        }
+        res.render('post_write', {
+            board: board
+        });
     } catch (err) {
         console.error(err);
         next(err);
@@ -42,16 +35,15 @@ router.post('/:board_id/write', async (req, res, next) => {
                 id: board_id
             }
         });
-        if(board.board_type === 'general')
-        {
+        console.log(board.board_type)
+        if (board.board_type === 'general') {
             await Post.create({
                 title: title,
                 content: content,
                 board_id: board_id,
                 creator_id: creator_id
             });
-        }
-        else if(board.board_type === 'recruitment'){
+        } else if (board.board_type === 'recruitment') {
             await Recruitment.create({
                 title: title,
                 content: content,
@@ -79,7 +71,7 @@ router.get('/:board_id', async (req, res, next) => {
             }
         });
         if (board.board_type === 'general') {
-            const posts = await sequelize.query('SELECT post.id, post.title, user.nickname, post.created_at, post.view_count, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, (SELECT count(*) FROM comment WHERE post_id = post.id) comment FROM `post` LEFT JOIN `user` ON post.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10',  {
+            const posts = await sequelize.query('SELECT post.id, post.title, user.nickname, post.created_at, post.view_count, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, (SELECT count(*) FROM comment WHERE post_id = post.id) comment FROM `post` LEFT JOIN `user` ON post.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10', {
                 type: QueryTypes.SELECT
             });
             const post_count = await Post.count({
@@ -95,7 +87,7 @@ router.get('/:board_id', async (req, res, next) => {
                 }
             );
         } else if (board.board_type === 'recruitment') {
-            const recruitments = await sequelize.query('SELECT recruitment.id, recruitment.title, user.nickname, recruitment.created_at, recruitment.view_count, (SELECT count(*) FROM `like` WHERE post_id = recruitment.id) `like`, (SELECT count(*) FROM comment WHERE post_id = recruitment.id) comment FROM `recruitment` LEFT JOIN `user` ON recruitment.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10', {
+            const recruitments = await sequelize.query('SELECT recruitment.id, recruitment.title, user.nickname, recruitment.created_at, recruitment.view_count, recruitment.deadline, (SELECT count(*) FROM `like` WHERE post_id = recruitment.id) `like`, (SELECT count(*) FROM comment WHERE post_id = recruitment.id) comment FROM `recruitment` LEFT JOIN `user` ON recruitment.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10', {
                 type: QueryTypes.SELECT
             });
             const recruitment_count = await Recruitment.count({
@@ -105,8 +97,8 @@ router.get('/:board_id', async (req, res, next) => {
             });
             res.render('board', {
                 board: board,
-                recruitments: recruitments,
-                recruitment_count: recruitment_count,
+                posts: recruitments,
+                post_count: recruitment_count,
                 page: page
             });
         }
