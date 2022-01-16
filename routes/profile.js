@@ -6,7 +6,7 @@ const moment = require('moment');
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
-
+const { Op } = require("sequelize");
 const router = express.Router();
 
 
@@ -18,10 +18,19 @@ try {
 }
 
 
-router.get('/', isLoggedIn, async(req, res) => {
+router.get('/:user_nickname', isLoggedIn, async(req, res) => {
+    const Find_User = await User.findOne({ where: { nickname : req.params.user_nickname } });
+    const UserList = await User.findAll({
+        attributes: ['nickname'],
+        where: { nickname: {
+               [Op.not]: req.user.nickname
+             }}
+    });
     res.render('profile', {
         title: '프로필' ,
-        User: req.user
+        User: Find_User,
+        req_User : req.user,
+        User_List : UserList
     });
 });
 
@@ -38,12 +47,19 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-router.post('/edit/img', isLoggedIn, upload.single('img'), (req, res) => {
-    console.log(req.file);
+router.post('/:user_nickname/edit/img', isLoggedIn, upload.single('img'), async(req, res) => {
+    const user_nickname = req.params.user_nickname;
+    if (user_nickname!==req.user.nickname) {
+        return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
+    }
     res.json({ url: `/img/${req.file.filename}` });
 });
 
-router.get('/edit', isLoggedIn, async(req, res) => {
+router.get('/:user_nickname/edit', isLoggedIn, async(req, res) => {
+    const user_nickname = req.params.user_nickname;
+    if (user_nickname!==req.user.nickname) {
+        return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
+    }
     res.render('edit', {
         title: '프로필 수정' ,
         User: req.user,
@@ -52,20 +68,22 @@ router.get('/edit', isLoggedIn, async(req, res) => {
 });
 
 const upload2 = multer();
-router.post('/edit', isLoggedIn, upload2.none(), async (req, res, next) => {
-
+router.post('/:user_nickname/edit', isLoggedIn, upload2.none(), async (req, res, next) => {
+    const user_nickname = req.params.user_nickname;
+    if (user_nickname!==req.user.nickname) {
+        return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
+    }
     const {sns_id, nickname,name,birth_date,gender,introduce,profile_image }= req.body;
 
     try {
         if (!nickname) {
-            res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
+            return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
         }
-        exUser = await User.findOne({where: {nickname}});
-        if (exUser.nickname!==req.user.nickname) {
-            res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
-            res.redirect('/join');
+        exUser = await User.findOne({where: {nickname : nickname}});
+        if (exUser&&exUser.nickname!==req.user.nickname) {
+            return res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
         }
-        User.update({
+        await User.update({
             sns_id : sns_id,
             nickname : nickname,
             name : name,
@@ -76,7 +94,7 @@ router.post('/edit', isLoggedIn, upload2.none(), async (req, res, next) => {
         }, {
             where: {id: req.user.id},
         });
-        res.redirect('/profile');
+        res.redirect(`/profile/${nickname}`);
     } catch (error) {
         console.error(error);
         return next(error);
@@ -85,23 +103,37 @@ router.post('/edit', isLoggedIn, upload2.none(), async (req, res, next) => {
 
 
 
-router.get('/change_password', isLoggedIn, async(req, res) => {
-    res.render('change_password', { title: '비밀번호 변경' });
+router.get('/:user_nickname/change_password', isLoggedIn, async(req, res) => {
+    const user_nickname = req.params.user_nickname;
+    if (user_nickname!==req.user.nickname) {
+        return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
+    }
+    res.render('change_password', {
+        title: '비밀번호 변경',
+        user_nickname : user_nickname
+    });
 });
-router.post('/change_password', isLoggedIn, async (req, res, next) => {
-
+router.post('/:user_nickname/change_password', isLoggedIn, async (req, res, next) => {
+    const user_nickname = req.params.user_nickname;
+    if (user_nickname!==req.user.nickname) {
+        return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
+    }
     const {password, new_password,verify_new_password} = req.body;
 
     try {
+
         if (!password) {
-            res.send('<script> alert("비밀번호를 입력해주세요.");history.back()</script>');
+            return res.send('<script> alert("비밀번호를 입력해주세요.");history.back()</script>');
         }
         const result = await bcrypt.compare(password, req.user.password);
         if (!result) {
-            res.send('<script> alert("비밀번호가 올바르지 않습니다.");history.back()</script>');
+            return res.send('<script> alert("비밀번호가 올바르지 않습니다.");history.back()</script>');
         }
         if (new_password!==verify_new_password) {
-            res.send('<script> alert("비밀번호가 같지 않습니다.");history.back()</script>');
+            return res.send('<script> alert("비밀번호가 같지 않습니다.");history.back()</script>');
+        }
+        if (password === new_password) {
+            return res.send('<script> alert("기존 비밀번호와 같습니다.");history.back()</script>');
         }
         const hash = await bcrypt.hash(new_password, 12);
         User.update({
@@ -109,16 +141,12 @@ router.post('/change_password', isLoggedIn, async (req, res, next) => {
         }, {
             where: {id: req.user.id},
         });
-        res.redirect('/profile');
+        res.redirect(`/profile/${user_nickname}`);
     } catch (error) {
         console.error(error);
         return next(error);
     }
 });
-
-
-
-
 
 
 module.exports = router;
