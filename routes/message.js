@@ -87,7 +87,7 @@ router.get('/receive', async(req, res, next) => {
    const start_message_number = page * 10 - 10;
 
    console.log(filter);
-   const user_id = "wodon";
+   const user_id = "psh3253";
    try{
       const user = await User.findOne({
          attributes: ['nickname'],
