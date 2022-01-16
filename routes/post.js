@@ -11,7 +11,7 @@ router.post('/:post_id/delete', async (req, res, next) => {
         const board = await Board.findOne({
             attributes: ['board_type'],
             where: {
-                id: board_id
+                id: board_id,
             }
         });
         if (board.board_type === 'general') {
@@ -62,6 +62,7 @@ router.post('/:post_id/delete', async (req, res, next) => {
 router.get('/:post_id/modify', async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
+    const deadline = req.query.deadline;
     //const user_id = req.user.id;
     const user_id = "psh3253";
 
@@ -72,17 +73,33 @@ router.get('/:post_id/modify', async (req, res, next) => {
                 id: board_id
             }
         });
-        const post = await Post.findOne({
-            attributes: ['id', 'title', 'content'],
-            where: {
-                id: post_id,
-                board_id: board_id
-            }
-        });
-        res.render('post_modify', {
-            board: board,
-            post: post
-        });
+        if(board.board_type === 'general') {
+            const post = await Post.findOne({
+                attributes: ['id', 'title', 'content'],
+                where: {
+                    id: post_id,
+                    board_id: board_id
+                }
+            });
+            res.render('post_modify', {
+                board: board,
+                post: post
+            });
+        }
+        else if(board.board_type === 'recruitment'){
+            const recruitment = await Recruitment.findOne({
+                attributes: ['id', 'title', 'content'],
+                where: {
+                    id: post_id,
+                    board_id: board_id
+                }
+            });
+            res.render('post_modify', {
+                board: board,
+                post: recruitment
+            });
+        }
+
     } catch (err) {
         console.error(err);
         next(err);
@@ -114,9 +131,17 @@ router.post('/:post_id/modify', async (req, res, next) => {
                     board_id: board_id
                 }
             });
-            res.redirect(`/post/${post_id}?board_id=${board_id}`);
         } else if (board.board_type === 'recruitment') {
-
+            await Recruitment.update({
+                title: title,
+                content: content
+            }, {
+                where: {
+                    id: post_id,
+                    board_id: board_id
+                }
+            });
+            res.redirect(`/post/${post_id}?board_id=${board_id}`);
         }
     } catch (err) {
         console.error(err);
@@ -199,6 +224,7 @@ router.post('/:post_id/comment/:comment_id/reply_comment/write', async (req, res
 
 router.post('/:post_id/comment/:comment_id/delete', async (req, res, next) => {
     const post_id = req.params.post_id;
+    const board_id = req.body.board_id;
     const comment_id = req.params.comment_id;
     //const user_id = req.user.id;
     const user_id = "psh3253";
@@ -206,13 +232,17 @@ router.post('/:post_id/comment/:comment_id/delete', async (req, res, next) => {
         const comment = await Comment.findOne({
             attributes: ['creator_id'],
             where: {
-                id: comment_id
+                id: comment_id,
+                board_id: board_id,
+                post_id: post_id
             }
         });
         if (comment.creator_id === user_id) {
             await Comment.destroy({
                 where: {
-                    id: comment_id
+                    id: comment_id,
+                    post_id: post_id,
+                    board_id: board_id
                 }
             });
             res.send('success');
@@ -286,7 +316,18 @@ router.get('/:post_id', async (req, res, next) => {
                 }
             });
         } else if (board.board_type === 'recruitment') {
-
+            post = await Recruitment.findOne({
+                attributes: ['id', 'title', 'content', 'created_at', 'creator_id', 'view_count', 'deadline', 'board_id', [
+                    sequelize.literal('(SELECT name FROM grade WHERE id = user.grade)'), 'grade'
+                ]],
+                where: {
+                    id: post_id
+                },
+                include: {
+                    model: User,
+                    attributes: ['nickname']
+                }
+            })
         }
         const is_like = await sequelize.models.Like.findOne({
             where: {

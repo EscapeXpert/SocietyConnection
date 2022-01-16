@@ -66,7 +66,7 @@ router.get('/send', async(req, res, next) => {
          }
       });
 
-      const message = await sequelize.query(`SELECT message.id, title, message, is_read, created_at, user.nickname FROM message LEFT JOIN user ON message.receiver_id = user.id WHERE message.sender_id = '${user_id}' AND message.is_sender_delete = FALSE ORDER BY created_at DESC LIMIT ` + start_message_number.toString() + `, 10`,{
+      const message = await sequelize.query('SELECT message.id, message.title, message.message, message.is_read, message.created_at, user.nickname FROM `message` LEFT JOIN `user` ON message.receiver_id = user.id WHERE message.sender_id = `${user_id}` AND message.is_sender_delete = FALSE ORDER BY created_at DESC LIMIT ' + start_message_number.toString() + ', 10',{
          type: QueryTypes.SELECT
       });
       res.render("message_send", {
@@ -101,7 +101,7 @@ router.get('/receive', async(req, res, next) => {
          }
       });
 
-      const messages = await sequelize.query(`SELECT message.id, message, title, is_read, created_at, user.nickname FROM message LEFT JOIN user ON message.sender_id = user.id WHERE message.receiver_id = '${user_id}' AND message.is_receiver_delete = FALSE ORDER BY created_at DESC LIMIT ` + start_message_number.toString() + `, 10`,{
+      const messages = await sequelize.query('SELECT message.id, message.message, message.title, message.is_read, message.created_at, user.nickname FROM `message` LEFT JOIN `user` ON message.sender_id = user.id WHERE message.receiver_id = `${user_id}` AND message.is_receiver_delete = FALSE ORDER BY created_at DESC LIMIT ' + start_message_number.toString() + ', 10',{
           type: QueryTypes.SELECT
       });
 
@@ -157,9 +157,10 @@ router.post('/delete', async(req, res, next)=>{
 router.get('/:message_id', async(req, res, next)=>{
    const message_id = req.params.message_id;
    const type = req.query.type;
+   // const user_id = req.user.id;
    const user_id = "psh3253";
    try{
-      const message = await sequelize.query(`SELECT * FROM message WHERE message.id = '${message_id}' AND (message.sender_id = '${user_id}' OR message.receiver_id = '${user_id}')`,{
+      const message = await sequelize.query('SELECT * FROM `message` WHERE message.id = `${message_id}` AND (message.sender_id = `${user_id}` OR message.receiver_id = `${user_id}`)',{
          type: QueryTypes.SELECT
       });
 
