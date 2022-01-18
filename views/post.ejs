@@ -34,8 +34,8 @@
             <p><%= content %></p>
         <% } %>
         <% if(board.board_type === 'recruitment') { %>
-        <% const deadline = post.deadline.toISOString()%>
-            <span><%= deadline%></span>
+            <% const deadline = post.deadline.toISOString() %>
+            <span><%= deadline %></span>
         <% } %>
     </div>
     <div>
@@ -63,7 +63,7 @@
         <h3>댓글</h3>
         <ul>
             <% for(let comment of comment_list) { %>
-                <li id="<%= comment.id %>">
+                <li id="<%= comment.id %>" class="comment_box">
                     <!-- 프로필 사진-->
                     <a href="/profile/<%= comment.User.nickname %>"><%= comment.User.nickname %></a>
                     <p><%= comment.content %></p>
@@ -74,6 +74,21 @@
                         <a href="#" id="comment_delete">삭제</a>
                     <% } %>
                 </li>
+                <% if(reply_comment_map.has(comment.id)) { %>
+                    <% const reply_comment_list = reply_comment_map.get(comment.id) %>
+                    <% for(let reply_comment of reply_comment_list) { %>
+                        <li id="<%= reply_comment.id %>" class="reply_comment_box" style="padding-left: 30px">
+                            <a href="/profile/<%= reply_comment.User.nickname %>"><%= reply_comment.User.nickname %></a>
+                            <p><%= reply_comment.content %></p>
+                            <% const date = new Date(reply_comment.created_at) %>
+                            <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+                            <a href="#" id="open_reply_comment">답글</a>
+                            <% if(user.id === comment.creator_id) { %>
+                                <a href="#" id="reply_comment_delete">삭제</a>
+                            <% } %>
+                        </li>
+                    <% } %>
+                <% } %>
             <% } %>
         </ul>
         <p><%= user.nickname %></p>
@@ -195,9 +210,17 @@
                 const reply_comment_tag = document.querySelector('#reply_comment');
                 reply_comment_tag.remove();
             }
-            const comment_id = open_reply_comment_tag.parentElement.id;
+            let comment_id;
+            let reply_comment_box_tag = open_reply_comment_tag.parentElement;
+            while (true) {
+                if (reply_comment_box_tag.className === 'comment_box') {
+                    comment_id = reply_comment_box_tag.id;
+                    break;
+                }
+                reply_comment_box_tag = reply_comment_box_tag.previousElementSibling;
+            }
             let new_li_tag = document.createElement('li');
-            new_li_tag.id = 'reply_comment'; 
+            new_li_tag.id = 'reply_comment';
             new_li_tag.innerHTML = '' +
                 '<label for="reply_comment_content"></label>' +
                 '<textarea name="reply_comment_content" id="reply_comment_content" placeholder="답글을 남겨주세요." rows="5" cols="50" style="resize: none" "></textarea>' +
@@ -205,7 +228,7 @@
                 '<a href="#" id="reply_comment_close">취소 </a>' +
                 '<a href="#" id="submit_reply_comment">등록</a>' +
                 '</div>';
-            open_reply_comment_tag.parentElement.appendChild(new_li_tag)
+            open_reply_comment_tag.parentElement.after(new_li_tag)
 
             const reply_comment_close_tag = document.querySelector('#reply_comment_close');
             reply_comment_close_tag.addEventListener('click', function (event) {
@@ -232,6 +255,25 @@
             });
             is_open_reply_comment = true;
         });
+    });
+
+    const reply_comment_delete_tags = document.querySelectorAll('#reply_comment_delete');
+    reply_comment_delete_tags.forEach(reply_comment_delete_tag => {
+        reply_comment_delete_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            const reply_comment_id = reply_comment_delete_tag.parentElement.id;
+            await axios.post(`/post/${post_id}/reply_comment/${reply_comment_id}/delete`)
+                .then((response) => {
+                    if (response.data === 'success') {
+                        location.reload();
+                    } else if (response.data === 'not creator') {
+                        alert("자신의 답글만 삭제할 수 있습니다.");
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        })
     });
 </script>
 </html>
