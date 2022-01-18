@@ -275,6 +275,34 @@ router.post('/:post_id/comment/write', async (req, res, next) => {
     }
 });
 
+router.post('/:post_id/reply_comment/:reply_comment_id/delete', async(req, res, next) => {
+    const post_id = req.params.post_id;
+    const reply_comment_id = req.params.reply_comment_id;
+    // cosnt user_id = req.user.id;
+    const user_id = 'psh3253'
+    try {
+        const reply_comment = await ReplyComment.findOne({
+            attributes: ['creator_id'],
+            where: {
+                id: reply_comment_id,
+            }
+        });
+        if (reply_comment.creator_id === user_id) {
+            await ReplyComment.destroy({
+                where: {
+                    id: reply_comment_id,
+                }
+            });
+            res.send('success');
+        } else {
+            res.send('not creator');
+        }
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
 router.get('/:post_id', async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
@@ -295,9 +323,6 @@ router.get('/:post_id', async (req, res, next) => {
         });
         let post;
         if (board.board_type === 'general') {
-            //post = await sequelize.query('SELECT post.id, post.title, post.content, post.created_at, post.creator_id, post.view_count, post.board_id, (SELECT count(*) FROM `like` WHERE post_id = post.id) `like`, (SELECT count(*) FROM `comment` WHERE post_id = post.id) comment, user.nickname, (SELECT name FROM grade WHERE id = user.grade) `grade` FROM post LEFT JOIN user ON post.creator_id = user.id WHERE post.id = ' + post_id, {
-            //    type: QueryTypes.SELECT
-            //});
             post = await Post.findOne({
                 attributes: ['id', 'title', 'content', 'created_at', 'creator_id', 'view_count', 'board_id', [
                     sequelize.literal('(SELECT name FROM grade WHERE id = user.grade)'), 'grade'
@@ -358,13 +383,29 @@ router.get('/:post_id', async (req, res, next) => {
                 attributes: ['nickname']
             }
         });
+        let reply_comment_map = new Map();
+        for(let i = 0; i < comment_list.length; i++)
+        {
+            const reply_comment_list = await ReplyComment.findAll({
+                attributes: ['id', 'content', 'created_at', 'creator_id', 'comment_id'],
+                where: {
+                    comment_id: comment_list[i].id
+                },
+                include: {
+                    model: User,
+                    attributes: ['nickname']
+                }
+            });
+            reply_comment_map.set(comment_list[i].id, reply_comment_list);
+        }
         res.render('post', {
             post: post,
             board: board,
             user: user,
             is_like: is_like,
             like_list: like_list,
-            comment_list: comment_list
+            comment_list: comment_list,
+            reply_comment_map: reply_comment_map
         });
     } catch (err) {
         console.error(err);
