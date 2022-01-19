@@ -19,11 +19,11 @@
 </div>
 <div>
     <!-- 프로필 사진-->
-    <a href="/profile/<%= post.nickname %>"><%= post.nickname %></a>
-    <span><%= post.grade %></span>
+    <a href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
+    <span><%= post.toJSON().grade %></span>
     <% if(post.creator_id !== user.id) { %>
         <a href='#'
-           onclick="window.open('/message/write?target_nickname=<%= post.nickname %>','<%= post.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
+           onclick="window.open('/message/write?target_nickname=<%= post.User.nickname %>','<%= post.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
     <% } %>
 </div>
 <div>

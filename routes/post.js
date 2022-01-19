@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment} = require('../models');
+const {isLoggedIn} = require("./middlewares");
 
-router.post('/:post_id/delete', async (req, res, next) => {
+router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
     //const user_id = req.user.id;
@@ -59,7 +60,7 @@ router.post('/:post_id/delete', async (req, res, next) => {
     }
 });
 
-router.get('/:post_id/modify', async (req, res, next) => {
+router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
     const deadline = req.query.deadline;
@@ -73,7 +74,7 @@ router.get('/:post_id/modify', async (req, res, next) => {
                 id: board_id
             }
         });
-        if(board.board_type === 'general') {
+        if (board.board_type === 'general') {
             const post = await Post.findOne({
                 attributes: ['id', 'title', 'content'],
                 where: {
@@ -85,8 +86,7 @@ router.get('/:post_id/modify', async (req, res, next) => {
                 board: board,
                 post: post
             });
-        }
-        else if(board.board_type === 'recruitment'){
+        } else if (board.board_type === 'recruitment') {
             const recruitment = await Recruitment.findOne({
                 attributes: ['id', 'title', 'content'],
                 where: {
@@ -106,13 +106,12 @@ router.get('/:post_id/modify', async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/modify', async (req, res, next) => {
+router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
     const title = req.body.title;
     const content = req.body.content;
-    //const user_id = req.user.id;
-    const user_id = "psh3253";
+    const user_id = req.user.id;
 
     try {
         const board = await Board.findOne({
@@ -122,15 +121,29 @@ router.post('/:post_id/modify', async (req, res, next) => {
             }
         });
         if (board.board_type === 'general') {
-            await Post.update({
-                title: title,
-                content: content
-            }, {
+            const post = await Post.findOne({
+                attributes: ['creator_id'],
                 where: {
                     id: post_id,
                     board_id: board_id
                 }
             });
+            if(post.creator_id === user_id)
+            {
+                await Post.update({
+                    title: title,
+                    content: content
+                }, {
+                    where: {
+                        id: post_id,
+                        board_id: board_id
+                    }
+                });
+                res.redirect(`/post/${post_id}?board_id=${board_id}`);
+            }
+            else {
+                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.")</script>');
+            }
         } else if (board.board_type === 'recruitment') {
             await Recruitment.update({
                 title: title,
@@ -149,17 +162,17 @@ router.post('/:post_id/modify', async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/set_notice', async (req, res) => {
+router.post('/:post_id/set_notice', isLoggedIn, async (req, res) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
 });
 
-router.post('/:post_id/unset_notice', async (req, res) => {
+router.post('/:post_id/unset_notice', isLoggedIn, async (req, res) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
 });
 
-router.get('/:post_id/apply', async (req, res) => {
+router.get('/:post_id/apply', isLoggedIn, async (req, res) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
 });
@@ -169,11 +182,10 @@ router.post('/:post_id/apply', async (req, res) => {
     const user_id = req.user.id;
 });
 
-router.post('/:post_id/like', async (req, res, next) => {
+router.post('/:post_id/like', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
-    //const user_id = req.user.id;
-    const user_id = "psh3253";
+    const user_id = req.user.id;
     try {
         const is_like = await Like.findOne({
             where: {
@@ -204,11 +216,10 @@ router.post('/:post_id/like', async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/comment/:comment_id/reply_comment/write', async (req, res, next) => {
+router.post('/:post_id/comment/:comment_id/reply_comment/write', isLoggedIn, async (req, res, next) => {
     const comment_id = req.params.comment_id;
     const reply_comment_content = req.body.reply_comment_content;
-    //const user_id = req.user.id;
-    const user_id = 'psh3253'
+    const user_id = req.user.id;
     try {
         await ReplyComment.create({
             content: reply_comment_content,
@@ -222,12 +233,11 @@ router.post('/:post_id/comment/:comment_id/reply_comment/write', async (req, res
     }
 });
 
-router.post('/:post_id/comment/:comment_id/delete', async (req, res, next) => {
+router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
     const comment_id = req.params.comment_id;
-    //const user_id = req.user.id;
-    const user_id = "psh3253";
+    const user_id = req.user.id;
     try {
         const comment = await Comment.findOne({
             attributes: ['creator_id'],
@@ -255,12 +265,11 @@ router.post('/:post_id/comment/:comment_id/delete', async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/comment/write', async (req, res, next) => {
+router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
     const content = req.body.comment_content;
-    //const user_id = req.user.id;
-    const user_id = "psh3253";
+    const user_id = req.user.id;
     try {
         await Comment.create({
             content: content,
@@ -275,11 +284,10 @@ router.post('/:post_id/comment/write', async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/reply_comment/:reply_comment_id/delete', async(req, res, next) => {
+router.post('/:post_id/reply_comment/:reply_comment_id/delete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const reply_comment_id = req.params.reply_comment_id;
-    // cosnt user_id = req.user.id;
-    const user_id = 'psh3253'
+    const user_id = req.user.id;
     try {
         const reply_comment = await ReplyComment.findOne({
             attributes: ['creator_id'],
@@ -303,11 +311,10 @@ router.post('/:post_id/reply_comment/:reply_comment_id/delete', async(req, res, 
     }
 });
 
-router.get('/:post_id', async (req, res, next) => {
+router.get('/:post_id', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
-    //const user_id = req.user.id;
-    const user_id = 'psh3253';
+    const user_id = req.user.id;
     try {
         const board = await Board.findOne({
             attributes: ['id', 'name', 'board_type'],
@@ -384,8 +391,7 @@ router.get('/:post_id', async (req, res, next) => {
             }
         });
         let reply_comment_map = new Map();
-        for(let i = 0; i < comment_list.length; i++)
-        {
+        for (let i = 0; i < comment_list.length; i++) {
             const reply_comment_list = await ReplyComment.findAll({
                 attributes: ['id', 'content', 'created_at', 'creator_id', 'comment_id'],
                 where: {

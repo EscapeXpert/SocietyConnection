@@ -9,11 +9,9 @@ const {Op} = require("sequelize");
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    console.log(req.user);
     const BoardList = await Board.findAll({
         attributes: ['id','name']
     });
-    console.log(BoardList);
     res.render('main', {
         title: '메인' ,
         User: req.user,
