@@ -12,6 +12,7 @@
             <label for="id"><%= User.nickname %></label>
         </div>
         <a href="/auth/logout">로그아웃</a>
+        <a href="/auth/kakao_logout">카카오계정과 함께 로그아웃</a>
         <a href="/profile/<%= User.nickname %>">프로필</a>
     <% }else{ %>
         <form id="main-form" action="/auth/login" method="post">

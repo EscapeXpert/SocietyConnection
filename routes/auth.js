@@ -77,7 +77,7 @@ router.get('/logout', isLoggedIn, async(req, res) => {
             const ACCESS_TOKEN = req.user.accessToken;
             let logout = await axios({
                 method:'post',
-                url:'https://kapi.kakao.com/v1/user/unlink',
+                url:'https://kapi.kakao.com/v1/user/logout',
                 headers:{
                     'Authorization': `Bearer ${ACCESS_TOKEN}`
                 }
@@ -91,7 +91,25 @@ router.get('/logout', isLoggedIn, async(req, res) => {
     req.session.destroy();
     res.redirect('/');
 });
-
+router.get('/kakao_logout', isLoggedIn, async(req, res) => {
+    if (req.user.login_type === 'kakao') {
+        try {
+            const REST_API_KEY = process.env.KAKAO_ID;
+            const LOGOUT_REDIRECT_URI = 'http://localhost:3001/auth/logout';
+            let logout = await axios({
+                method: 'get',
+                url: `https://kauth.kakao.com/oauth/logout?client_id=${REST_API_KEY}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`
+            });
+            console.log("카카오 계정과 함께 로그아웃",logout);
+        } catch (error) {
+            console.error(error);
+            res.json(error);
+        }
+    }
+    req.logout();
+    req.session.destroy();
+    res.redirect('/');
+});
 router.get('/kakao', passport.authenticate('kakao'));
 
 router.get('/kakao/callback', passport.authenticate('kakao', {
