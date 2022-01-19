@@ -100,9 +100,25 @@ router.get('/:board_id', async (req, res, next) => {
                 }
             );
         } else if (board.board_type === 'recruitment') {
-            const recruitments = await sequelize.query('SELECT recruitment.id, recruitment.title, user.nickname, recruitment.created_at, recruitment.view_count, recruitment.deadline, (SELECT count(*) FROM `like` WHERE post_id = recruitment.id) `like`, (SELECT count(*) FROM comment WHERE post_id = recruitment.id) comment FROM `recruitment` LEFT JOIN `user` ON recruitment.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10', {
-                type: QueryTypes.SELECT
+            const recruitments = await Recruitment.findAll({
+                attributes: ['id', 'title', 'created_at', 'view_count', 'deadline', [
+                    sequelize.literal('(SELECT count(*) FROM `like` WHERE `board_id` = ' + board_id + ' AND `post_id` = `recruitment`.`id`)'), 'like'
+                ], [
+                    sequelize.literal('(SELECT count(*) FROM `comment` WHERE `board_id` = ' + board_id + ' AND `post_id` = `recruitment`.`id`)'), 'comment'
+                ]],
+                where: {
+                    board_id: board_id
+                },
+                include: [{
+                    model: User,
+                    attributes: ['nickname']
+                }],
+                offset: start_post_number,
+                limit: 10,
             });
+            //const recruitments = await sequelize.query('SELECT recruitment.id, recruitment.title, user.nickname, recruitment.created_at, recruitment.view_count, recruitment.deadline, (SELECT count(*) FROM `like` WHERE post_id = recruitment.id) `like`, (SELECT count(*) FROM comment WHERE post_id = recruitment.id) comment FROM `recruitment` LEFT JOIN `user` ON recruitment.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10', {
+            //    type: QueryTypes.SELECT
+            //});
             const recruitment_count = await Recruitment.count({
                 where: {
                     board_id: board_id
