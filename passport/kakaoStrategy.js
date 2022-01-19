@@ -1,16 +1,28 @@
 const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
 const User = require('../models/user');
+const axios = require("axios");
 
 module.exports = () => {
   passport.use(new KakaoStrategy({
     clientID: process.env.KAKAO_ID,
     callbackURL: '/auth/kakao/callback',
   }, async (accessToken, refreshToken, profile, done) => {
-    console.log('profile',profile);
+    //console.log('profile',profile);
     let new_user_gender;
     try {
       if(profile._json.kakao_account.email_needs_agreement===true){
+        try {
+          let logout = await axios({
+            method:'post',
+            url:'https://kapi.kakao.com/v1/user/unlink',
+            headers:{
+              'Authorization': `Bearer ${accessToken}`
+            }
+          });
+        } catch (error) {
+          console.error(error);
+        }
         throw new Error('이메일 수집 동의를 선택해주세요.');
       }
       const exUser = await User.findOne({
