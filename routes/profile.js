@@ -136,7 +136,7 @@ router.post('/:user_nickname/change_password', isLoggedIn, async (req, res, next
             return res.send('<script> alert("기존 비밀번호와 같습니다.");history.back()</script>');
         }
         const hash = await bcrypt.hash(new_password, 12);
-        User.update({
+        await User.update({
             password: hash,
         }, {
             where: {id: req.user.id},
