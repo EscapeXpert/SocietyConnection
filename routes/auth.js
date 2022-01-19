@@ -18,25 +18,25 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
     try {
         let exUser = await User.findOne({where: {id}});
         if (!id) {
-            res.send('<script> alert("아이디를 입력해주세요.");history.back()</script>');
+            return res.send('<script> alert("아이디를 입력해주세요.");history.back()</script>');
         }
         if (exUser) {
-            res.send('<script> alert("이미 존재하는 아이디입니다.");history.back()</script>');
+            return res.send('<script> alert("이미 존재하는 아이디입니다.");history.back()</script>');
         }
         if (!password) {
-            res.send('<script> alert("비밀번호를 입력해주세요.");history.back()</script>');
+            return res.send('<script> alert("비밀번호를 입력해주세요.");history.back()</script>');
         }
         if (password !== verify_password) {
-            res.send('<script> alert("비밀번호가 같지 않습니다.");history.back()</script>');
+            return res.send('<script> alert("비밀번호가 같지 않습니다.");history.back()</script>');
         }
         if (!nickname) {
-            res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
+            return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
         }
 
         exUser = await User.findOne({where: {nickname}});
         if (exUser) {
             res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
-            res.redirect('/join');
+            return res.redirect('/join');
         }
 
         const hash = await bcrypt.hash(password, 12);
@@ -72,7 +72,7 @@ router.post('/login', isNotLoggedIn, async (req, res, next) => {
 });
 
 router.get('/logout', isLoggedIn, async (req, res) => {
-    if (req.user.login_type === 'kakao') {
+    /*if (req.user.login_type === 'kakao') {
         try {
             const ACCESS_TOKEN = req.user.accessToken;
             let logout = await axios({
@@ -86,9 +86,12 @@ router.get('/logout', isLoggedIn, async (req, res) => {
             console.error(error);
             res.json(error);
         }
-    }
+    }*/
     req.logout();
-    req.session.destroy();
+    if(req.session){
+        req.session.destroy();
+    }
+
     res.redirect('/');
 });
 router.get('/kakao_logout', isLoggedIn, async (req, res) => {
@@ -96,11 +99,8 @@ router.get('/kakao_logout', isLoggedIn, async (req, res) => {
         const REST_API_KEY = process.env.KAKAO_ID;
         const LOGOUT_REDIRECT_URI = 'http://localhost:3001/auth/logout';
         res.redirect(`https://kauth.kakao.com/oauth/logout?client_id=${REST_API_KEY}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`);
-
     }
-    req.logout();
-    req.session.destroy();
-    res.redirect('/');
+    //res.redirect('/');
 });
 router.get('/kakao', passport.authenticate('kakao'));
 
