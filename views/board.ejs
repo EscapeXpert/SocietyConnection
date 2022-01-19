@@ -33,7 +33,7 @@
                     <% } %>
                 </div>
             </td>
-            <td><%= post.nickname %></td>
+            <td><%= post.User.nickname %></td>
             <% const date = new Date(post.created_at) %>
             <% const current_date = new Date() %>
             <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>

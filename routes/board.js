@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const {isLoggedIn} = require('./middlewares');
 const {sequelize, Post, Board, Recruitment, User} = require('../models');
 const {QueryTypes} = require('sequelize');
 
-router.get('/:board_id/write', async (req, res, next) => {
+router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
     const board_id = req.params.board_id;
     try {
         const board = await Board.findOne({
@@ -21,13 +22,12 @@ router.get('/:board_id/write', async (req, res, next) => {
     }
 });
 
-router.post('/:board_id/write', async (req, res, next) => {
+router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
     const board_id = req.params.board_id;
     const title = req.body.title;
     const content = req.body.content;
     const deadline = req.body.deadline;
-    const creator_id = 'psh3253';
-    //const creator_id = req.user.id;
+    const creator_id = req.user.id;
     try {
         const board = await Board.findOne({
             attributes: ['board_type'],

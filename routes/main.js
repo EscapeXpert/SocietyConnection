@@ -7,7 +7,6 @@ const passport = require("passport");
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    console.log(req.user);
     res.render('main', {
         title: '메인' ,
         User: req.user,
