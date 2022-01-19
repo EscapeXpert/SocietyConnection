@@ -8,12 +8,12 @@ const axios = require("axios");
 const router = express.Router();
 
 
-router.get('/join', isNotLoggedIn, async(req, res) => {
-    res.render('join', { title: '회원가입' });
+router.get('/join', isNotLoggedIn, async (req, res) => {
+    res.render('join', {title: '회원가입'});
 });
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
 
-    const {id, password,verify_password,  nickname} = req.body;
+    const {id, password, verify_password, nickname} = req.body;
 
     try {
         let exUser = await User.findOne({where: {id}});
@@ -26,7 +26,7 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
         if (!password) {
             res.send('<script> alert("비밀번호를 입력해주세요.");history.back()</script>');
         }
-        if (password!==verify_password) {
+        if (password !== verify_password) {
             res.send('<script> alert("비밀번호가 같지 않습니다.");history.back()</script>');
         }
         if (!nickname) {
@@ -52,7 +52,7 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/login', isNotLoggedIn, async(req, res, next) => {
+router.post('/login', isNotLoggedIn, async (req, res, next) => {
     passport.authenticate('local', (authError, user, info) => {
         if (authError) {
             console.error(authError);
@@ -71,14 +71,14 @@ router.post('/login', isNotLoggedIn, async(req, res, next) => {
     })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
 });
 
-router.get('/logout', isLoggedIn, async(req, res) => {
-    if(req.user.login_type==='kakao'){
+router.get('/logout', isLoggedIn, async (req, res) => {
+    if (req.user.login_type === 'kakao') {
         try {
             const ACCESS_TOKEN = req.user.accessToken;
             let logout = await axios({
-                method:'post',
-                url:'https://kapi.kakao.com/v1/user/logout',
-                headers:{
+                method: 'post',
+                url: 'https://kapi.kakao.com/v1/user/logout',
+                headers: {
                     'Authorization': `Bearer ${ACCESS_TOKEN}`
                 }
             });
@@ -91,20 +91,12 @@ router.get('/logout', isLoggedIn, async(req, res) => {
     req.session.destroy();
     res.redirect('/');
 });
-router.get('/kakao_logout', isLoggedIn, async(req, res) => {
+router.get('/kakao_logout', isLoggedIn, async (req, res) => {
     if (req.user.login_type === 'kakao') {
-        try {
-            const REST_API_KEY = process.env.KAKAO_ID;
-            const LOGOUT_REDIRECT_URI = 'http://localhost:3001/auth/logout';
-            let logout = await axios({
-                method: 'get',
-                url: `https://kauth.kakao.com/oauth/logout?client_id=${REST_API_KEY}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`
-            });
-            console.log("카카오 계정과 함께 로그아웃",logout);
-        } catch (error) {
-            console.error(error);
-            res.json(error);
-        }
+        const REST_API_KEY = process.env.KAKAO_ID;
+        const LOGOUT_REDIRECT_URI = 'http://localhost:3001/auth/logout';
+        res.redirect(`https://kauth.kakao.com/oauth/logout?client_id=${REST_API_KEY}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`);
+
     }
     req.logout();
     req.session.destroy();
