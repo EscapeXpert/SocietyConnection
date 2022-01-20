@@ -34,71 +34,76 @@
             <p><%= content %></p>
         <% } %>
         <% if(board.board_type === 'recruitment') { %>
-            <% const deadline = post.deadline.toISOString() %>
-            <span><%= deadline %></span>
+            <% const offset = new Date().getTimezoneOffset() * 60000 %>
+            <% const date_string = new Date(post.deadline - offset).toISOString() %>
+            <td><%= date_string.slice(0, 16).replace('T', ' ') %></td>
         <% } %>
     </div>
-    <div>
-        <a href="#" id="like">
-            <% if(is_like == null) { %>
-                <img src="/public/icon/red-empty-heart.svg" width="16" height="16" alt="">
-            <% } else { %>
-                <img src="/public/icon/red-heart.svg" width="16" height="16" alt="">
-            <% } %>
-        </a>
-        <a href="#" id="go_like_list">좋아요 <%= like_list.length %></a>
-        <a href="#" id="go_comment_list">댓글 <%= comment_list.length %></a>
-    </div>
-    <div id="like_list" class="like_list" style="display: none">
-        <ul>
-            <% for(let like_user of like_list) { %>
-                <li>
-                    <!-- 프로필 사진-->
-                    <a href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
-                </li>
-            <% } %>
-        </ul>
-    </div>
-    <div id="comment_list" class="comment_list" style="display: block">
-        <h3>댓글</h3>
-        <ul>
-            <% for(let comment of comment_list) { %>
-                <li id="<%= comment.id %>" class="comment_box">
-                    <!-- 프로필 사진-->
-                    <a href="/profile/<%= comment.User.nickname %>"><%= comment.User.nickname %></a>
-                    <p><%= comment.content %></p>
-                    <% const date = new Date(comment.created_at) %>
-                    <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
-                    <a href="#" id="open_reply_comment">답글</a>
-                    <% if(user.id === comment.creator_id) { %>
-                        <a href="#" id="comment_delete">삭제</a>
-                    <% } %>
-                </li>
-                <% if(reply_comment_map.has(comment.id)) { %>
-                    <% const reply_comment_list = reply_comment_map.get(comment.id) %>
-                    <% for(let reply_comment of reply_comment_list) { %>
-                        <li id="<%= reply_comment.id %>" class="reply_comment_box" style="padding-left: 30px">
-                            <a href="/profile/<%= reply_comment.User.nickname %>"><%= reply_comment.User.nickname %></a>
-                            <p><%= reply_comment.content %></p>
-                            <% const date = new Date(reply_comment.created_at) %>
-                            <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
-                            <a href="#" id="open_reply_comment">답글</a>
-                            <% if(user.id === comment.creator_id) { %>
-                                <a href="#" id="reply_comment_delete">삭제</a>
-                            <% } %>
-                        </li>
+    <% if(board.board_type === 'general') { %>
+        <div>
+            <a href="#" id="like">
+                <% if(is_like == null) { %>
+                    <img src="/public/icon/red-empty-heart.svg" width="16" height="16" alt="">
+                <% } else { %>
+                    <img src="/public/icon/red-heart.svg" width="16" height="16" alt="">
+                <% } %>
+            </a>
+            <a href="#" id="go_like_list">좋아요 <%= like_list.length %></a>
+            <a href="#" id="go_comment_list">댓글 <%= comment_list.length %></a>
+        </div>
+        <div id="like_list" class="like_list" style="display: none">
+            <ul>
+                <% for(let like_user of like_list) { %>
+                    <li>
+                        <!-- 프로필 사진-->
+                        <a href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+        <div id="comment_list" class="comment_list" style="display: block">
+            <h3>댓글</h3>
+            <ul>
+                <% for(let comment of comment_list) { %>
+                    <li id="<%= comment.id %>" class="comment_box">
+                        <!-- 프로필 사진-->
+                        <a href="/profile/<%= comment.User.nickname %>"><%= comment.User.nickname %></a>
+                        <p><%= comment.content %></p>
+                        <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                        <% const date = new Date(comment.created_at - offset) %>
+                        <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+                        <a href="#" id="open_reply_comment">답글</a>
+                        <% if(user.id === comment.creator_id) { %>
+                            <a href="#" id="comment_delete">삭제</a>
+                        <% } %>
+                    </li>
+                    <% if(reply_comment_map.has(comment.id)) { %>
+                        <% const reply_comment_list = reply_comment_map.get(comment.id) %>
+                        <% for(let reply_comment of reply_comment_list) { %>
+                            <li id="<%= reply_comment.id %>" class="reply_comment_box" style="padding-left: 30px">
+                                <a href="/profile/<%= reply_comment.User.nickname %>"><%= reply_comment.User.nickname %></a>
+                                <p><%= reply_comment.content %></p>
+                                <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                                <% const date = new Date(reply_comment.created_at - offset) %>
+                                <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+                                <a href="#" id="open_reply_comment">답글</a>
+                                <% if(user.id === comment.creator_id) { %>
+                                    <a href="#" id="reply_comment_delete">삭제</a>
+                                <% } %>
+                            </li>
+                        <% } %>
                     <% } %>
                 <% } %>
-            <% } %>
-        </ul>
-        <p><%= user.nickname %></p>
-        <label for="comment_content"></label>
-        <textarea name="comment_content" id="comment_content" placeholder="댓글을 남겨보세요." rows="5" cols="50"
-                  style="resize: none"></textarea>
-        <div class="comment_button_box">
-            <a href="#" id="submit_comment">등록</a>
+            </ul>
+            <p><%= user.nickname %></p>
+            <label for="comment_content"></label>
+            <textarea name="comment_content" id="comment_content" placeholder="댓글을 남겨보세요." rows="5" cols="50"
+                      style="resize: none"></textarea>
+            <div class="comment_button_box">
+                <a href="#" id="submit_comment">등록</a>
+            </div>
         </div>
-    </div>
+    <% } %>
 </div>
 <div class="">
 
@@ -108,23 +113,8 @@
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    const like_tag = document.querySelector('#like');
     const post_id = document.querySelector('#post_id').value;
     const board_id = document.querySelector('#board_id').value;
-    like_tag.addEventListener('click', async function (event) {
-        event.preventDefault();
-        await axios.post(`/post/${post_id}/like`, {
-            board_id: board_id
-        })
-            .then((response) => {
-                if (response.data === 'success') {
-                    location.reload();
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-    });
 
     const delete_tag = document.querySelector('#delete');
     delete_tag.addEventListener('click', async function (event) {
@@ -138,6 +128,23 @@
                 } else if (response.data === 'not creator') {
                     alert("자신의 게시글만 삭제하실 수 있습니다.");
                     history.back();
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    });
+
+    <% if(board.board_type === 'general') { %>
+    const like_tag = document.querySelector('#like');
+    like_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await axios.post(`/post/${post_id}/like`, {
+            board_id: board_id
+        })
+            .then((response) => {
+                if (response.data === 'success') {
+                    location.reload();
                 }
             })
             .catch((err) => {
@@ -278,5 +285,6 @@
                 });
         })
     });
+    <% } %>
 </script>
 </html>

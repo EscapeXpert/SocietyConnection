@@ -6,8 +6,8 @@ const {isLoggedIn} = require("./middlewares");
 router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
-    //const user_id = req.user.id;
-    const user_id = "psh3253"
+    const user_id = req.user.id;
+    //const user_id = "psh3253"
     try {
         const board = await Board.findOne({
             attributes: ['board_type'],
@@ -63,9 +63,8 @@ router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
 router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
-    const deadline = req.query.deadline;
-    //const user_id = req.user.id;
-    const user_id = "psh3253";
+    const user_id = req.user.id;
+    //const user_id = "psh3253";
 
     try {
         const board = await Board.findOne({
@@ -88,7 +87,7 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
             });
         } else if (board.board_type === 'recruitment') {
             const recruitment = await Recruitment.findOne({
-                attributes: ['id', 'title', 'content'],
+                attributes: ['id', 'title', 'content', 'deadline'],
                 where: {
                     id: post_id,
                     board_id: board_id
@@ -112,6 +111,7 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     const title = req.body.title;
     const content = req.body.content;
     const user_id = req.user.id;
+    const deadline = req.body.deadline;
 
     try {
         const board = await Board.findOne({
@@ -143,16 +143,41 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                 res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.")</script>');
             }
         } else if (board.board_type === 'recruitment') {
-            await Recruitment.update({
-                title: title,
-                content: content
-            }, {
+            const post = await Recruitment.findOne({
+                attributes: ['creator_id'],
                 where: {
                     id: post_id,
                     board_id: board_id
                 }
             });
-            res.redirect(`/post/${post_id}?board_id=${board_id}`);
+            if (post.creator_id === user_id) {
+                const offset = new Date().getTimezoneOffset() * 60000;
+                const date = new Date(Date.now() - offset);
+                const max_date = new Date(Date.now() - offset)
+                max_date.setFullYear(max_date.getFullYear() + 1)
+                console.log(deadline);
+                console.log(date);
+                if(deadline > date){
+                    console.log("Hello");
+                }
+                if (deadline < date)
+                    return res.send('<script>alert("마감 기한은 현재 시각 이전으로 설정할 수 없습니다.");history.back();</script>');
+                else {
+                    await Recruitment.update({
+                        title: title,
+                        content: content,
+                        deadline: deadline
+                    }, {
+                        where: {
+                            id: post_id,
+                            board_id: board_id
+                        }
+                    });
+                }
+                res.redirect(`/post/${post_id}?board_id=${board_id}`);
+            } else {
+                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.")</script>');
+            }
         }
     } catch (err) {
         console.error(err);
@@ -268,6 +293,7 @@ router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
     const board_id = req.body.board_id;
     const content = req.body.comment_content;
     const user_id = req.user.id;
+    console.log(content);
     try {
         await Comment.create({
             content: content,

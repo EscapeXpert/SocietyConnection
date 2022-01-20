@@ -20,8 +20,11 @@
         <% if(board.board_type === 'recruitment') { %>
             <div>
                 <label for="deadline"></label>
-                <% console.log(123) %>
-                <input type="date" name="deadline" id="deadline" value="<%= post.deadline%> required">
+                <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                <% const date = new Date(Date.now() - offset) %>
+                <% const max_date = new Date(Date.now() - offset) %>
+                <% max_date.setFullYear(max_date.getFullYear() + 1)%>
+                <input type="datetime-local" name="deadline" id="deadline" min="<%= date.toISOString().slice(0, 16) %>" max="<%= max_date.toISOString().slice(0, 16)%>" value="<%= date.toISOString().slice(0,16)%>" required>
             </div>
         <% } %>
         <div>

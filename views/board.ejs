@@ -15,8 +15,9 @@
         <th>작성자</th>
         <th>작성일</th>
         <th>조회수</th>
-        <th>추천수</th>
-        <% if(board.board_type === 'recruitment') { %>
+        <% if(board.board_type === 'general') { %>
+            <th>추천수</th>
+        <% } else if(board.board_type === 'recruitment') { %>
             <th>마감기한</th>
         <% } %>
     </tr>
@@ -28,23 +29,33 @@
             <td>
                 <div class="title">
                     <a href="/post/<%= post.id %>?board_id=<%= board.id %>"><%= post.title %></a>
-                    <% if(post.toJSON().comment > 0) { %>
-                        <a href="/post/<%= post.id %>?board_id=<%= board.id %>#commnet_list">[<%= post.toJSON().comment %>]</a>
+                    <% if(board.board_type === 'general') { %>
+                        <% if(post.toJSON().comment > 0) { %>
+                            <a href="/post/<%= post.id %>?board_id=<%= board.id %>#commnet_list">[<%= post.toJSON().comment %>
+                                ]</a>
+                        <% } %>
                     <% } %>
                 </div>
             </td>
             <td><%= post.User.nickname %></td>
             <% const date = new Date(post.created_at) %>
             <% const current_date = new Date() %>
+            <% const offset = new Date().getTimezoneOffset() * 60000 %>
+            <% const date_string = new Date(post.created_at - offset).toISOString() %>
             <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
-                <td><%= date.toISOString().slice(11, 16) %></td>
+                <td><%= date_string.slice(11, 16) %></td>
+            <% } else if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth()){ %>
+                <td><%= date_string.slice(5, 10) %></td>
             <% } else { %>
-                <td><%= date.toISOString().slice(0, 10) %></td>
+                <td><%= date_string.slice(0, 10) %></td>
             <% } %>
             <td><%= post.view_count %></td>
-            <td><%= post.toJSON().like %></td>
-            <% if(board.board_type === 'recruitment') { %>
-                <td><%= post.deadline %></td>
+            <% if(board.board_type === 'general') { %>
+                <td><%= post.toJSON().like %></td>
+            <% } else if(board.board_type === 'recruitment') { %>
+                <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                <% const date_string = new Date(post.created_at - offset).toISOString() %>
+                <td><%= date_string.slice(0, 16).replace('T', ' ') %></td>
             <% } %>
         </tr>
     <% } %>

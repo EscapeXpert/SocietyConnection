@@ -5,8 +5,8 @@ const {QueryTypes} = require('sequelize');
 
 router.get('/:recruitment_id', async(req, res, next) => {
     const recruitment_id = req.params.recruitment_id;
-    // const user_id = req.user.id;
-    const user_id = 'psh3253';
+    const user_id = req.user.id;
+    //const user_id = 'psh3253';
     try{
         const user = await User.findOne({
             attributes:['id', 'nickname'],

@@ -29,19 +29,21 @@
             <% if (filter === "is_not_read" && message.is_read == true) {
                 continue
             } %>
-            <% const date = new Date(message.created_at) %>
-            <% const new_date = new Date() %>
             <li>
             <span>
                 <input type="checkbox" id="check" name="check" value="<%= message.id %>">
             </span>
                 <span>
-                    <% if(new_date.getFullYear() !== date.getFullYear()) { %>
-                        <%= date.toISOString().slice(0, 10) + " " + date.toISOString().slice(11, 16) %>
-                    <% } else if(new_date.getDate() === date.getDate()){ %>
-                        <%= date.toISOString().slice(11, 16) %>
+                    <% const date = new Date(message.created_at) %>
+                    <% const current_date = new Date() %>
+                    <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                    <% const date_string = new Date(message.created_at - offset).toISOString() %>
+                    <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                        <span><%= date_string.slice(11, 16)%></span>
+                    <% } else if(date.getFullYear() === current_date.getFullYear()){ %>
+                        <span><%= date_string.slice(5, 10) %></span>
                     <% } else { %>
-                        <%= date.toISOString().slice(5, 10) + " " + date.toISOString().slice(11, 16) %>
+                        <span><%= date_string.slice(0, 10)%></span>
                     <% } %>
                 </span>
                 <span>

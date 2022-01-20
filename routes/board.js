@@ -54,16 +54,23 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
                 creator_id: creator_id
             });
         } else if (board.board_type === 'recruitment') {
-            await Recruitment.create({
-                title: title,
-                content: content,
-                board_id: board_id,
-                creator_id: creator_id,
-                deadline: deadline
-            });
+            const offset = new Date().getTimezoneOffset() * 60000;
+            const date = new Date(Date.now() - offset);
+            if (deadline < date)
+                return res.send('<script>alert("마감 기한은 현재 시각 이전으로 설정할 수 없습니다.");history.back();</script>');
+            else {
+                await Recruitment.create({
+                    title: title,
+                    content: content,
+                    board_id: board_id,
+                    creator_id: creator_id,
+                    deadline: deadline
+                });
+            }
         }
         res.redirect(`/board/${board_id}`);
-    } catch (err) {
+    } catch
+        (err) {
         console.error(err);
         next(err);
     }
@@ -111,11 +118,7 @@ router.get('/:board_id', async (req, res, next) => {
             );
         } else if (board.board_type === 'recruitment') {
             const recruitments = await Recruitment.findAll({
-                attributes: ['id', 'title', 'created_at', 'view_count', 'deadline', [
-                    sequelize.literal('(SELECT count(*) FROM `like` WHERE `board_id` = ' + board_id + ' AND `post_id` = `recruitment`.`id`)'), 'like'
-                ], [
-                    sequelize.literal('(SELECT count(*) FROM `comment` WHERE `board_id` = ' + board_id + ' AND `post_id` = `recruitment`.`id`)'), 'comment'
-                ]],
+                attributes: ['id', 'title', 'created_at', 'view_count', 'deadline'],
                 where: {
                     board_id: board_id
                 },
@@ -126,9 +129,7 @@ router.get('/:board_id', async (req, res, next) => {
                 offset: start_post_number,
                 limit: 10,
             });
-            //const recruitments = await sequelize.query('SELECT recruitment.id, recruitment.title, user.nickname, recruitment.created_at, recruitment.view_count, recruitment.deadline, (SELECT count(*) FROM `like` WHERE post_id = recruitment.id) `like`, (SELECT count(*) FROM comment WHERE post_id = recruitment.id) comment FROM `recruitment` LEFT JOIN `user` ON recruitment.creator_id = user.id LIMIT ' + start_post_number.toString() + ', 10', {
-            //    type: QueryTypes.SELECT
-            //});
+
             const recruitment_count = await Recruitment.count({
                 where: {
                     board_id: board_id
