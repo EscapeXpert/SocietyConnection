@@ -27,13 +27,15 @@
             </span>
             <span><a href="/message/<%=message.id%>?type=send"><%=message.title%></a></span>
             <% const date = new Date(message.created_at) %>
-            <% const new_date = new Date() %>
-            <% if(new_date.getFullYear() !== date.getFullYear()) { %>
-                <span><%= date.toISOString().slice(0, 10) + " " + date.toISOString().slice(11, 16) %></span>
-            <% } else if(new_date.getDate() === date.getDate()){ %>
-                <span><%= date.toISOString().slice(11, 16) %></span>
+            <% const current_date = new Date() %>
+            <% const offset = new Date().getTimezoneOffset() * 60000 %>
+            <% const date_string = new Date(message.created_at - offset).toISOString() %>
+            <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                <span><%= date_string.slice(11, 16)%></span>
+            <% } else if(date.getFullYear() === current_date.getFullYear()){ %>
+                <span><%= date_string.slice(5, 10) %></span>
             <% } else { %>
-                <span><%= date.toISOString().slice(5, 10) + " " + date.toISOString().slice(11, 16) %></span>
+                <span><%= date_string.slice(0, 10)%></span>
             <% } %>
             <% if(message.is_read == false) { %>
                 <span>읽지 않음</span>

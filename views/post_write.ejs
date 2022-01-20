@@ -19,14 +19,11 @@
         <% if(board.board_type === 'recruitment') {%>
             <div>
                 <label for="deadline"></label>
-                <% const date = new Date() %>
-                <% console.log(date)%>
-                <% const now = new Date().toISOString() %>
-                <% const max = new Date()%>
-                <% console.log(now) %>
-                <% max.setFullYear(max.getFullYear()+1)%>
-                <% max.toISOString()%>
-                <input type="datetime-local" name="deadline" id="deadline" min="<%= now %>" max="<%= max + max %>" value="<%= now %>">
+                <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                <% const date = new Date(Date.now() - offset) %>
+                <% const max_date = new Date(Date.now() - offset) %>
+                <% max_date.setFullYear(max_date.getFullYear() + 1)%>
+                <input type="datetime-local" name="deadline" id="deadline" min="<%= date.toISOString().slice(0, 16) %>" max="<%= max_date.toISOString().slice(0, 16)%>", value="<%= date.toISOString().slice(0,16)%>" required>
             </div>
         <% } %>
         <div>

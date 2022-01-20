@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const {sequelize, Message, User} = require('../models');
 const {Op} = require('sequelize');
+const {isLoggedIn} = require("./middlewares");
 
-router.get('/write', async (req, res, next) => {
+router.get('/write', isLoggedIn, async (req, res, next) => {
     const target_nickname = req.query.target_nickname;
     try {
         res.render("message_write", {
@@ -15,7 +16,7 @@ router.get('/write', async (req, res, next) => {
     }
 });
 
-router.post('/write', async (req, res, next) => {
+router.post('/write', isLoggedIn, async (req, res, next) => {
     const target_nickname = req.body.target_nickname;
     const title = req.body.title;
     const message = req.body.message;
@@ -46,7 +47,7 @@ router.post('/write', async (req, res, next) => {
     }
 });
 
-router.get('/send', async (req, res, next) => {
+router.get('/send', isLoggedIn, async (req, res, next) => {
     const page = req.query.page || 1;
     const user_id = req.user.id;
     const start_message_number = page * 10 - 10;
@@ -95,7 +96,7 @@ router.get('/send', async (req, res, next) => {
     }
 });
 
-router.get('/receive', async (req, res, next) => {
+router.get('/receive', isLoggedIn, async (req, res, next) => {
     const page = req.query.page || 1;
     const filter = req.query.filter;
     const start_message_number = page * 10 - 10;
@@ -147,7 +148,7 @@ router.get('/receive', async (req, res, next) => {
     }
 });
 
-router.post('/delete', async (req, res, next) => {
+router.post('/delete', isLoggedIn, async (req, res, next) => {
     const message_ids = req.body.message_ids;
     const user_id = req.user.id;
     console.log(message_ids);
@@ -182,7 +183,7 @@ router.post('/delete', async (req, res, next) => {
     }
 })
 
-router.get('/:message_id', async (req, res, next) => {
+router.get('/:message_id', isLoggedIn, async (req, res, next) => {
     const message_id = req.params.message_id;
     const type = req.query.type;
     const user_id = req.user.id;
