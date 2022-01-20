@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+</head>
+<body>
+<div id="edit">
+    <form id="edit-form" action="/admin/<%= User.nickname %>/edit" method="post">
+        <div>
+            <label for="nickname">닉네임</label>
+            <input id="nickname" name="nickname" type="text" maxlength="15" required value=<%=User.nickname%>>
+        </div>
+        <div>
+            <label for="grade">grade</label>
+            <input id="grade" name="grade" type="text" max="200" required value="<%= User.grade %>">
+        </div>
+        <button id="edit_button" type="submit">수정</button>
+    </form>
+</div>
+</body>
+</html>

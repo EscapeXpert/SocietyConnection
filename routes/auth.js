@@ -72,21 +72,6 @@ router.post('/login', isNotLoggedIn, async (req, res, next) => {
 });
 
 router.get('/logout', isLoggedIn, async (req, res) => {
-    /*if (req.user.login_type === 'kakao') {
-        try {
-            const ACCESS_TOKEN = req.user.accessToken;
-            let logout = await axios({
-                method: 'post',
-                url: 'https://kapi.kakao.com/v1/user/logout',
-                headers: {
-                    'Authorization': `Bearer ${ACCESS_TOKEN}`
-                }
-            });
-        } catch (error) {
-            console.error(error);
-            res.json(error);
-        }
-    }*/
     req.logout();
     if(req.session){
         req.session.destroy();
@@ -100,7 +85,6 @@ router.get('/kakao_logout', isLoggedIn, async (req, res) => {
         const LOGOUT_REDIRECT_URI = 'http://localhost:3001/auth/logout';
         res.redirect(`https://kauth.kakao.com/oauth/logout?client_id=${REST_API_KEY}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`);
     }
-    //res.redirect('/');
 });
 router.get('/kakao', passport.authenticate('kakao'));
 

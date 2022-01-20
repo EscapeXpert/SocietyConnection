@@ -20,17 +20,10 @@ try {
 
 router.get('/:user_nickname', isLoggedIn, async(req, res) => {
     const Find_User = await User.findOne({ where: { nickname : req.params.user_nickname } });
-    const UserList = await User.findAll({
-        attributes: ['nickname'],
-        where: { nickname: {
-               [Op.not]: req.user.nickname
-             }}
-    });
     res.render('profile', {
         title: '프로필' ,
         User: Find_User,
-        req_User : req.user,
-        User_List : UserList
+        req_User : req.user
     });
 });
 
