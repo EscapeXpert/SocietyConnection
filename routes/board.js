@@ -1,21 +1,32 @@
 const express = require('express');
 const router = express.Router();
 const {isLoggedIn} = require('./middlewares');
-const {sequelize, Post, Board, Recruitment, User} = require('../models');
+const {sequelize, Post, Board, Recruitment, User, Grade} = require('../models');
 const {QueryTypes} = require('sequelize');
 
 router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
     const board_id = req.params.board_id;
+    const user_grade = req.user.grade;
     try {
         const board = await Board.findOne({
-            attributes: ['id', 'board_type', 'name'],
+            attributes: ['id', 'board_type', 'name', 'min_write_grade'],
             where: {
                 id: board_id
             }
         });
-        res.render('post_write', {
-            board: board
-        });
+        if (user_grade >= board.min_write_grade) {
+            res.render('post_write', {
+                board: board
+            });
+        } else {
+            const grade = await Grade.findOne({
+                attributes: ['name'],
+                where: {
+                    id: board.min_write_grade
+                }
+            });
+            res.send('<script>alert("게시글을 작성할 수 있는 권한이 없습니다. 이 게시판은 ' + grade.name + '등급부터 쓸 수 있습니다.");history.back();</script>');
+        }
     } catch (err) {
         console.error(err);
         next(err);
@@ -35,7 +46,6 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
                 id: board_id
             }
         });
-        console.log(board.board_type)
         if (board.board_type === 'general') {
             await Post.create({
                 title: title,
