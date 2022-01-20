@@ -64,8 +64,6 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
     const user_id = req.user.id;
-    //const user_id = "psh3253";
-
     try {
         const board = await Board.findOne({
             attributes: ['id', 'board_type'],
@@ -75,30 +73,39 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
         });
         if (board.board_type === 'general') {
             const post = await Post.findOne({
-                attributes: ['id', 'title', 'content'],
+                attributes: ['id', 'title', 'content', 'creator_id'],
                 where: {
                     id: post_id,
-                    board_id: board_id
                 }
             });
-            res.render('post_modify', {
-                board: board,
-                post: post
-            });
+            if(user_id === post.creator_id)
+            {
+                res.render('post_modify', {
+                    board: board,
+                    post: post
+                });
+            }
+            else {
+                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");history.back()</script>');
+            }
         } else if (board.board_type === 'recruitment') {
-            const recruitment = await Recruitment.findOne({
-                attributes: ['id', 'title', 'content', 'deadline'],
+            const post = await Recruitment.findOne({
+                attributes: ['id', 'title', 'content', 'deadline', 'creator_id', 'created_at'],
                 where: {
                     id: post_id,
-                    board_id: board_id
                 }
             });
-            res.render('post_modify', {
-                board: board,
-                post: recruitment
-            });
+            if(user_id === post.creator_id)
+            {
+                res.render('post_modify', {
+                    board: board,
+                    post: post
+                });
+            }
+            else {
+                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");history.back()</script>');
+            }
         }
-
     } catch (err) {
         console.error(err);
         next(err);
@@ -110,8 +117,8 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     const board_id = req.body.board_id;
     const title = req.body.title;
     const content = req.body.content;
-    const user_id = req.user.id;
     const deadline = req.body.deadline;
+    const user_id = req.user.id;
 
     try {
         const board = await Board.findOne({
@@ -140,7 +147,7 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                 });
                 res.redirect(`/post/${post_id}?board_id=${board_id}`);
             } else {
-                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.")</script>');
+                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");history.back()</script>');
             }
         } else if (board.board_type === 'recruitment') {
             const post = await Recruitment.findOne({
@@ -155,8 +162,6 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                 const date = new Date(Date.now() - offset);
                 const max_date = new Date(Date.now() - offset)
                 max_date.setFullYear(max_date.getFullYear() + 1)
-                console.log(deadline);
-                console.log(date);
                 if(deadline > date){
                     console.log("Hello");
                 }
@@ -293,7 +298,6 @@ router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
     const board_id = req.body.board_id;
     const content = req.body.comment_content;
     const user_id = req.user.id;
-    console.log(content);
     try {
         await Comment.create({
             content: content,
@@ -309,7 +313,6 @@ router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
 });
 
 router.post('/:post_id/reply_comment/:reply_comment_id/delete', isLoggedIn, async (req, res, next) => {
-    const post_id = req.params.post_id;
     const reply_comment_id = req.params.reply_comment_id;
     const user_id = req.user.id;
     try {
@@ -354,9 +357,8 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                 id: user_id
             }
         });
-        let post;
         if (board.board_type === 'general') {
-            post = await Post.findOne({
+            const post = await Post.findOne({
                 attributes: ['id', 'title', 'content', 'created_at', 'creator_id', 'view_count', 'board_id', [
                     sequelize.literal('(SELECT name FROM grade WHERE id = user.grade)'), 'grade'
                 ]],
@@ -365,16 +367,78 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                 },
                 include: {
                     model: User,
-                    attributes: ['nickname']
+                    attributes: ['nickname', 'profile_image']
                 }
             });
-            await Post.update({view_count: post.view_count + 1}, {
+            const is_like = await sequelize.models.Like.findOne({
                 where: {
-                    id: post_id,
+                    post_id: post_id,
+                    user_id: user_id,
+                    board_id: board_id
                 }
             });
+            const like_list = await Like.findAll({
+                attributes: [],
+                where: {
+                    post_id: post_id,
+                    board_id: board_id
+                },
+                include: {
+                    model: User,
+                    attributes: ['nickname', 'profile_image'],
+                }
+            });
+            const comment_list = await Comment.findAll({
+                attributes: ['id', 'content', 'created_at', 'creator_id'],
+                where: {
+                    post_id: post_id,
+                    board_id: board_id,
+                },
+                include: {
+                    model: User,
+                    attributes: ['nickname', 'profile_image']
+                }
+            });
+            let reply_comment_map = new Map();
+            for (let i = 0; i < comment_list.length; i++) {
+                const reply_comment_list = await ReplyComment.findAll({
+                    attributes: ['id', 'content', 'created_at', 'creator_id', 'comment_id'],
+                    where: {
+                        comment_id: comment_list[i].id
+                    },
+                    include: {
+                        model: User,
+                        attributes: ['nickname', 'profile_image']
+                    }
+                });
+                reply_comment_map.set(comment_list[i].id, reply_comment_list);
+            }
+            if (user_grade >= board.min_read_grade || post.creator_id === user_id) {
+                await Post.update({view_count: post.view_count + 1}, {
+                    where: {
+                        id: post_id,
+                    }
+                });
+                res.render('post_general', {
+                    post: post,
+                    board: board,
+                    user: user,
+                    is_like: is_like,
+                    like_list: like_list,
+                    comment_list: comment_list,
+                    reply_comment_map: reply_comment_map
+                });
+            } else {
+                const grade = await Grade.findOne({
+                    attributes: ['name'],
+                    where: {
+                        id: board.min_read_grade
+                    }
+                });
+                res.send('<script>alert("게시글을 볼 수 있는 권한이 없습니다. 이 게시판은 ' + grade.name + '등급부터 볼 수 있습니다.");history.back()</script>')
+            }
         } else if (board.board_type === 'recruitment') {
-            post = await Recruitment.findOne({
+            const post = await Recruitment.findOne({
                 attributes: ['id', 'title', 'content', 'created_at', 'creator_id', 'view_count', 'deadline', 'board_id', [
                     sequelize.literal('(SELECT name FROM grade WHERE id = user.grade)'), 'grade'
                 ]],
@@ -383,72 +447,31 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                 },
                 include: {
                     model: User,
-                    attributes: ['nickname']
+                    attributes: ['nickname', 'profile_image']
                 }
             });
-        }
-        const is_like = await sequelize.models.Like.findOne({
-            where: {
-                post_id: post_id,
-                user_id: user_id,
-                board_id: board_id
+            if (user_grade >= board.min_read_grade || post.creator_id === user_id) {
+                await Recruitment.update({view_count: post.view_count + 1}, {
+                    where: {
+                        id: post_id,
+                    }
+                });
+                res.render('post_recruitment', {
+                    post: post,
+                    board: board,
+                    user: user
+                });
+            } else {
+                const grade = await Grade.findOne({
+                    attributes: ['name'],
+                    where: {
+                        id: board.min_read_grade
+                    }
+                });
+                res.send('<script>alert("게시글을 볼 수 있는 권한이 없습니다. 이 게시판은 ' + grade.name + '등급부터 볼 수 있습니다.");history.back()</script>')
             }
-        });
-        const like_list = await Like.findAll({
-            attributes: [],
-            where: {
-                post_id: post_id,
-                board_id: board_id
-            },
-            include: {
-                model: User,
-                attributes: ['nickname'],
-            }
-        });
-        const comment_list = await Comment.findAll({
-            attributes: ['id', 'content', 'created_at', 'creator_id'],
-            where: {
-                post_id: post_id,
-                board_id: board_id,
-            },
-            include: {
-                model: User,
-                attributes: ['nickname']
-            }
-        });
-        let reply_comment_map = new Map();
-        for (let i = 0; i < comment_list.length; i++) {
-            const reply_comment_list = await ReplyComment.findAll({
-                attributes: ['id', 'content', 'created_at', 'creator_id', 'comment_id'],
-                where: {
-                    comment_id: comment_list[i].id
-                },
-                include: {
-                    model: User,
-                    attributes: ['nickname']
-                }
-            });
-            reply_comment_map.set(comment_list[i].id, reply_comment_list);
         }
-        if (user_grade >= board.min_read_grade || post.creator_id === user_id) {
-            res.render('post', {
-                post: post,
-                board: board,
-                user: user,
-                is_like: is_like,
-                like_list: like_list,
-                comment_list: comment_list,
-                reply_comment_map: reply_comment_map
-            });
-        } else {
-            const grade = await Grade.findOne({
-                attributes: ['name'],
-                where: {
-                    id: board.min_read_grade
-                }
-            });
-            res.send('<script>alert("게시글을 볼 수 있는 권한이 없습니다. 이 게시판은 ' + grade.name + '등급부터 볼 수 있습니다.");history.back()</script>')
-        }
+
     } catch (err) {
         console.error(err);
         next(err);

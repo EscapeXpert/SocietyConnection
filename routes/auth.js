@@ -3,8 +3,6 @@ const passport = require('passport');
 const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-const axios = require("axios");
-
 const router = express.Router();
 
 
@@ -17,26 +15,15 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
 
     try {
         let exUser = await User.findOne({where: {id}});
-        if (!id) {
-            return res.send('<script> alert("아이디를 입력해주세요.");history.back()</script>');
-        }
         if (exUser) {
             return res.send('<script> alert("이미 존재하는 아이디입니다.");history.back()</script>');
         }
-        if (!password) {
-            return res.send('<script> alert("비밀번호를 입력해주세요.");history.back()</script>');
-        }
         if (password !== verify_password) {
-            return res.send('<script> alert("비밀번호가 같지 않습니다.");history.back()</script>');
+            return res.send('<script> alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");history.back()</script>');
         }
-        if (!nickname) {
-            return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
-        }
-
         exUser = await User.findOne({where: {nickname}});
         if (exUser) {
             res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
-            return res.redirect('/join');
         }
 
         const hash = await bcrypt.hash(password, 12);
@@ -59,7 +46,13 @@ router.post('/login', isNotLoggedIn, async (req, res, next) => {
             return next(authError);
         }
         if (!user) {
-            return res.redirect(`/?loginError=${info.message}`);
+            if(info.message === 'no member')
+            {
+                return res.send('<script> alert("가입되지 않은 회원입니다.");history.back();</script>');
+            } else if(info.message === 'incorrect password')
+            {
+                return res.send('<script> alert("비밀번호가 일치하지 않습니다.");history.back();</script>');
+            }
         }
         return req.login(user, (loginError) => {
             if (loginError) {
