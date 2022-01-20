@@ -9,6 +9,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const passportConfig = require('./passport');
 const boardRouter = require('./routes/board');
+const adminRouter = require('./routes/admin');
 const messageRouter = require('./routes/message');
 const postRouter = require('./routes/post');
 const recruitmentRouter = require('./routes/recruitment');
@@ -16,6 +17,8 @@ const authRouter = require('./routes/auth');
 const mainRouter = require('./routes/main');
 const profileRouter = require('./routes/profile');
 const {sequelize} = require('./models');
+const User = require("./models/user");
+const bcrypt = require("bcrypt");
 
 passportConfig();
 
@@ -46,9 +49,11 @@ app.use(session({
         secure: false
     }
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/board', boardRouter);
+app.use('/admin', adminRouter);
 app.use('/message', messageRouter);
 app.use('/post', postRouter);
 app.use('/recruitment', recruitmentRouter);
@@ -71,3 +76,24 @@ app.use((err, req, res, next) => {
 app.listen(app.get('port'), () => {
     console.log(app.get('port'), '번 포트에서 대기 중');
 });
+
+async function make_admin(){
+    try {
+        const ex_admin = await User.findOne({where: {id : 'admin'}});
+        if(!ex_admin){
+            console.log("admin 계정이 없어서 admin계정을 생성합니다.");
+            const password = 'admin';
+            const hash = await bcrypt.hash(password, 12);
+            await User.create({
+                id : 'admin',
+                password: hash,
+                nickname : 'admin',
+                grade : 5,
+            });
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+make_admin();
+

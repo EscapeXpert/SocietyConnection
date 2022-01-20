@@ -11,11 +11,15 @@
             <label for="id">닉네임</label>
             <label for="id"><%= User.nickname %></label>
         </div>
-        <a href="/auth/logout">로그아웃</a>
         <%if(User.login_type==='kakao'){%>
-            <a href="/auth/kakao_logout">카카오계정과 함께 로그아웃</a>
+            <a href="/auth/kakao_logout">로그아웃</a>
+        <% }else{ %>
+            <a href="/auth/logout">로그아웃</a>
         <%}%>
         <a href="/profile/<%= User.nickname %>">프로필</a>
+        <%if(User.grade==5){%>
+            <a href="/admin">admin 페이지</a>
+        <%}%>
         <% if(BoardList){ %>
             <div>
                 <label>게시판 목록</label>
