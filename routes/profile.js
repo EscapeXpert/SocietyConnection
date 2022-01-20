@@ -114,19 +114,15 @@ router.post('/:user_nickname/change_password', isLoggedIn, async (req, res, next
     const {password, new_password,verify_new_password} = req.body;
 
     try {
-
-        if (!password) {
-            return res.send('<script> alert("비밀번호를 입력해주세요.");history.back()</script>');
-        }
         const result = await bcrypt.compare(password, req.user.password);
         if (!result) {
-            return res.send('<script> alert("비밀번호가 올바르지 않습니다.");history.back()</script>');
+            return res.send('<script> alert("기존 비밀번호가 일치하지 않습니다.");history.back()</script>');
         }
         if (new_password!==verify_new_password) {
-            return res.send('<script> alert("비밀번호가 같지 않습니다.");history.back()</script>');
+            return res.send('<script> alert("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");history.back()</script>');
         }
         if (password === new_password) {
-            return res.send('<script> alert("기존 비밀번호와 같습니다.");history.back()</script>');
+            return res.send('<script> alert("새 비밀번호를 기존 비밀번호와 일치하게 설정할 수 없습니다.");history.back()</script>');
         }
         const hash = await bcrypt.hash(new_password, 12);
         await User.update({

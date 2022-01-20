@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= post.title %></title>
+</head>
+<body>
+<a href="/board/<%= board.id %>"><%= board.name %></a>
+<div>
+    <% if(post.creator_id === user.id) { %>
+        <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
+        <a href="#" id="delete">삭제</a>
+    <% } %>
+</div>
+<div>
+    <% if(post.User.profile_image != null) { %>
+        <img src="<%= post.User.profile_image %>" alt="" width="32" height="32">
+    <% } else { %>
+        <img src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+    <% } %>
+    <a href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
+    <span><%= post.toJSON().grade %></span>
+    <% if(post.creator_id !== user.id) { %>
+        <a href='#'
+           onclick="window.open('/message/write?target_nickname=<%= post.User.nickname %>','<%= post.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
+    <% } %>
+</div>
+<div>
+    <div>
+        <h3><%= post.title %></h3>
+        <span>마감기한</span>
+        <% const offset = new Date().getTimezoneOffset() * 60000 %>
+        <% const date_string = new Date(post.deadline - offset).toISOString() %>
+        <span><%= date_string.slice(0, 16).replace('T', ' ') %></span>
+        <% const contents = post.content.split('\n') %>
+        <% for(var content of contents) { %>
+            <p><%= content %></p>
+        <% } %>
+    </div>
+</div>
+<div class="">
+
+</div>
+<input type="hidden" id="post_id" name="post_id" value="<%= post.id %>">
+<input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    const post_id = document.querySelector('#post_id').value;
+    const board_id = document.querySelector('#board_id').value;
+
+    const delete_tag = document.querySelector('#delete');
+    delete_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await axios.post(`/post/${post_id}/delete`, {
+            board_id: board_id
+        })
+            .then((response) => {
+                if (response.data === 'success') {
+                    location.href = `/board/${board_id}`;
+                } else if (response.data === 'not creator') {
+                    alert("자신의 게시글만 삭제하실 수 있습니다.");
+                    history.back();
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    });
+</script>
+</html>

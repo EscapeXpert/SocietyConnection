@@ -46,8 +46,9 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
                 id: board_id
             }
         });
+        let post;
         if (board.board_type === 'general') {
-            await Post.create({
+            post = await Post.create({
                 title: title,
                 content: content,
                 board_id: board_id,
@@ -59,7 +60,7 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
             if (deadline < date)
                 return res.send('<script>alert("마감 기한은 현재 시각 이전으로 설정할 수 없습니다.");history.back();</script>');
             else {
-                await Recruitment.create({
+                post = await Recruitment.create({
                     title: title,
                     content: content,
                     board_id: board_id,
@@ -68,9 +69,8 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
                 });
             }
         }
-        res.redirect(`/board/${board_id}`);
-    } catch
-        (err) {
+        res.redirect(`/post/${post.id}?board_id=${board_id}`);
+    } catch (err) {
         console.error(err);
         next(err);
     }
