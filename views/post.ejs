@@ -137,6 +137,7 @@
                     location.href = `/board/${board_id}`;
                 } else if (response.data === 'not creator') {
                     alert("자신의 게시글만 삭제하실 수 있습니다.");
+                    history.back();
                 }
             })
             .catch((err) => {
@@ -176,6 +177,7 @@
                         location.reload();
                     } else if (response.data === 'not creator') {
                         alert("자신의 댓글만 삭제할 수 있습니다.");
+                        history.back();
                     }
                 })
                 .catch((err) => {
@@ -268,6 +270,7 @@
                         location.reload();
                     } else if (response.data === 'not creator') {
                         alert("자신의 답글만 삭제할 수 있습니다.");
+                        history.back();
                     }
                 })
                 .catch((err) => {

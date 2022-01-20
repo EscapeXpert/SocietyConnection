@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment} = require('../models');
+const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade} = require('../models');
 const {isLoggedIn} = require("./middlewares");
 
 router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
@@ -128,8 +128,7 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                     board_id: board_id
                 }
             });
-            if(post.creator_id === user_id)
-            {
+            if (post.creator_id === user_id) {
                 await Post.update({
                     title: title,
                     content: content
@@ -140,8 +139,7 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                     }
                 });
                 res.redirect(`/post/${post_id}?board_id=${board_id}`);
-            }
-            else {
+            } else {
                 res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.")</script>');
             }
         } else if (board.board_type === 'recruitment') {
@@ -315,13 +313,15 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
     const user_id = req.user.id;
+    const user_grade = req.user.grade;
     try {
         const board = await Board.findOne({
-            attributes: ['id', 'name', 'board_type'],
+            attributes: ['id', 'name', 'board_type', 'min_read_grade'],
             where: {
                 id: board_id
             }
         });
+
         const user = await User.findOne({
             attributes: ['id', 'nickname'],
             where: {
@@ -359,7 +359,7 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                     model: User,
                     attributes: ['nickname']
                 }
-            })
+            });
         }
         const is_like = await sequelize.models.Like.findOne({
             where: {
@@ -404,15 +404,25 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
             });
             reply_comment_map.set(comment_list[i].id, reply_comment_list);
         }
-        res.render('post', {
-            post: post,
-            board: board,
-            user: user,
-            is_like: is_like,
-            like_list: like_list,
-            comment_list: comment_list,
-            reply_comment_map: reply_comment_map
-        });
+        if (user_grade >= board.min_read_grade || post.creator_id === user_id) {
+            res.render('post', {
+                post: post,
+                board: board,
+                user: user,
+                is_like: is_like,
+                like_list: like_list,
+                comment_list: comment_list,
+                reply_comment_map: reply_comment_map
+            });
+        } else {
+            const grade = await Grade.findOne({
+                attributes: ['name'],
+                where: {
+                    id: board.min_read_grade
+                }
+            });
+            res.send('<script>alert("게시글을 볼 수 있는 권한이 없습니다. 이 게시판은 ' + grade.name + '등급부터 볼 수 있습니다.");history.back()</script>')
+        }
     } catch (err) {
         console.error(err);
         next(err);
