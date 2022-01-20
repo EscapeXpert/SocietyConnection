@@ -43,7 +43,7 @@ module.exports = class Message extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Message.belongsTo(db.User, { foreignKey: 'sender_id', targetKey: 'id'});
-        db.Message.belongsTo(db.User, { foreignKey: 'receiver_id', targetKey: 'id'});
+        db.Message.belongsTo(db.User, { foreignKey: 'sender_id', targetKey: 'id', onDelete: 'no action'});
+        db.Message.belongsTo(db.User, { foreignKey: 'receiver_id', targetKey: 'id', onDelete: 'no action'});
     }
 };

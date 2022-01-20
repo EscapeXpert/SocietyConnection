@@ -25,7 +25,7 @@ module.exports = class Applicant extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Applicant.belongsTo(db.User, {foreignKey: 'user_id', targetKey: 'id'});
-        db.Applicant.belongsTo(db.Recruitment, {foreignKey: 'recruitment_id', targetKey: 'id'});
+        db.Applicant.belongsTo(db.User, {foreignKey: 'user_id', targetKey: 'id', onDelete: 'no action'});
+        db.Applicant.belongsTo(db.Recruitment, {foreignKey: 'recruitment_id', targetKey: 'id', onDelete: 'cascade'});
     }
 };

@@ -367,7 +367,7 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                     model: User,
                     attributes: ['nickname']
                 }
-            })
+            });
             await Post.update({view_count: post.view_count + 1}, {
                 where: {
                     id: post_id,

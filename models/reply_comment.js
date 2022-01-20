@@ -30,7 +30,7 @@ module.exports = class ReplyComment extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.ReplyComment.belongsTo(db.User, { foreignKey: 'creator_id', sourceKey: 'id'});
-        db.ReplyComment.belongsTo(db.Comment, {foreignKey: 'comment_id', sourceKey: 'id'});
+        db.ReplyComment.belongsTo(db.User, { foreignKey: 'creator_id', sourceKey: 'id', onDelete: 'no action'});
+        db.ReplyComment.belongsTo(db.Comment, {foreignKey: 'comment_id', sourceKey: 'id', onDelete: 'cascade'});
     }
 };
