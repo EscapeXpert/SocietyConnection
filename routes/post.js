@@ -78,14 +78,12 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                     id: post_id,
                 }
             });
-            if(user_id === post.creator_id)
-            {
+            if (user_id === post.creator_id) {
                 res.render('post_modify', {
                     board: board,
                     post: post
                 });
-            }
-            else {
+            } else {
                 res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");history.back()</script>');
             }
         } else if (board.board_type === 'recruitment') {
@@ -95,14 +93,16 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                     id: post_id,
                 }
             });
-            if(user_id === post.creator_id)
-            {
-                res.render('post_modify', {
-                    board: board,
-                    post: post
-                });
-            }
-            else {
+            if (user_id === post.creator_id) {
+                if (new Date().getTime() < post.deadline.getTime()) {
+                    res.render('post_modify', {
+                        board: board,
+                        post: post
+                    });
+                } else {
+                    res.send('<script> alert("수정 기간이 지났습니다.");window.location.replace("/post/' + post_id + '?board_id=' + board_id + '");</script>');
+                }
+            } else {
                 res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");history.back()</script>');
             }
         }
@@ -151,7 +151,7 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
             }
         } else if (board.board_type === 'recruitment') {
             const post = await Recruitment.findOne({
-                attributes: ['creator_id'],
+                attributes: ['creator_id', 'created_at'],
                 where: {
                     id: post_id,
                     board_id: board_id
@@ -160,11 +160,10 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
             if (post.creator_id === user_id) {
                 const offset = new Date().getTimezoneOffset() * 60000;
                 const date = new Date(Date.now() - offset);
-                const max_date = new Date(Date.now() - offset)
+                const max_date = new Date(post.created_at - offset);
                 max_date.setFullYear(max_date.getFullYear() + 1)
-                if(deadline > date){
-                    console.log("Hello");
-                }
+                console.log(max_date.getTime());
+                console.log(deadline.getTime());
                 if (deadline < date)
                     return res.send('<script>alert("마감 기한은 현재 시각 이전으로 설정할 수 없습니다.");history.back();</script>');
                 else {
@@ -181,7 +180,7 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                 }
                 res.redirect(`/post/${post_id}?board_id=${board_id}`);
             } else {
-                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.")</script>');
+                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");</script>');
             }
         }
     } catch (err) {
@@ -190,22 +189,23 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/set_notice', isLoggedIn, async (req, res) => {
+router.post('/:post_id/set_notice', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
 });
 
-router.post('/:post_id/unset_notice', isLoggedIn, async (req, res) => {
+router.post('/:post_id/unset_notice', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
 });
 
-router.get('/:post_id/apply', isLoggedIn, async (req, res) => {
+router.get('/:post_id/apply', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
+
 });
 
-router.post('/:post_id/apply', async (req, res) => {
+router.post('/:post_id/apply', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
 });

@@ -141,6 +141,9 @@ router.get('/:board_id', async (req, res, next) => {
                 }],
                 offset: start_post_number,
                 limit: 10,
+                order: [
+                    ['created_at', 'DESC'],
+                ]
             });
 
             const recruitment_count = await Recruitment.count({
