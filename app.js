@@ -32,7 +32,7 @@ sequelize.sync({force: false})
     })
     .catch(() => {
         console.error("데이터베이스 연결 실패")
-    })
+    });
 
 app.use(morgan('dev'))
 app.use('/public', express.static(path.join(__dirname, 'public')));

@@ -342,7 +342,6 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
     const user_id = req.user.id;
-    const user_grade = req.user.grade;
     try {
         const board = await Board.findOne({
             attributes: ['id', 'name', 'board_type', 'min_read_grade'],
@@ -352,7 +351,7 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
         });
 
         const user = await User.findOne({
-            attributes: ['id', 'nickname'],
+            attributes: ['id', 'nickname', 'grade'],
             where: {
                 id: user_id
             }
@@ -413,7 +412,7 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                 });
                 reply_comment_map.set(comment_list[i].id, reply_comment_list);
             }
-            if (user_grade >= board.min_read_grade || post.creator_id === user_id) {
+            if (user.grade >= board.min_read_grade || post.creator_id === user_id) {
                 await Post.update({view_count: post.view_count + 1}, {
                     where: {
                         id: post_id,
@@ -450,7 +449,7 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                     attributes: ['nickname', 'profile_image']
                 }
             });
-            if (user_grade >= board.min_read_grade || post.creator_id === user_id) {
+            if (user.grade >= board.min_read_grade || post.creator_id === user_id) {
                 await Recruitment.update({view_count: post.view_count + 1}, {
                     where: {
                         id: post_id,

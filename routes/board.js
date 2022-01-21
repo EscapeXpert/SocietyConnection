@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const {isLoggedIn} = require('./middlewares');
 const {sequelize, Post, Board, Recruitment, User, Grade} = require('../models');
-const {QueryTypes} = require('sequelize');
 
 router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
     const board_id = req.params.board_id;
-    const user_grade = req.user.grade;
+    const user_id = req.user.id;
     try {
         const board = await Board.findOne({
             attributes: ['id', 'board_type', 'name', 'min_write_grade'],
@@ -14,7 +13,13 @@ router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
                 id: board_id
             }
         });
-        if (user_grade >= board.min_write_grade) {
+        const user = await User.findOne({
+            attributes: ['grade'],
+            where: {
+                id: user_id
+            }
+        })
+        if (user.grade >= board.min_write_grade) {
             res.render('post_write', {
                 board: board
             });
@@ -78,6 +83,7 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
 
 router.get('/:board_id', async (req, res, next) => {
     const board_id = req.params.board_id;
+    const sort = req.query.sort || 'created_at';
     const page = req.query.page || 1;
     const start_post_number = page * 10 - 10;
     try {
@@ -88,11 +94,17 @@ router.get('/:board_id', async (req, res, next) => {
             }
         });
         if (board.board_type === 'general') {
+            let order;
+            if (sort === 'like') {
+                order = [[sequelize.literal('`like`'), 'DESC'], ['id', 'DESC']];
+            } else {
+                order = [['id', 'DESC']]
+            }
             const posts = await Post.findAll({
                 attributes: ['id', 'title', 'created_at', 'view_count', [
-                    sequelize.literal('(SELECT count(*) FROM `like` WHERE `board_id` = ' + board_id + ' AND `post_id` = `post`.`id`)'), 'like'
+                    sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
                 ], [
-                    sequelize.literal('(SELECT count(*) FROM `comment` WHERE `board_id` = ' + board_id + ' AND `post_id` = `post`.`id`)'), 'comment'
+                    sequelize.literal('(SELECT count(*) FROM `comment` WHERE `post_id` = `post`.`id`)'), 'comment'
                 ]],
                 where: {
                     board_id: board_id
@@ -101,6 +113,7 @@ router.get('/:board_id', async (req, res, next) => {
                     model: User,
                     attributes: ['nickname']
                 }],
+                order: order,
                 offset: start_post_number,
                 limit: 10,
             });
