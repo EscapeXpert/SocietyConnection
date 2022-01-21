@@ -7,7 +7,7 @@
 <body>
 <a href="/board/<%= board.id %>"><%= board.name %></a>
 <div>
-    <% if(post.creator_id === user.id) { %>
+    <% if(post.creator_id === user.id && post.deadline.getTime() > new Date().getTime()) { %>
         <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
         <a href="#" id="delete">삭제</a>
     <% } %>
@@ -38,9 +38,12 @@
         <% } %>
     </div>
 </div>
-<div class="">
+<% if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime() ) { %>
+    <div class="apply">
+        <a href="/post/<%= post.id %>/apply">신청</a>
 
-</div>
+    </div>
+<% } %>
 <input type="hidden" id="post_id" name="post_id" value="<%= post.id %>">
 <input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
 </body>

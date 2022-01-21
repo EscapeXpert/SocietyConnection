@@ -55,7 +55,7 @@
                 <td><%= post.toJSON().like %></td>
             <% } else if(board.board_type === 'recruitment') { %>
                 <% const offset = new Date().getTimezoneOffset() * 60000 %>
-                <% const date_string = new Date(post.created_at - offset).toISOString() %>
+                <% const date_string = new Date(post.deadline - offset).toISOString() %>
                 <td><%= date_string.slice(0, 16).replace('T', ' ') %></td>
             <% } %>
         </tr>
