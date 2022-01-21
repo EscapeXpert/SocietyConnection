@@ -7,6 +7,8 @@
     </title>
 </head>
 <body>
+<a href="#" id="sort_by_created_at">최신순</a>
+<a href="#" id="sort_by_like">추천순</a>
 <table>
     <thead>
     <tr>
@@ -55,7 +57,7 @@
                 <td><%= post.toJSON().like %></td>
             <% } else if(board.board_type === 'recruitment') { %>
                 <% const offset = new Date().getTimezoneOffset() * 60000 %>
-                <% const date_string = new Date(post.created_at - offset).toISOString() %>
+                <% const date_string = new Date(post.deadline - offset).toISOString() %>
                 <td><%= date_string.slice(0, 16).replace('T', ' ') %></td>
             <% } %>
         </tr>
@@ -78,4 +80,21 @@
 </div>
 <a href="/board/<%= board.id %>/write">글쓰기</a>
 </body>
+<input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    const board_id = document.querySelector('#board_id').value;
+
+    const sort_by_create_tag = document.querySelector('#sort_by_created_at');
+    sort_by_create_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        location.href = `/board/${board_id}/?sort=created_at`;
+    });
+
+    const sort_by_like_tag = document.querySelector('#sort_by_like');
+    sort_by_like_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        location.href = `/board/${board_id}/?sort=like`;
+    });
+</script>
 </html>

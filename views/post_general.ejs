@@ -11,6 +11,9 @@
         <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
         <a href="#" id="delete">삭제</a>
     <% } %>
+    <% if(user.grade === 5) { %>
+        <a href="#" id="set_notice">공지로 등록</a>
+    <% } %>
 </div>
 <div>
     <% if(post.User.profile_image != null) { %>
@@ -286,6 +289,12 @@
                     console.error(err);
                 });
         })
+    });
+
+    const set_notice_tag = document.querySelector('#set_notice');
+    set_notice_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+
     });
 </script>
 </html>
