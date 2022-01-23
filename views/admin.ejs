@@ -48,5 +48,33 @@
     <% } %>
     </tbody>
 </table>
+<div>
+    <label>게시판 목록</label>
+    <a href="/admin/board_create">게시판 생성</a>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>name</th>
+        <th>min_read_grade</th>
+        <th>min_write_grade</th>
+        <th>board_type</th>
+        <th>게시판 수정</th>
+        <th>게시판 삭제</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let list_of_board of BoardList) { %>
+        <tr>
+            <td><%= list_of_board.dataValues.name %></td>
+            <td><%= list_of_board.dataValues.min_read_grade %></td>
+            <td><%= list_of_board.dataValues.min_write_grade %></td>
+            <td><%= list_of_board.dataValues.board_type %></td>
+            <td><a href="/admin/<%= list_of_board.dataValues.id %>/board_edit">수정</a></td>
+            <td><a href="/admin/<%= list_of_board.dataValues.id %>/board_delete">삭제</a></td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
 </body>
 </html>

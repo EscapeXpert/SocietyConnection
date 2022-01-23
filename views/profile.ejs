@@ -7,16 +7,12 @@
 <body>
 <div id="profile">
     <div>
-        <label for="id">아이디</label>
-        <label for="id"><%= User.id %></label>
+        <label for="nickname">닉네임</label>
+        <label for="nickname"><%= User.nickname %></label>
     </div>
     <div>
         <label for="sns_id">sns_id</label>
         <label for="sns_id"><%= User.sns_id %></label>
-    </div>
-    <div>
-        <label for="nickname">닉네임</label>
-        <label for="nickname"><%= User.nickname %></label>
     </div>
     <div>
         <label for="name">이름</label>
@@ -51,6 +47,7 @@
             <a href="/profile/<%= User.nickname %>/change_password">비밀번호 변경</a>
             <a href="/profile/<%= User.nickname %>/edit">프로필 수정</a>
             <a href="/message/receive" onclick="window.open(this.href, '_blank', 'width=600, height=600'); return false;">쪽지함</a>
+            <a href="/profile/<%= User.nickname %>/account_delete">회원탈퇴</a>
         </div>
     <% } %>
 </div>

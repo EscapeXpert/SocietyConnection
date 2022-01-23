@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+</head>
+<body>
+<div id="edit">
+    <form id="edit-form" action="/admin/board_create" method="post">
+        <div>
+            <label for="name">게시판 이름</label>
+            <input id="name" name="name" type="text" maxlength="15" >
+        </div>
+        <div>
+            <label for="min_read_grade">min_read_grade</label>
+            <select name="min_read_grade">
+                <% for(let list_of_grade of GradeList) { %>
+                <option value=<%=list_of_grade.dataValues.id%>><%=list_of_grade.dataValues.name%></option>
+                <% } %>
+            </select>
+            <label for="min_write_grade">min_write_grade</label>
+            <select name="min_write_grade">
+                <% for(let list_of_grade of GradeList) { %>
+                <option value=<%=list_of_grade.dataValues.id%>><%=list_of_grade.dataValues.name%></option>
+                <% } %>
+            </select>
+        </div>
+        <div>
+            <label for="board_type">board_type</label>
+            <input id="board_type" name="board_type" type="text" maxlength="15">
+        </div>
+        <button id="edit_button" type="submit">생성</button>
+    </form>
+</div>
+</body>
+</html>

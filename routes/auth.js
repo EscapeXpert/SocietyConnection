@@ -15,15 +15,22 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
 
     try {
         let exUser = await User.findOne({where: {id}});
+        if (!id) {
+            return res.send('<script> alert("아이디를 입력해주세요.");history.back()</script>');
+        }
         if (exUser) {
             return res.send('<script> alert("이미 존재하는 아이디입니다.");history.back()</script>');
         }
         if (password !== verify_password) {
             return res.send('<script> alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");history.back()</script>');
         }
+        if (!nickname) {
+            return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
+        }
+
         exUser = await User.findOne({where: {nickname}});
         if (exUser) {
-            res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
+            return res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
         }
 
         const hash = await bcrypt.hash(password, 12);
@@ -69,7 +76,6 @@ router.get('/logout', isLoggedIn, async (req, res) => {
     if(req.session){
         req.session.destroy();
     }
-
     res.redirect('/');
 });
 router.get('/kakao_logout', isLoggedIn, async (req, res) => {
