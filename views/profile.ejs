@@ -50,18 +50,8 @@
         <div>
             <a href="/profile/<%= User.nickname %>/change_password">비밀번호 변경</a>
             <a href="/profile/<%= User.nickname %>/edit">프로필 수정</a>
-            <a href="/message/receive">쪽지함</a>
+            <a href="/message/receive" onclick="window.open(this.href, '_blank', 'width=600, height=600'); return false;">쪽지함</a>
         </div>
-        <% if(User_List){ %>
-            <div>
-                <label>다른 사용자 프로필 목록</label>
-            </div>
-            <% for(let list_of_user of User_List) { %>
-                <div>
-                    <a href="/profile/<%= list_of_user.dataValues.nickname %>"><%= list_of_user.dataValues.nickname %></a>
-                </div>
-            <% } %>
-        <% } %>
     <% } %>
 </div>
 </body>

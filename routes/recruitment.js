@@ -3,12 +3,10 @@ const router = express.Router();
 const {sequelize, Recruitment, Board, User, Comment} = require('../models');
 const {QueryTypes} = require('sequelize');
 
-
-
 router.get('/:recruitment_id', async(req, res, next) => {
     const recruitment_id = req.params.recruitment_id;
-    // const user_id = req.user.id;
-    const user_id = 'psh3253';
+    const user_id = req.user.id;
+    //const user_id = 'psh3253';
     try{
         const user = await User.findOne({
             attributes:['id', 'nickname'],
@@ -56,8 +54,8 @@ router.get('/:recruitment_id', async(req, res, next) => {
             }
         });
 
-        res.render('recruitment', {
-            recruitment: recruitment[0],
+        res.render('post', {
+            post: recruitment[0],
             board: board,
             user: user,
             is_like: is_like,

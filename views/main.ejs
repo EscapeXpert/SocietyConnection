@@ -11,8 +11,25 @@
             <label for="id">닉네임</label>
             <label for="id"><%= User.nickname %></label>
         </div>
-        <a href="/auth/logout">로그아웃</a>
+        <%if(User.login_type==='kakao'){%>
+            <a href="/auth/kakao_logout">로그아웃</a>
+        <% }else{ %>
+            <a href="/auth/logout">로그아웃</a>
+        <%}%>
         <a href="/profile/<%= User.nickname %>">프로필</a>
+        <%if(User.grade==5){%>
+            <a href="/admin">admin 페이지</a>
+        <%}%>
+        <% if(BoardList){ %>
+            <div>
+                <label>게시판 목록</label>
+            </div>
+            <% for(let list_of_board of BoardList) { %>
+                <div>
+                    <a href="/board/<%= list_of_board.dataValues.id %>"><%= list_of_board.dataValues.name %></a>
+                </div>
+            <% } %>
+        <% } %>
     <% }else{ %>
         <form id="main-form" action="/auth/login" method="post">
             <div>
@@ -26,6 +43,16 @@
             <button id="login" type="submit">로그인</button>
             <a href="/auth/join">회원가입</a>
             <a href="/auth/kakao">카카오톡</a>
+            <% if(BoardList){ %>
+                <div>
+                    <label>게시판 목록</label>
+                </div>
+                <% for(let list_of_board of BoardList) { %>
+                    <div>
+                        <a href="/board/<%= list_of_board.dataValues.id %>"><%= list_of_board.dataValues.name %></a>
+                    </div>
+                <% } %>
+            <% } %>
         </form>
     <% } %>
 </div>

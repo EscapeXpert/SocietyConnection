@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        <%= title %>
+    </title>
+</head>
+<body>
+<div>
+    <label>사용자 목록</label>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>nickname</th>
+        <th>sns_id</th>
+        <th>name</th>
+        <th>birth_date</th>
+        <th>gender</th>
+        <th>introduce</th>
+        <th>profile_image</th>
+        <th>grade</th>
+        <th>프로필 수정</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let User of UserList) { %>
+        <tr>
+            <td><%= User.nickname %></td>
+            <td><%= User.sns_id %></td>
+            <td><%= User.name %></td>
+            <td><%= User.birth_date %></td>
+            <% if(User.gender){ %>
+                <td>남자</td>
+            <% }else{ %>
+                <td>여자</td>
+            <% } %>
+            <td><%= User.introduce %></td>
+            <%if(User.profile_image){%>
+                <td><img id="img-preview" src=<%= User.profile_image %>  width="75" alt="미리보기"></td>
+            <%}else{%>
+                <td><img id="img-preview" style="display: none;" src=<%= User.profile_image %>  width="75" alt="미리보기"></td>
+            <%}%>
+            <td><%= User.grade %></td>
+            <td><a href="/admin/<%= User.nickname %>/edit">수정</a></td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+</body>
+</html>

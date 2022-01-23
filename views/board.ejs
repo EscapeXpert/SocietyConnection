@@ -7,6 +7,8 @@
     </title>
 </head>
 <body>
+<a href="#" id="sort_by_created_at">최신순</a>
+<a href="#" id="sort_by_like">추천순</a>
 <table>
     <thead>
     <tr>
@@ -15,70 +17,58 @@
         <th>작성자</th>
         <th>작성일</th>
         <th>조회수</th>
-        <th>추천수</th>
+        <% if(board.board_type === 'general') { %>
+            <th>추천수</th>
+        <% } else if(board.board_type === 'recruitment') { %>
+            <th>마감기한</th>
+        <% } %>
     </tr>
     </thead>
     <tbody>
-    <% if(board.board_type === 'general') { %>
-        <% for(let post of posts) { %>
-            <tr>
-                <td><%= post.id %></td>
-                <td>
-                    <div class="title">
-                        <a href="/post/<%= post.id %>?board_id=<%=board.id%>"><%= post.title %></a>
-                        <% if(post.comment > 0) { %>
-                            <a href="/post/<%= post.id %>?board_id=<%=board.id%>#commnet_list">[<%= post.comment %>]</a>
+    <% for(let post of posts) { %>
+        <tr>
+            <td><%= post.id %></td>
+            <td>
+                <div class="title">
+                    <a href="/post/<%= post.id %>?board_id=<%= board.id %>"><%= post.title %></a>
+                    <% if(board.board_type === 'general') { %>
+                        <% if(post.toJSON().comment > 0) { %>
+                            <a href="/post/<%= post.id %>?board_id=<%= board.id %>#commnet_list">
+                                [<%= post.toJSON().comment %>]
+                            </a>
                         <% } %>
-                    </div>
-                </td>
-                <td><%= post.nickname %></td>
-                <% const date = new Date(post.created_at) %>
-                <% const current_date = new Date() %>
-                <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
-                    <td><%= date.toISOString().slice(11, 16) %></td>
-                <% } else { %>
-                    <td><%= date.toISOString().slice(0, 10) %></td>
-                <% } %>
-                <td><%= post.view_count %></td>
-                <td><%= post.like %></td>
-            </tr>
-        <% } %>
-    <% } else if(board.board_type === 'recruitment') { %>
-        <% for(let recruitment of recruitments) { %>
-            <tr>
-                <td><%= recruitment.id %></td>
-                <td>
-                    <div class="title">
-                        <a href="/recruitment/<%= recruitment.id %>"><%= recruitment.title %></a>
-                        <% if(recruitment.comment > 0) { %>
-                            <a href="/recruitment/<%= recruitment.id %>/#comment_list">[<%= recruitment.comment %>]</a>
-                        <% } %>
-                    </div>
-                </td>
-                <td><%= recruitment.nickname %></td>
-                <% const date = new Date(recruitment.created_at) %>
-                <% const current_date = new Date() %>
-                <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
-                    <td><%= date.toISOString().slice(11, 16) %></td>
-                <% } else { %>
-                    <td><%= date.toISOString().slice(0, 10) %></td>
-                <% } %>
-                <td><%= recruitment.view_count %></td>
-                <td><%= recruitment.like %></td>
-            </tr>
-        <% } %>
+                    <% } %>
+                </div>
+            </td>
+            <td><%= post.User.nickname %></td>
+            <% const date = new Date(post.created_at) %>
+            <% const current_date = new Date() %>
+            <% const offset = new Date().getTimezoneOffset() * 60000 %>
+            <% const date_string = new Date(post.created_at - offset).toISOString() %>
+            <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                <td><%= date_string.slice(11, 16) %></td>
+            <% } else if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth()){ %>
+                <td><%= date_string.slice(5, 10) %></td>
+            <% } else { %>
+                <td><%= date_string.slice(0, 10) %></td>
+            <% } %>
+            <td><%= post.view_count %></td>
+            <% if(board.board_type === 'general') { %>
+                <td><%= post.toJSON().like %></td>
+            <% } else if(board.board_type === 'recruitment') { %>
+                <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                <% const date_string = new Date(post.deadline - offset).toISOString() %>
+                <td><%= date_string.slice(0, 16).replace('T', ' ') %></td>
+            <% } %>
+        </tr>
     <% } %>
     </tbody>
 </table>
 <div>
     <% let max_page %>
-    <% if(board.board_type === 'general') { %>
-        <% max_page = parseInt(parseInt(post_count / 10) + Math.ceil((post_count % 10) / 10)) %>
-    <% } else if(board.board_type === 'recruitment') { %>
-        <% max_page = parseInt(parseInt(recruitment_count / 10) + Math.ceil((recruitment_count % 10) / 10)) %>
-    <% } %>
+    <% max_page = parseInt(parseInt(post_count / 10) + Math.ceil((post_count % 10) / 10)) %>
     <% const start_page = Math.floor((parseInt(page) - 1) / 10) * 10 + 1 %>
-    <% if (start_page != 1) { %>
+    <% if (start_page !== 1) { %>
         <a href="/board/<%= board.id %>?page=<%= start_page - 10 %>">이전</a>
     <% } %>
     <% for(let i = start_page; (i < start_page + 10) && i <= max_page; i++) { %>
@@ -90,4 +80,21 @@
 </div>
 <a href="/board/<%= board.id %>/write">글쓰기</a>
 </body>
+<input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    const board_id = document.querySelector('#board_id').value;
+
+    const sort_by_create_tag = document.querySelector('#sort_by_created_at');
+    sort_by_create_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        location.href = `/board/${board_id}/?sort=created_at`;
+    });
+
+    const sort_by_like_tag = document.querySelector('#sort_by_like');
+    sort_by_like_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        location.href = `/board/${board_id}/?sort=like`;
+    });
+</script>
 </html>

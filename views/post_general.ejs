@@ -11,14 +11,21 @@
         <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
         <a href="#" id="delete">삭제</a>
     <% } %>
+    <% if(user.grade === 5) { %>
+        <a href="#" id="set_notice">공지로 등록</a>
+    <% } %>
 </div>
 <div>
-    <!-- 프로필 사진-->
-    <a href="/profile/<%= post.nickname %>"><%= post.nickname %></a>
-    <span><%= post.grade %></span>
+    <% if(post.User.profile_image != null) { %>
+        <img src="<%= post.User.profile_image %>" alt="" width="32" height="32">
+    <% } else { %>
+        <img src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+    <% } %>
+    <a href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
+    <span><%= post.toJSON().grade %></span>
     <% if(post.creator_id !== user.id) { %>
         <a href='#'
-           onclick="window.open('/message/write?target_nickname=<%= post.nickname %>','<%= post.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
+           onclick="window.open('/message/write?target_nickname=<%= post.User.nickname %>','<%= post.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
     <% } %>
 </div>
 <div>
@@ -29,6 +36,7 @@
             <p><%= content %></p>
         <% } %>
     </div>
+
     <div>
         <a href="#" id="like">
             <% if(is_like == null) { %>
@@ -44,7 +52,11 @@
         <ul>
             <% for(let like_user of like_list) { %>
                 <li>
-                    <!-- 프로필 사진-->
+                    <% if(like_user.User.profile_image != null) { %>
+                        <img src="<%= like_user.User.profile_image %>" alt="" width="32" height="32">
+                    <% } else { %>
+                        <img src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+                    <% } %>
                     <a href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
                 </li>
             <% } %>
@@ -54,17 +66,43 @@
         <h3>댓글</h3>
         <ul>
             <% for(let comment of comment_list) { %>
-                <li id="<%= comment.id %>">
-                    <!-- 프로필 사진-->
+                <li id="<%= comment.id %>" class="comment_box">
+                    <% if(comment.User.profile_image != null) { %>
+                        <img src="<%= comment.User.profile_image %>" alt="" width="32" height="32">
+                    <% } else { %>
+                        <img src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+                    <% } %>
                     <a href="/profile/<%= comment.User.nickname %>"><%= comment.User.nickname %></a>
                     <p><%= comment.content %></p>
-                    <% const date = new Date(comment.created_at) %>
+                    <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                    <% const date = new Date(comment.created_at - offset) %>
                     <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
                     <a href="#" id="open_reply_comment">답글</a>
                     <% if(user.id === comment.creator_id) { %>
                         <a href="#" id="comment_delete">삭제</a>
                     <% } %>
                 </li>
+                <% if(reply_comment_map.has(comment.id)) { %>
+                    <% const reply_comment_list = reply_comment_map.get(comment.id) %>
+                    <% for(let reply_comment of reply_comment_list) { %>
+                        <li id="<%= reply_comment.id %>" class="reply_comment_box" style="padding-left: 30px">
+                            <% if(reply_comment.User.profile_image != null) { %>
+                                <img src="<%= reply_comment.User.profile_image %>" alt="" width="32" height="32">
+                            <% } else { %>
+                                <img src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+                            <% } %>
+                            <a href="/profile/<%= reply_comment.User.nickname %>"><%= reply_comment.User.nickname %></a>
+                            <p><%= reply_comment.content %></p>
+                            <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                            <% const date = new Date(reply_comment.created_at - offset) %>
+                            <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+                            <a href="#" id="open_reply_comment">답글</a>
+                            <% if(user.id === comment.creator_id) { %>
+                                <a href="#" id="reply_comment_delete">삭제</a>
+                            <% } %>
+                        </li>
+                    <% } %>
+                <% } %>
             <% } %>
         </ul>
         <p><%= user.nickname %></p>
@@ -81,23 +119,8 @@
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    const like_tag = document.querySelector('#like');
     const post_id = document.querySelector('#post_id').value;
     const board_id = document.querySelector('#board_id').value;
-    like_tag.addEventListener('click', async function (event) {
-        event.preventDefault();
-        await axios.post(`/post/${post_id}/like`, {
-            board_id: board_id
-        })
-            .then((response) => {
-                if (response.data === 'success') {
-                    location.reload();
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-    });
 
     const delete_tag = document.querySelector('#delete');
     delete_tag.addEventListener('click', async function (event) {
@@ -110,6 +133,23 @@
                     location.href = `/board/${board_id}`;
                 } else if (response.data === 'not creator') {
                     alert("자신의 게시글만 삭제하실 수 있습니다.");
+                    history.back();
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    });
+
+    const like_tag = document.querySelector('#like');
+    like_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await axios.post(`/post/${post_id}/like`, {
+            board_id: board_id
+        })
+            .then((response) => {
+                if (response.data === 'success') {
+                    location.reload();
                 }
             })
             .catch((err) => {
@@ -141,12 +181,15 @@
         comment_delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
             const comment_id = comment_delete_tag.parentElement.id;
-            await axios.post(`/post/${post_id}/comment/${comment_id}/delete`)
+            await axios.post(`/post/${post_id}/comment/${comment_id}/delete`, {
+                board_id: board_id
+            })
                 .then((response) => {
                     if (response.data === 'success') {
                         location.reload();
-                    } else if (response.data === 'no creator') {
+                    } else if (response.data === 'not creator') {
                         alert("자신의 댓글만 삭제할 수 있습니다.");
+                        history.back();
                     }
                 })
                 .catch((err) => {
@@ -181,17 +224,25 @@
                 const reply_comment_tag = document.querySelector('#reply_comment');
                 reply_comment_tag.remove();
             }
-            const comment_id = open_reply_comment_tag.parentElement.id;
+            let comment_id;
+            let reply_comment_box_tag = open_reply_comment_tag.parentElement;
+            while (true) {
+                if (reply_comment_box_tag.className === 'comment_box') {
+                    comment_id = reply_comment_box_tag.id;
+                    break;
+                }
+                reply_comment_box_tag = reply_comment_box_tag.previousElementSibling;
+            }
             let new_li_tag = document.createElement('li');
             new_li_tag.id = 'reply_comment';
             new_li_tag.innerHTML = '' +
                 '<label for="reply_comment_content"></label>' +
                 '<textarea name="reply_comment_content" id="reply_comment_content" placeholder="답글을 남겨주세요." rows="5" cols="50" style="resize: none" "></textarea>' +
                 '<div class="reply_comment_button_box">' +
-                '<a href="#" id="reply_comment_close">취소</a>' +
+                '<a href="#" id="reply_comment_close">취소 </a>' +
                 '<a href="#" id="submit_reply_comment">등록</a>' +
                 '</div>';
-            open_reply_comment_tag.parentElement.appendChild(new_li_tag)
+            open_reply_comment_tag.parentElement.after(new_li_tag)
 
             const reply_comment_close_tag = document.querySelector('#reply_comment_close');
             reply_comment_close_tag.addEventListener('click', function (event) {
@@ -218,6 +269,32 @@
             });
             is_open_reply_comment = true;
         });
+    });
+
+    const reply_comment_delete_tags = document.querySelectorAll('#reply_comment_delete');
+    reply_comment_delete_tags.forEach(reply_comment_delete_tag => {
+        reply_comment_delete_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            const reply_comment_id = reply_comment_delete_tag.parentElement.id;
+            await axios.post(`/post/${post_id}/reply_comment/${reply_comment_id}/delete`)
+                .then((response) => {
+                    if (response.data === 'success') {
+                        location.reload();
+                    } else if (response.data === 'not creator') {
+                        alert("자신의 답글만 삭제할 수 있습니다.");
+                        history.back();
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        })
+    });
+
+    const set_notice_tag = document.querySelector('#set_notice');
+    set_notice_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+
     });
 </script>
 </html>

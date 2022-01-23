@@ -52,8 +52,8 @@ module.exports = class Recruitment extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Recruitment.hasMany(db.Applicant, { foreignKey: 'recruitment_id', sourceKey: 'id'});
-        db.Recruitment.belongsTo(db.User, { foreignKey: 'creator_id', targetKey: 'id'});
+        db.Recruitment.hasMany(db.Applicant, { foreignKey: 'recruitment_id', sourceKey: 'id', onDelete: 'cascade'});
+        db.Recruitment.belongsTo(db.User, { foreignKey: 'creator_id', targetKey: 'id', onDelete: 'no action'});
     }
 
 };
