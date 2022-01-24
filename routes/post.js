@@ -7,7 +7,6 @@ router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
     const user_id = req.user.id;
-    //const user_id = "psh3253"
     try {
         const board = await Board.findOne({
             attributes: ['board_type'],
@@ -20,14 +19,12 @@ router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
                 attributes: ['creator_id'],
                 where: {
                     id: post_id,
-                    board_id: board_id
                 }
             });
             if (post.creator_id === user_id) {
                 await Post.destroy({
                     where: {
                         id: post_id,
-                        board_id: board_id
                     }
                 });
                 res.send('success');
@@ -39,14 +36,12 @@ router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
                 attributes: ['creator_id'],
                 where: {
                     id: post_id,
-                    board_id: board_id
                 }
             });
             if (post.creator_id === user_id) {
                 await Recruitment.destroy({
                     where: {
                         id: post_id,
-                        board_id: board_id
                     }
                 });
                 res.send('success');
@@ -189,14 +184,44 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/set_notice', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/notice', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
-});
-
-router.post('/:post_id/unset_notice', isLoggedIn, async (req, res, next) => {
-    const post_id = req.params.post_id;
-    const user_id = req.user.id;
+    try {
+        const user = await User.findOne({
+            attributes: ['grade'],
+            where: {
+                id: user_id
+            }
+        });
+        if (user.grade === 5) {
+            const post = await Post.findOne({
+                attributes: ['is_notice'],
+                where: {
+                    id: post_id
+                }
+            });
+            if (post.is_notice) {
+                await Post.update({is_notice: false}, {
+                    where: {
+                        id: post_id,
+                    }
+                });
+            } else {
+                await Post.update({is_notice: true}, {
+                    where: {
+                        id: post_id,
+                    }
+                });
+            }
+            res.send('success');
+        } else {
+            res.send('not admin');
+        }
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
 });
 
 router.get('/:post_id/apply', isLoggedIn, async (req, res, next) => {
@@ -212,28 +237,24 @@ router.post('/:post_id/apply', isLoggedIn, async (req, res, next) => {
 
 router.post('/:post_id/like', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
-    const board_id = req.body.board_id;
     const user_id = req.user.id;
     try {
         const is_like = await Like.findOne({
             where: {
                 post_id: post_id,
                 user_id: user_id,
-                board_id: board_id
             }
         });
         if (is_like == null) {
             await Like.create({
                 post_id: post_id,
                 user_id: user_id,
-                board_id: board_id
             });
         } else {
             await Like.destroy({
                 where: {
                     post_id: post_id,
                     user_id: user_id,
-                    board_id: board_id
                 }
             });
         }
@@ -263,7 +284,6 @@ router.post('/:post_id/comment/:comment_id/reply_comment/write', isLoggedIn, asy
 
 router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
-    const board_id = req.body.board_id;
     const comment_id = req.params.comment_id;
     const user_id = req.user.id;
     try {
@@ -271,7 +291,6 @@ router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res,
             attributes: ['creator_id'],
             where: {
                 id: comment_id,
-                board_id: board_id,
                 post_id: post_id
             }
         });
@@ -279,8 +298,7 @@ router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res,
             await Comment.destroy({
                 where: {
                     id: comment_id,
-                    post_id: post_id,
-                    board_id: board_id
+                    post_id: post_id
                 }
             });
             res.send('success');
@@ -295,15 +313,13 @@ router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res,
 
 router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
-    const board_id = req.body.board_id;
     const content = req.body.comment_content;
     const user_id = req.user.id;
     try {
         await Comment.create({
             content: content,
             creator_id: user_id,
-            post_id: post_id,
-            board_id: board_id
+            post_id: post_id
         });
         res.send('success');
     } catch (err) {
@@ -358,7 +374,7 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
         });
         if (board.board_type === 'general') {
             const post = await Post.findOne({
-                attributes: ['id', 'title', 'content', 'created_at', 'creator_id', 'view_count', 'board_id', [
+                attributes: ['id', 'title', 'content', 'is_notice', 'created_at', 'creator_id', 'view_count', 'board_id', [
                     sequelize.literal('(SELECT name FROM grade WHERE id = user.grade)'), 'grade'
                 ]],
                 where: {
@@ -373,14 +389,12 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                 where: {
                     post_id: post_id,
                     user_id: user_id,
-                    board_id: board_id
                 }
             });
             const like_list = await Like.findAll({
                 attributes: [],
                 where: {
                     post_id: post_id,
-                    board_id: board_id
                 },
                 include: {
                     model: User,
@@ -391,7 +405,6 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                 attributes: ['id', 'content', 'created_at', 'creator_id'],
                 where: {
                     post_id: post_id,
-                    board_id: board_id,
                 },
                 include: {
                     model: User,

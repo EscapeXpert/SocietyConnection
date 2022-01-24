@@ -27,7 +27,11 @@
     <tbody>
     <% for(let post of posts) { %>
         <tr>
-            <td><%= post.id %></td>
+            <% if(board.board_type === 'general' && post.is_notice) { %>
+                <td><span class="notice_prefix">공지</span></td>
+            <% } else { %>
+                <td><%= post.id %></td>
+            <% } %>
             <td>
                 <div class="title">
                     <a href="/post/<%= post.id %>?board_id=<%= board.id %>"><%= post.title %></a>

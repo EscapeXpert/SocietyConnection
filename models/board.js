@@ -40,8 +40,6 @@ module.exports = class Board extends Sequelize.Model {
 
     static associate(db) {
         db.Board.hasMany(db.Post, { foreignKey: 'board_id', sourceKey: 'id', onDelete: 'cascade'});
-        db.Board.hasMany(db.Comment, {foreignKey: 'board_id', sourceKey: 'id', onDelete: 'cascade'});
-        db.Board.hasMany(db.Like, {foreignKey: 'board_id', sourceKey: 'id', onDelete: 'cascade'});
         db.Board.hasMany(db.PostFile, {foreignKey: 'board_id', sourceKey: 'id', onDelete: 'cascade'});
     }
 };
