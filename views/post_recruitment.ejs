@@ -40,8 +40,11 @@
 </div>
 <% if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime() ) { %>
     <div class="apply">
-        <a href="/post/<%= post.id %>/apply">신청</a>
-
+        <% if(already === null) { %>
+            <a href="/post/<%= post.id %>/apply" id="open_apply">신청</a>
+        <% } else { %>
+            <a href="#" id="cancel">취소</a>
+        <% } %>
     </div>
 <% } %>
 <input type="hidden" id="post_id" name="post_id" value="<%= post.id %>">
@@ -49,18 +52,16 @@
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    const post_id = document.querySelector('#post_id').value;
-    const board_id = document.querySelector('#board_id').value;
-
+    <% if(post.creator_id === user.id) { %>
     const delete_tag = document.querySelector('#delete');
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        await axios.post(`/post/${post_id}/delete`, {
-            board_id: board_id
+        await axios.post(`/post/<%= post.id%>>/delete`, {
+            board_id: board.id
         })
             .then((response) => {
                 if (response.data === 'success') {
-                    location.href = `/board/${board_id}`;
+                    location.href = `/board/<%= board.id%>>`;
                 } else if (response.data === 'not creator') {
                     alert("자신의 게시글만 삭제하실 수 있습니다.");
                     history.back();
@@ -70,5 +71,26 @@
                 console.error(err);
             });
     });
+    <% } else { %>
+    const cancel_tag = document.querySelector('#cancel');
+    cancel_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await axios.post(`/post/<%= post.id%>/apply_cancel`, {
+            board_id: board_id
+        })
+            .then((response) => {
+                if (response.data === 'success') {
+                    alert("취소되었습니다.");
+                    location.replace(`/post/<%= post.id%>?board_id=<%= board.id%>`);
+                } else if(response.data === 'no apply'){
+                    alert("신청 기록이 없습니다.");
+                    location.replace(`/post/<%= post.id%>?board_id=<%= board.id%>`);
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+        });
+    <% } %>
 </script>
 </html>

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade} = require('../models');
+const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade, Applicant} = require('../models');
 const {isLoggedIn} = require("./middlewares");
 
 router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
@@ -227,12 +227,101 @@ router.post('/:post_id/notice', isLoggedIn, async (req, res, next) => {
 router.get('/:post_id/apply', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
+    try {
+        const post = await Recruitment.findOne({
+            attributes: ['id', 'title', 'creator_id', 'content', 'board_id'],
+            where: {
+                id: post_id
+            }
+        });
+
+        const already = await Applicant.findOne({
+            attributes: ['id', 'user_id', 'recruitment_id'],
+            where: {
+                user_id: user_id,
+                recruitment_id: post_id
+            }
+        });
+
+        if (already !== null) {
+            res.send('<script> alert("신청 완료된 상태입니다.");window.location.replace("/post/' + post_id + '?board_id=' + post.board_id + '");</script>');
+        } else{
+            res.render('apply', {
+               post: post
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
 
 });
 
 router.post('/:post_id/apply', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
+    const message = req.body.message;
+    try {
+        const already = await Applicant.findOne({
+            attributes: ['id', 'user_id', 'recruitment_id'],
+            where: {
+                user_id: user_id,
+                recruitment_id: post_id,
+                message: message
+            }
+        });
+
+        const board = await Recruitment.findOne({
+            attributes: ['board_id'],
+            where: {
+                id: post_id
+            }
+        });
+
+        if (already === null) {
+            await Applicant.create({
+                recruitment_id: post_id,
+                user_id: user_id,
+                message: message
+            });
+            res.send('<script> alert("신청 완료.");window.location.replace("/post/' + post_id + '?board_id=' + board.board_id + '");</script>');
+        }
+        res.send('success');
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+router.post('/:post_id/apply_cancel', isLoggedIn, async (req, res, next) => {
+    const post_id = req.params.post_id;
+    const user_id = req.user.id;
+    const message = req.body.message;
+    const board_id = req.body.board_id;
+    try {
+        const already = await Applicant.findOne({
+            attributes: ['id', 'user_id', 'recruitment_id'],
+            where: {
+                user_id: user_id,
+                recruitment_id: post_id
+            }
+        });
+        console.log(already);
+        if (already !== null) {
+            await Applicant.destroy({
+                where: {
+                    recruitment_id: post_id,
+                    user_id: user_id
+                }
+            });
+            res.send('success');
+        } else {
+            res.send('no apply');
+        }
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
 });
 
 router.post('/:post_id/like', isLoggedIn, async (req, res, next) => {
@@ -468,10 +557,18 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                         id: post_id,
                     }
                 });
+                const already = await Applicant.findOne({
+                    attributes: ['id', 'user_id', 'recruitment_id'],
+                    where: {
+                        user_id: user_id,
+                        recruitment_id: post_id
+                    }
+                });
                 res.render('post_recruitment', {
                     post: post,
                     board: board,
-                    user: user
+                    user: user,
+                    already: already
                 });
             } else {
                 const grade = await Grade.findOne({
