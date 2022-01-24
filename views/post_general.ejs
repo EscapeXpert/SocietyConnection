@@ -12,7 +12,13 @@
         <a href="#" id="delete">삭제</a>
     <% } %>
     <% if(user.grade === 5) { %>
-        <a href="#" id="set_notice">공지로 등록</a>
+        <a href="#" id="notice">
+            <% if(post.is_notice) { %>
+                공지 해제
+            <% } else { %>
+                공지 등록
+            <% } %>
+        </a>
     <% } %>
 </div>
 <div>
@@ -114,23 +120,19 @@
         </div>
     </div>
 </div>
-<input type="hidden" id="post_id" name="post_id" value="<%= post.id %>">
-<input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    const post_id = document.querySelector('#post_id').value;
-    const board_id = document.querySelector('#board_id').value;
-
+    <% if (post.creator_id === user.id) { %>
     const delete_tag = document.querySelector('#delete');
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        await axios.post(`/post/${post_id}/delete`, {
-            board_id: board_id
+        await axios.post('/post/<%=post.id%>/delete', {
+            board_id: <%= board.id%>
         })
             .then((response) => {
                 if (response.data === 'success') {
-                    location.href = `/board/${board_id}`;
+                    location.href = '/board/<%= board.id%>';
                 } else if (response.data === 'not creator') {
                     alert("자신의 게시글만 삭제하실 수 있습니다.");
                     history.back();
@@ -140,13 +142,12 @@
                 console.error(err);
             });
     });
+    <% } %>
 
     const like_tag = document.querySelector('#like');
     like_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        await axios.post(`/post/${post_id}/like`, {
-            board_id: board_id
-        })
+        await axios.post('/post/<%= post.id%>/like')
             .then((response) => {
                 if (response.data === 'success') {
                     location.reload();
@@ -181,9 +182,7 @@
         comment_delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
             const comment_id = comment_delete_tag.parentElement.id;
-            await axios.post(`/post/${post_id}/comment/${comment_id}/delete`, {
-                board_id: board_id
-            })
+            await axios.post('/post/<%= post.id%>/comment/${comment_id}/delete')
                 .then((response) => {
                     if (response.data === 'success') {
                         location.reload();
@@ -201,8 +200,7 @@
     submit_comment_tag.addEventListener('click', async function (event) {
         event.preventDefault();
         const comment_content = document.querySelector('#comment_content').value;
-        axios.post(`/post/${post_id}/comment/write`, {
-            board_id: board_id,
+        axios.post('/post/<%= post.id%>/comment/write', {
             comment_content: comment_content
         })
             .then((response) => {
@@ -255,7 +253,7 @@
             submit_reply_commit_tag.addEventListener('click', async function (event) {
                 event.preventDefault();
                 const content = document.querySelector('#reply_comment_content').value;
-                axios.post(`/post/${post_id}/comment/${comment_id}/reply_comment/write`, {
+                axios.post(`/post/<%=post.id%>/comment/${comment_id}/reply_comment/write`, {
                     reply_comment_content: content
                 })
                     .then((response) => {
@@ -276,7 +274,7 @@
         reply_comment_delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
             const reply_comment_id = reply_comment_delete_tag.parentElement.id;
-            await axios.post(`/post/${post_id}/reply_comment/${reply_comment_id}/delete`)
+            await axios.post(`/post<%= post.id%>/reply_comment/${reply_comment_id}/delete`)
                 .then((response) => {
                     if (response.data === 'success') {
                         location.reload();
@@ -291,10 +289,22 @@
         })
     });
 
-    const set_notice_tag = document.querySelector('#set_notice');
-    set_notice_tag.addEventListener('click', async function (event) {
+    <% if(user.grade === 5) { %>
+    const notice_tag = document.querySelector('#notice');
+    notice_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-
+        await axios.post('/post/<%= post.id%>/notice')
+            .then((response) => {
+                if (response.data === 'success') {
+                    location.reload();
+                } else if (response.data === 'not admin') {
+                    alert("관리자만 공지를 설정하실 수 있습니다.");
+                    history.back();
+                }
+            }).catch((err) => {
+                console.error(err);
+            });
     });
+    <% } %>
 </script>
 </html>
