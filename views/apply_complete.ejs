@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= post.title %> 선택</title>
+</head>
+<body>
+<div>
+    <ul>
+        <li>
+            <span>닉네임</span>
+        </li>
+    </ul>
+</div>
+
+    <div>
+        <ol>
+            <% for(var applicant of applicants) { %>
+                <li>
+                    <span><%= applicant.User.nickname%></span>
+                    <details>
+                        <summary>지원 내용</summary>
+                        <span><%= applicant.message %></span>
+                    </details>
+                </li>
+            <% } %>
+        </ol>
+    </div>
+    <div>
+        <a href="#" id="confirm">확정</a>
+    </div>
+</body>
+</html>
