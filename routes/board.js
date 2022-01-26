@@ -2,6 +2,45 @@ const express = require('express');
 const router = express.Router();
 const {isLoggedIn} = require('./middlewares');
 const {sequelize, Post, Board, Recruitment, User, Grade} = require('../models');
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+try {
+    fs.readdirSync('./uploads/post');
+} catch (error) {
+    console.error('uploads/post 폴더가 없어 uploads 폴더를 생성합니다.');
+    fs.mkdirSync('./uploads/post');
+}
+
+try {
+    fs.readdirSync('./uploads/post/img');
+} catch (error) {
+    console.error('uploads/post/img 폴더가 없어 uploads 폴더를 생성합니다.');
+    fs.mkdirSync('./uploads/post/img');
+}
+
+const img_upload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'uploads/post/img/');
+        },
+        filename(req, file, cb) {
+            const ext = path.extname(file.originalname);
+            cb(null, path.basename(file.originalname, ext) + ext);
+        },
+    }),
+    limits: {fileSize: 10 * 1024 * 1024},
+});
+
+router.post('/upload', img_upload.single('img'), async (req, res, next) => {
+    const filename = req.file.filename;
+    let fileInfo = "";
+    fileInfo += "&bNewLine=true";
+    fileInfo += "&sFileName=" + filename;
+    fileInfo += "&sFileURL=http://localhost:3001/uploads/post/img/" + filename;
+    res.send(fileInfo);
+});
 
 router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
     const board_id = req.params.board_id;
@@ -44,6 +83,7 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
     const content = req.body.content;
     const deadline = req.body.deadline;
     const creator_id = req.user.id;
+    console.log(content);
     try {
         const board = await Board.findOne({
             attributes: ['board_type'],
