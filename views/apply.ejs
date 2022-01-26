@@ -9,11 +9,11 @@
     <p>프로젝트 내용</p>
     <label rows="10" cols="50" name="content" id="content"><%= post.content%></label>
 </div>
-<form action="/post/<%= post.id %>/apply?already=true" method="post">
+<form action="/post/<%= post.id %>/apply" method="post">
     <div>
         <p>신청 내용</p>
         <label for="apply"></label>
-        <textarea rows="10" cols="50" name="message" id="message" placeholder="내용을 입력하세요." maxlength="1000"
+        <textarea rows="10" cols="50" name="message" id="message" placeholder="내용을 입력하세요." maxlength="100"
                   required></textarea>
     </div>
     <div>
