@@ -9,7 +9,7 @@
     <form id="edit-form" action="/admin/board_create" method="post">
         <div>
             <label for="name">게시판 이름</label>
-            <input id="name" name="name" type="text" maxlength="15" >
+            <input id="name" name="name" type="text" maxlength="15" required>
         </div>
         <div>
             <label for="min_read_grade">min_read_grade</label>
@@ -27,7 +27,10 @@
         </div>
         <div>
             <label for="board_type">board_type</label>
-            <input id="board_type" name="board_type" type="text" maxlength="15">
+            <select name="board_type">
+                <option value='general'>general</option>
+                <option value='recruitment'>recruitment</option>
+            </select>
         </div>
         <button id="edit_button" type="submit">생성</button>
     </form>

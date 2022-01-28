@@ -50,6 +50,10 @@ module.exports = class User extends Sequelize.Model {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 defaultValue: 1,
+            },
+            session_id: {
+                type: Sequelize.STRING(50),
+                allowNull: true
             }
         }, {
             sequelize,
