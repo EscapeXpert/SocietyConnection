@@ -9,7 +9,7 @@
     <form id="edit-form" action="/profile/<%= User.nickname %>/edit" method="post">
         <div>
             <label for="sns_id">sns_id</label>
-            <input id="sns_id" name="sns_id" type="text" maxlength="30" required value=<%=User.sns_id%>>
+            <input id="sns_id" name="sns_id" type="text" maxlength="30" value=<%=User.sns_id%>>
         </div>
         <div>
             <label for="nickname">닉네임</label>
@@ -17,11 +17,11 @@
         </div>
         <div>
             <label for="name">이름</label>
-            <input id="name" name="name" type="text" max="15" required value=<%=User.name%>>
+            <input id="name" name="name" type="text" max="15" value=<%=User.name%>>
         </div>
         <div>
             <label for="birth_date">생년월일</label>
-            <input id="birth_date" name="birth_date" type="date" required value=<%=birth%>>
+            <input id="birth_date" name="birth_date" type="date" value=<%=birth%>>
         </div>
         <div>
             <label for="gender">성별</label>
@@ -35,7 +35,7 @@
         </div>
         <div>
             <label for="introduce">자기소개</label>
-            <input id="introduce" name="introduce" type="text" max="200" required value="<%= User.introduce %>">
+            <input id="introduce" name="introduce" type="text" max="200" value="<%= User.introduce %>">
         </div>
         <div class="img-preview">
             <%if(User.profile_image){%>

@@ -54,7 +54,7 @@
                     <% } %>
                 </span>
                 <span>
-                    <%= message.nickname %>
+                    <a href="/profile/<%= message.User.nickname%>"><%= message.User.nickname%></a>
                 </span>
                 <span>
                     <a href="/message/<%= message.id %>?type=receive"><%= message.title %></a>

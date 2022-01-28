@@ -7,8 +7,14 @@
     </title>
 </head>
 <body>
-<a href="#" id="sort_by_created_at">최신순</a>
-<a href="#" id="sort_by_like">추천순</a>
+<% if(board.board_type === 'general') { %>
+    <a href="#" id="sort_by_created_at">최신순</a>
+    <a href="#" id="sort_by_like">추천순</a>
+<% } else if(board.board_type === 'recruitment') { %>
+    <a href="#" id="sort_by_created_at">최신순</a>
+    <a href="#" id="sort_by_deadline">마감기한순</a>
+    <a href="#" id="sort_by_after_deadline">마감완료</a>
+<% } %>
 <table>
     <thead>
     <tr>
@@ -73,21 +79,23 @@
     <% max_page = parseInt(parseInt(post_count / 10) + Math.ceil((post_count % 10) / 10)) %>
     <% const start_page = Math.floor((parseInt(page) - 1) / 10) * 10 + 1 %>
     <% if (start_page !== 1) { %>
-        <a href="/board/<%= board.id %>?page=<%= start_page - 10 %>">이전</a>
+        <a href="/board/<%= board.id %>?page=<%= start_page - 10 %>&sort=<%=sort%>">이전</a>
     <% } %>
     <% for(let i = start_page; (i < start_page + 10) && i <= max_page; i++) { %>
-        <a href="/board/<%= board.id %>?page=<%= i %>"><%= i %></a>
+        <a href="/board/<%= board.id %>?page=<%= i %>&sort=<%=sort%>"><%= i %></a>
     <% } %>
     <% if ((start_page + 10) <= max_page) { %>
-        <a href="/board/<%= board.id %>?page=<%= start_page + 10 %>">다음</a>
+        <a href="/board/<%= board.id %>?page=<%= start_page + 10 %>&sort=<%=sort%>">다음</a>
     <% } %>
 </div>
 <a href="/board/<%= board.id %>/write">글쓰기</a>
 </body>
 <input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
+<input type="hidden" id="board_type" name="board_type" value="<%= board.board_type %>">
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     const board_id = document.querySelector('#board_id').value;
+    const board_type = document.querySelector('#board_type').value;
 
     const sort_by_create_tag = document.querySelector('#sort_by_created_at');
     sort_by_create_tag.addEventListener('click', async function (event) {
@@ -95,10 +103,25 @@
         location.href = `/board/${board_id}/?sort=created_at`;
     });
 
-    const sort_by_like_tag = document.querySelector('#sort_by_like');
-    sort_by_like_tag.addEventListener('click', async function (event) {
-        event.preventDefault();
-        location.href = `/board/${board_id}/?sort=like`;
-    });
+    if(board_type === 'general') {
+        const sort_by_like_tag = document.querySelector('#sort_by_like');
+        sort_by_like_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            location.href = `/board/${board_id}/?sort=like`;
+        });
+    }
+    else if(board_type === 'recruitment') {
+        const sort_by_deadline_tag = document.querySelector('#sort_by_deadline');
+        sort_by_deadline_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            location.href = `/board/${board_id}/?sort=deadline`;
+        });
+
+        const sort_by_after_deadline_tag = document.querySelector('#sort_by_after_deadline');
+        sort_by_after_deadline_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            location.href = `/board/${board_id}/?sort=after_deadline`;
+        });
+    }
 </script>
 </html>

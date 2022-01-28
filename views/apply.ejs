@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= post.title %> 신청 </title>
+</head>
+<body>
+<div>
+    <p>프로젝트 내용</p>
+    <label rows="10" cols="50" name="content" id="content"><%= post.content%></label>
+</div>
+<form action="/post/<%= post.id %>/apply" method="post">
+    <div>
+        <p>신청 내용</p>
+        <label for="apply"></label>
+        <textarea rows="10" cols="50" name="message" id="message" placeholder="내용을 입력하세요." maxlength="100"
+                  required></textarea>
+    </div>
+    <div>
+        <input type="submit" value="신청하기">
+    </div>
+</form>
+</body>
+</html>

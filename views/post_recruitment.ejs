@@ -6,12 +6,7 @@
 </head>
 <body>
 <a href="/board/<%= board.id %>"><%= board.name %></a>
-<div>
-    <% if(post.creator_id === user.id && post.deadline.getTime() > new Date().getTime()) { %>
-        <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
-        <a href="#" id="delete">삭제</a>
-    <% } %>
-</div>
+
 <div>
     <% if(post.User.profile_image != null) { %>
         <img src="<%= post.User.profile_image %>" alt="" width="32" height="32">
@@ -40,27 +35,85 @@
 </div>
 <% if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime() ) { %>
     <div class="apply">
-        <a href="/post/<%= post.id %>/apply">신청</a>
-
+        <% if(already === null) { %>
+            <a href='#'
+               onclick="window.open('/post/<%= post.id %>/apply', 'apply', 'status=no, toolbar=no, menubar=no, width=400, height=400'); return false">신청</a>
+        <% } else { %>
+            <a href="#" id="cancel">취소</a>
+        <% } %>
     </div>
 <% } %>
-<input type="hidden" id="post_id" name="post_id" value="<%= post.id %>">
-<input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
+
+<div>
+    <% if(post.creator_id === user.id && post.is_complete === false) { %>
+        <% if(post.deadline.getTime() > new Date().getTime()) { %>
+            <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
+            <% if(applicant_count == 0) { %>
+                <a href="#" id="delete">삭제</a>
+            <% } %>
+        <% } else if(post.deadline.getTime() < new Date().getTime()) { %>
+            <div>
+                <ul>
+                    <li>
+                        <span>체크</span>
+                        <span>닉네임</span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <ol>
+                    <% for(var applicant of applicants) { %>
+                        <li>
+                <span>
+                    <input type="checkbox" id="check" name="check" value="<%= applicant.id %>"
+                    <% if(applicant.is_accepted === true) { %> checked
+                            <% } %>
+                    >
+                </span>
+                            <span><a href="/profile/<%= applicant.User.nickname %>"><%= applicant.User.nickname %></a></span>
+                            <details>
+                                <summary>지원 내용</summary>
+                                <span><%= applicant.message %></span>
+                            </details>
+                        </li>
+                    <% } %>
+                </ol>
+            </div>
+            <a href="#" id="complete">마감</a>
+            <a href='#'
+               onclick="window.open('/post/<%= post.id %>/apply/complete', '<%= post.id %>', 'status=no, toolbar=no, menubar=no, width=600, height=500');return false">마감</a>
+        <% } %>
+    <% } %>
+</div>
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    const post_id = document.querySelector('#post_id').value;
-    const board_id = document.querySelector('#board_id').value;
+    <% if(post.creator_id === user.id) { %>
+    <% if(post.deadline.getTime() < new Date().getTime() ) { %>
+    const complete_tag = document.querySelector('#complete');
+    complete_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        const checked = document.querySelectorAll("input#check:checked");
+        const applicant_ids = [];
+        for(let i of checked){
+            applicant_ids.push(i.getAttribute("value"))
+        }
+        console.log("1234");
+        console.log(applicant_ids);
+        window.open(`/post/<%=post.id%>/apply/complete?applicant_id=` + applicant_ids, '<%= post.id%>', 'status=no, toolbar=no, menubar=no, width=600, height=500');
 
+    });
+
+    <% } else if(applicant_count === 0) { %>
     const delete_tag = document.querySelector('#delete');
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        await axios.post(`/post/${post_id}/delete`, {
-            board_id: board_id
+        await axios.post(`/post/<%= post.id %>/delete`, {
+            board_id: <%= board.id %>
         })
             .then((response) => {
                 if (response.data === 'success') {
-                    location.href = `/board/${board_id}`;
+                    location.href = `/board/<%= board.id %>`;
                 } else if (response.data === 'not creator') {
                     alert("자신의 게시글만 삭제하실 수 있습니다.");
                     history.back();
@@ -70,5 +123,27 @@
                 console.error(err);
             });
     });
+    <% } %>
+    <% } else { %>
+    const cancel_tag = document.querySelector('#cancel');
+    cancel_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await axios.post(`/post/<%= post.id %>/apply_cancel`, {
+            board_id: <%= board.id %>
+        })
+            .then((response) => {
+                if (response.data === 'success') {
+                    alert("취소되었습니다.");
+                    location.replace(`/post/<%= post.id %>?board_id=<%= board.id %>`);
+                } else if (response.data === 'no apply') {
+                    alert("신청 기록이 없습니다.");
+                    location.replace(`/post/<%= post.id %>?board_id=<%= board.id %>`);
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    });
+    <% } %>
 </script>
 </html>

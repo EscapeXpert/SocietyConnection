@@ -42,7 +42,7 @@
             <% } else { %>
                 <span>읽음</span>
             <% } %>
-            <span><%= message.nickname %></span>
+            <span><a href="/profile/<%= message.User.nickname%>"><%= message.User.nickname %></a></span>
         </li>
     <% } %>
     </ol>

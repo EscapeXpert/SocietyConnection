@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade} = require('../models');
+const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade, Applicant} = require('../models');
 const {isLoggedIn} = require("./middlewares");
+const {Op} = require('sequelize');
 
 router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
@@ -224,15 +225,144 @@ router.post('/:post_id/notice', isLoggedIn, async (req, res, next) => {
     }
 });
 
+router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
+    const post_id = req.params.post_id;
+    const usre_id = req.params.user;
+    const applicant_id = req.query.applicant_id.split(',');
+    console.log(applicant_id);
+
+    try{
+        const post = await Recruitment.findOne({
+            attributes: ['id', 'title', 'creator_id', 'content', 'board_id'],
+            where: {
+                id: post_id
+            }
+        });
+
+        const applicants = await Applicant.findAll({
+            attributes: ['id', 'user_id', 'message', 'is_accepted'],
+            where: {
+                id: applicant_id
+            },
+            include: [{
+                model: User,
+                attributes: ['nickname']
+            }]
+        });
+
+        res.render('apply_complete', {
+            applicants: applicants,
+            post: post
+        });
+
+    } catch(err){
+        console.error(err);
+        next(err);
+    }
+});
+
+router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
+
+});
+
 router.get('/:post_id/apply', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
+    try {
+        const post = await Recruitment.findOne({
+            attributes: ['id', 'title', 'creator_id', 'content', 'board_id'],
+            where: {
+                id: post_id
+            }
+        });
+
+        const already = await Applicant.findOne({
+            attributes: ['id', 'user_id', 'recruitment_id'],
+            where: {
+                user_id: user_id,
+                recruitment_id: post_id
+            }
+        });
+
+        if (already !== null) {
+            res.send('<script> alert("신청 완료된 상태입니다.");window.location.replace("/post/' + post_id + '?board_id=' + post.board_id + '");</script>');
+        } else {
+            res.render('apply', {
+                post: post
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
 
 });
 
 router.post('/:post_id/apply', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
+    const message = req.body.message;
+    try {
+        const already = await Applicant.findOne({
+            attributes: ['id', 'user_id', 'recruitment_id'],
+            where: {
+                user_id: user_id,
+                recruitment_id: post_id,
+                message: message
+            }
+        });
+
+        const board = await Recruitment.findOne({
+            attributes: ['board_id'],
+            where: {
+                id: post_id
+            }
+        });
+
+        if (already === null) {
+            await Applicant.create({
+                recruitment_id: post_id,
+                user_id: user_id,
+                message: message
+            });
+            res.send('<script> alert("신청 완료.");window.opener.location.reload();window.close();</script>');
+        }
+        res.send('success');
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
+
+router.post('/:post_id/apply_cancel', isLoggedIn, async (req, res, next) => {
+    const post_id = req.params.post_id;
+    const user_id = req.user.id;
+    const message = req.body.message;
+    const board_id = req.body.board_id;
+    try {
+        const already = await Applicant.findOne({
+            attributes: ['id', 'user_id', 'recruitment_id'],
+            where: {
+                user_id: user_id,
+                recruitment_id: post_id
+            }
+        });
+        console.log(already);
+        if (already !== null) {
+            await Applicant.destroy({
+                where: {
+                    recruitment_id: post_id,
+                    user_id: user_id
+                }
+            });
+            res.send('success');
+        } else {
+            res.send('no apply');
+        }
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
 });
 
 router.post('/:post_id/like', isLoggedIn, async (req, res, next) => {
@@ -451,7 +581,7 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
             }
         } else if (board.board_type === 'recruitment') {
             const post = await Recruitment.findOne({
-                attributes: ['id', 'title', 'content', 'created_at', 'creator_id', 'view_count', 'deadline', 'board_id', [
+                attributes: ['id', 'title', 'content', 'created_at', 'creator_id', 'view_count', 'deadline', 'board_id', 'is_complete', [
                     sequelize.literal('(SELECT name FROM grade WHERE id = user.grade)'), 'grade'
                 ]],
                 where: {
@@ -468,10 +598,38 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                         id: post_id,
                     }
                 });
+                const already = await Applicant.findOne({
+                    attributes: ['id', 'user_id', 'recruitment_id'],
+                    where: {
+                        user_id: user_id,
+                        recruitment_id: post_id
+                    }
+                });
+
+                const applicants = await Applicant.findAll({
+                    attributes: ['id', 'user_id', 'message', 'is_accepted'],
+                    where: {
+                        recruitment_id: post_id
+                    },
+                    include: [{
+                        model: User,
+                        attributes: ['nickname']
+                    }]
+                });
+
+                const applicant_count = await Applicant.count({
+                    where: {
+                        recruitment_id: post_id
+                    }
+                });
+
                 res.render('post_recruitment', {
                     post: post,
                     board: board,
-                    user: user
+                    user: user,
+                    already: already,
+                    applicants: applicants,
+                    applicant_count: applicant_count
                 });
             } else {
                 const grade = await Grade.findOne({
