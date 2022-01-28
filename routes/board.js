@@ -38,7 +38,7 @@ router.post('/upload', img_upload.single('img'), async (req, res, next) => {
     let fileInfo = "";
     fileInfo += "&bNewLine=true";
     fileInfo += "&sFileName=" + filename;
-    fileInfo += "&sFileURL=http://localhost:3001/uploads/post/img/" + filename;
+    fileInfo += "&sFileURL=/uploads/post/img/" + filename;
     res.send(fileInfo);
 });
 
@@ -80,7 +80,7 @@ router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
 router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
     const board_id = req.params.board_id;
     const title = req.body.title;
-    const content = req.body.content;
+    const content = req.body.ir1;
     const deadline = req.body.deadline;
     const creator_id = req.user.id;
     console.log(content);

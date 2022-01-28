@@ -368,7 +368,6 @@ function callAjaxForHTML5(tempFile, sUploadURL) {
     request.open('POST', sUploadURL, false);
 
     var formData = new FormData();
-    console.log("Yes");
     formData.append("contentType", "multipart/form-data");
     formData.append("file-name", encodeURIComponent(tempFile.name));
     formData.append("file-size", tempFile.size);
@@ -390,7 +389,6 @@ function makeArrayFromString(sResString) {
         aSubTemp = [],
         htTemp = {}
     aResultleng = 0;
-    console.log(sResString);
     try {
         if (!sResString || sResString.indexOf("sFileURL") < 0) {
             return;
@@ -411,7 +409,7 @@ function makeArrayFromString(sResString) {
     if (aResult.length == nImageFileCount) {
         setPhotoToEditor(aResult);
         aResult = null;
-        window.close();
+        //window.close();
     }
 }
 

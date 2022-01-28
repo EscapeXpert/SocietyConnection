@@ -37,10 +37,9 @@
 <div>
     <div>
         <h3><%= post.title %></h3>
-        <% const contents = post.content.split('\n') %>
-        <% for(var content of contents) { %>
-            <p><%= content %></p>
-        <% } %>
+        <div class="content">
+            <%-post.content%>
+        </div>
     </div>
 
     <div>
