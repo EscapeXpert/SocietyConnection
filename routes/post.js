@@ -112,7 +112,7 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
     const title = req.body.title;
-    const content = req.body.content;
+    const content = req.body.ir1;
     const deadline = req.body.deadline;
     const user_id = req.user.id;
 

@@ -5,30 +5,58 @@
     <title>게시글 쓰기</title>
 </head>
 <body>
-    <form action="/board/<%= board.id %>/write" method="post">
+<form id="post_write" action="/board/<%= board.id %>/write" method="post">
+    <div>
+        <label for="title"></label>
+        <input type="text" name="title" id="title" placeholder="제목을 입력해 주세요." maxlength="100" required>
+    </div>
+    <div>
+        <label for="ir1"></label>
+        <!--textarea rows="10" cols="50" style="resize: none" name="content" id="content" placeholder="내용을 입력하세요." maxlength="1000"
+                  required></textarea-->
+        <textarea name="ir1" id="ir1" rows="10" cols="100"></textarea>
+    </div>
+    <!-- 첨부파일 및 이미지-->
+    <% if(board.board_type === 'recruitment') { %>
         <div>
-            <label for="title"></label>
-            <input type="text" name="title" id="title" placeholder="제목을 입력해 주세요." maxlength="100" required>
+            <label for="deadline"></label>
+            <% const offset = new Date().getTimezoneOffset() * 60000 %>
+            <% const date = new Date(Date.now() - offset) %>
+            <% const max_date = new Date(Date.now() - offset) %>
+            <% max_date.setFullYear(max_date.getFullYear() + 1) %>
+            <input type="datetime-local" name="deadline" id="deadline" min="<%= date.toISOString().slice(0, 16) %>"
+                   max="<%= max_date.toISOString().slice(0, 16) %>" , value="<%= date.toISOString().slice(0, 16) %>"
+                   required>
         </div>
-        <div>
-            <label for="content"></label>
-            <textarea rows="10" cols="50" style="resize: none" name="content" id="content" placeholder="내용을 입력하세요." maxlength="1000"
-                      required></textarea>
-        </div>
-        <!-- 첨부파일 및 이미지-->
-        <% if(board.board_type === 'recruitment') {%>
-            <div>
-                <label for="deadline"></label>
-                <% const offset = new Date().getTimezoneOffset() * 60000 %>
-                <% const date = new Date(Date.now() - offset) %>
-                <% const max_date = new Date(Date.now() - offset) %>
-                <% max_date.setFullYear(max_date.getFullYear() + 1)%>
-                <input type="datetime-local" name="deadline" id="deadline" min="<%= date.toISOString().slice(0, 16) %>" max="<%= max_date.toISOString().slice(0, 16)%>", value="<%= date.toISOString().slice(0,16)%>" required>
-            </div>
-        <% } %>
-        <div>
-            <input type="submit" value="등록">
-        </div>
-    </form>
+    <% } %>
+    <div>
+        <a href="#" onclick="submitContents()">등록</a>
+    </div>
+</form>
 </body>
+<script type="text/javascript" src="/public/se2/js/service/HuskyEZCreator.js" charset="utf-8"></script>
+<script type="text/javascript">
+    var oEditors = [];
+    nhn.husky.EZCreator.createInIFrame({
+        oAppRef: oEditors,
+        elPlaceHolder: "ir1",
+        sSkinURI: "/public/se2/SmartEditor2Skin.html",
+        fCreator: "createSEditor2"
+    });
+
+    function submitContents() {
+        // 에디터의 내용이 textarea에 적용된다.
+        oEditors.getById["ir1"].exec("UPDATE_CONTENTS_FIELD", []);
+        //const title = document.querySelector('#title').value;
+        //const content = document.querySelector('#ir1').value;
+        // 에디터의 내용에 대한 값 검증은 이곳에서
+        // document.getElementById("ir1").value를 이용해서 처리한다.
+
+        try {
+            document.querySelector('#post_write').submit();
+        } catch (e) {
+
+        }
+    }
+</script>
 </html>
