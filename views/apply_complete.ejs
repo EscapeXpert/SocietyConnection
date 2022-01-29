@@ -30,4 +30,31 @@
         <a href="#" id="confirm">확정</a>
     </div>
 </body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    <% if(post.creator_id === user_id) { %>
+    console.log("1234");
+    const confirm_tag = document.querySelector('#confirm');
+    confirm_tag.addEventListener('click', async function(event) {
+       event.preventDefault();
+       const applicants_id = [];
+       for(let applicant of applicants){
+           applicants_id.push(applicant.id);
+       }
+       console.log(applicants_id);
+       await axios.post('/post/<%= post.id%>/apply/complete?',{
+           applicant_id: applicants_id
+       })
+        .then((response) => {
+            if(response.data === 'success') {
+                alert("확정되었습니다.");
+                location.replace(`/post/<%= post.id %>?board_id=<%= post.board_id%>`);
+            }
+        })
+       .catch((err) => {
+           console.error(err);
+       });
+    });
+    <% } %>
+</script>
 </html>
