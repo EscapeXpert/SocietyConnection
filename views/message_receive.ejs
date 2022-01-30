@@ -86,7 +86,8 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     const delete_tag = document.querySelector("#delete")
-    delete_tag.addEventListener('click', async function () {
+    delete_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
         const checked = document.querySelectorAll("input#check:checked");
         const message_ids = [];
         for(let i of checked)

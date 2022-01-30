@@ -27,10 +27,9 @@
         <% const offset = new Date().getTimezoneOffset() * 60000 %>
         <% const date_string = new Date(post.deadline - offset).toISOString() %>
         <span><%= date_string.slice(0, 16).replace('T', ' ') %></span>
-        <% const contents = post.content.split('\n') %>
-        <% for(var content of contents) { %>
-            <p><%= content %></p>
-        <% } %>
+        <div class="content">
+            <%-post.content%>
+        </div>
     </div>
 </div>
 <% if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime() ) { %>
@@ -79,9 +78,7 @@
                     <% } %>
                 </ol>
             </div>
-            <a href="#" id="complete">마감</a>
-            <a href='#'
-               onclick="window.open('/post/<%= post.id %>/apply/complete', '<%= post.id %>', 'status=no, toolbar=no, menubar=no, width=600, height=500');return false">마감</a>
+            <a href="#" id="complete">선발</a>
         <% } %>
     <% } %>
 </div>
@@ -98,8 +95,6 @@
         for(let i of checked){
             applicant_ids.push(i.getAttribute("value"))
         }
-        console.log("1234");
-        console.log(applicant_ids);
         window.open(`/post/<%=post.id%>/apply/complete?applicant_id=` + applicant_ids, '<%= post.id%>', 'status=no, toolbar=no, menubar=no, width=600, height=500');
 
     });

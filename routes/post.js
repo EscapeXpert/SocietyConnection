@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade, Applicant} = require('../models');
+const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade, Applicant, Message} = require('../models');
 const {isLoggedIn} = require("./middlewares");
 const {Op} = require('sequelize');
 
@@ -158,8 +158,6 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                 const date = new Date(Date.now() - offset);
                 const max_date = new Date(post.created_at - offset);
                 max_date.setFullYear(max_date.getFullYear() + 1)
-                console.log(max_date.getTime());
-                console.log(deadline.getTime());
                 if (deadline < date)
                     return res.send('<script>alert("마감 기한은 현재 시각 이전으로 설정할 수 없습니다.");history.back();</script>');
                 else {
@@ -227,9 +225,8 @@ router.post('/:post_id/notice', isLoggedIn, async (req, res, next) => {
 
 router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
     const post_id = req.params.post_id;
-    const usre_id = req.params.user;
+    const user_id = req.user.id;
     const applicant_id = req.query.applicant_id.split(',');
-    console.log(applicant_id);
 
     try{
         const post = await Recruitment.findOne({
@@ -239,21 +236,27 @@ router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
             }
         });
 
-        const applicants = await Applicant.findAll({
-            attributes: ['id', 'user_id', 'message', 'is_accepted'],
-            where: {
-                id: applicant_id
-            },
-            include: [{
-                model: User,
-                attributes: ['nickname']
-            }]
-        });
+        if(post.creator_id === user_id){
+            const applicants = await Applicant.findAll({
+                attributes: ['id', 'user_id', 'message', 'is_accepted'],
+                where: {
+                    id: applicant_id
+                },
+                include: [{
+                    model: User,
+                    attributes: ['nickname']
+                }]
+            });
 
-        res.render('apply_complete', {
-            applicants: applicants,
-            post: post
-        });
+            res.render('apply_complete', {
+                applicants: applicants,
+                post: post,
+                user_id: user_id
+            });
+        }
+        else{
+            res.send('<script> alert("자신의 게시글만 선발할 수 있습니다.");</script>');
+        }
 
     } catch(err){
         console.error(err);
@@ -262,7 +265,60 @@ router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
 });
 
 router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
+    const post_id = req.params.post_id;
+    const user_id = req.user.id;
+    const applicant_id = req.body.applicant_id;
 
+    try{
+        const post = await Recruitment.findOne({
+            attributes: ['id', 'title', 'content', 'board_id', 'creator_id'],
+            where: {
+                id: post_id
+            }
+        });
+
+        if(post.creator_id === user_id){
+            const message = post.title + " 선발되셨습니다"
+            const applicants = await Applicant.findAll({
+                attributes: ['id', 'user_id', 'message', 'is_accepted'],
+                where: {
+                    id: applicant_id
+                }
+            });
+
+            await Recruitment.update({is_complete: true}, {
+                where: {
+                    id: post_id
+                }
+            });
+
+            for(let i of applicant_id){
+                await Applicant.update({is_accepted: true}, {
+                    where: {
+                        recruitment_id: post_id
+                    }
+                });
+            }
+
+            for(let i of applicants){
+                await Message.create({
+                    title: post.title,
+                    sender_id: user_id,
+                    receiver_id: i.user_id,
+                    message: message
+                });
+            }
+
+            res.send('success');
+
+        } else{
+            res.send('not creator');
+        }
+
+    } catch(err){
+        console.error(err);
+        next(err);
+    }
 });
 
 router.get('/:post_id/apply', isLoggedIn, async (req, res, next) => {
@@ -327,7 +383,6 @@ router.post('/:post_id/apply', isLoggedIn, async (req, res, next) => {
             });
             res.send('<script> alert("신청 완료.");window.opener.location.reload();window.close();</script>');
         }
-        res.send('success');
     } catch (err) {
         console.error(err);
         next(err);
