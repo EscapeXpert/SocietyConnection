@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade, Applicant} = require('../models');
+const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade, Applicant, Message} = require('../models');
 const {isLoggedIn} = require("./middlewares");
 const {Op} = require('sequelize');
 
@@ -228,7 +228,6 @@ router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
     const user_id = req.user.id;
     const applicant_id = req.query.applicant_id.split(',');
 
-    console.log(applicant_id);
     try{
         const post = await Recruitment.findOne({
             attributes: ['id', 'title', 'creator_id', 'content', 'board_id'],
@@ -256,7 +255,7 @@ router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
             });
         }
         else{
-            res.send('<script> alert("자신의 게시글만 마감할 수 있습니다.");</script>');
+            res.send('<script> alert("자신의 게시글만 선발할 수 있습니다.");</script>');
         }
 
     } catch(err){
@@ -268,8 +267,8 @@ router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
 router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
-    const applicant_id = req.body.applicant_id.split(',');
-    console.log(applicant_id);
+    const applicant_id = req.body.applicant_id;
+
     try{
         const post = await Recruitment.findOne({
             attributes: ['id', 'title', 'content', 'board_id', 'creator_id'],
@@ -279,6 +278,7 @@ router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
         });
 
         if(post.creator_id === user_id){
+            const message = post.title + " 선발되셨습니다"
             const applicants = await Applicant.findAll({
                 attributes: ['id', 'user_id', 'message', 'is_accepted'],
                 where: {
@@ -286,14 +286,13 @@ router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
                 }
             });
 
-            await Recruitment.update({is_complete: false}, {
+            await Recruitment.update({is_complete: true}, {
                 where: {
                     id: post_id
                 }
             });
 
             for(let i of applicant_id){
-                console.log(i);
                 await Applicant.update({is_accepted: true}, {
                     where: {
                         recruitment_id: post_id
@@ -301,8 +300,19 @@ router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
                 });
             }
 
+            for(let i of applicants){
+                await Message.create({
+                    title: post.title,
+                    sender_id: user_id,
+                    receiver_id: i.user_id,
+                    message: message
+                });
+            }
+
+            res.send('success');
+
         } else{
-            res.send('<script> alert("자신의 게시글만 마감할 수 있습니다.");</script>');
+            res.send('not creator');
         }
 
     } catch(err){

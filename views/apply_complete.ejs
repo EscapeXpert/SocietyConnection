@@ -32,17 +32,16 @@
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    <% if(post.creator_id === user_id) { %>
-    console.log("1234");
+    const applicants = <%- JSON.stringify(applicants) %>
+    const applicants_id = [];
     const confirm_tag = document.querySelector('#confirm');
     confirm_tag.addEventListener('click', async function(event) {
        event.preventDefault();
-       const applicants_id = [];
-       for(let applicant of applicants){
+       for(let applicant of applicants)
+       {
            applicants_id.push(applicant.id);
        }
-       console.log(applicants_id);
-       await axios.post('/post/<%= post.id%>/apply/complete?',{
+       await axios.post(`/post/<%= post.id%>/apply/complete`,{
            applicant_id: applicants_id
        })
         .then((response) => {
@@ -55,6 +54,5 @@
            console.error(err);
        });
     });
-    <% } %>
 </script>
 </html>
