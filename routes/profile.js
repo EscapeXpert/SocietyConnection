@@ -1,13 +1,15 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const {isLoggedIn} = require('./middlewares');
-const User = require('../models/user');
 const moment = require('moment');
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const {Op} = require("sequelize");
 const axios = require("axios");
+const {sequelize,Message, Post, Board, User, Comment, Recruitment, ReplyComment, Applicant} = require('../models');
+
+
 const router = express.Router();
 
 
@@ -143,11 +145,17 @@ router.get('/:user_nickname/account_delete', isLoggedIn, async (req, res) => {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
     }
     try {
+        /*await Message.destroy({
+            where: {
+                sender_id: user_nickname,
+                receiver_id: null
+            }
+        });*/
         await User.destroy({
             where: {nickname: user_nickname}
         });
         if (req.user.login_type === 'kakao') {
-            let logout = await axios({
+            let unlink = await axios({
                 method: 'post',
                 url: 'https://kapi.kakao.com/v1/user/unlink',
                 headers: {
@@ -164,5 +172,70 @@ router.get('/:user_nickname/account_delete', isLoggedIn, async (req, res) => {
         console.error(error);
     }
 });
+
+router.get('/:user_nickname/my_activity', isLoggedIn, async (req, res) => {
+    const user_nickname = req.params.user_nickname;
+    if (user_nickname !== req.user.nickname) {
+        return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
+    }
+    const MyPostList = await Post.findAll({
+        attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'creator_id','board_id',[
+            sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
+        ]],
+        where: {creator_id: req.user.id}
+    });
+    const MyRecruitmentList = await Recruitment.findAll({
+        where: {creator_id: req.user.id}
+    });
+    const MyApplicantList = await Applicant.findAll({
+        where: {user_id: req.user.id},
+        include: {
+            model: Recruitment,
+            attributes: ['id','title','creator_id','board_id']
+        }
+    });
+    const MyCommentList = await Comment.findAll({
+        where: {creator_id: req.user.id},
+        include: {
+            model: Post,
+            attributes: ['id','title','creator_id','board_id']
+        }
+    });
+    const MyReplyCommentList = await ReplyComment.findAll({
+        where: {creator_id: req.user.id},
+        include: {
+            model: Comment,
+            include:{
+                model: Post,
+                attributes: ['id','title','creator_id','board_id']
+            }
+        }
+    });
+    /*
+    console.log("MyPostListMyPostListMyPostList",MyPostList);
+    console.log("MyRecruitmentListMyRecruitmentListMyRecruitmentList",MyRecruitmentList);
+    for(let Applicant of MyApplicantList){
+        console.log('Applicant',Applicant);
+        console.log('Applicant.Recruitment',Applicant.Recruitment);
+    }
+    for(let Comment of MyCommentList){
+        console.log('Comment.dataValues.Post',Comment.dataValues.Post);
+        console.log('Comment.Post',Comment.Post);
+    }
+    console.log("MyCommentListMyCommentListMyCommentList",MyCommentList);
+    for(let ReplyComment of MyReplyCommentList) {
+        console.log('ReplyComment', ReplyComment);
+    }*/
+    res.render('my_activity', {
+        title: '나의 활동',
+        MyPostList : MyPostList,
+        MyRecruitmentList : MyRecruitmentList,
+        MyApplicantList : MyApplicantList,
+        MyCommentList : MyCommentList,
+        MyReplyCommentList : MyReplyCommentList
+    });
+});
+
+
 
 module.exports = router;
