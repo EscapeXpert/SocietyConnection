@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        <%= title %>
+    </title>
+</head>
+<body>
+<div>
+    <label>나의 활동</label>
+</div>
+<div>
+    <label>내가 쓴글</label>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>조회수</th>
+        <th>추천수</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let Post of MyPostList) { %>
+        <tr>
+            <% if(Post.is_notice) { %>
+                <td>공지</td>
+            <% } else { %>
+                <td><%= Post.dataValues.id %></td>
+            <% } %>
+            <td><a href="/post/<%= Post.dataValues.id %>?board_id=<%= Post.dataValues.board_id %>"><%= Post.dataValues.title %></a></td>
+            <td><%= Post.dataValues.creator_id %></td>
+            <td><%= Post.dataValues.view_count %></td>
+            <td><%= Post.dataValues.created_at %></td>
+            <td><%= Post.dataValues.like %></td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+<div>
+    <label>내가 쓴 모집글</label>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>조회수</th>
+        <th>마감기한</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let Recruitment of MyRecruitmentList) { %>
+        <tr>
+            <td><%= Recruitment.dataValues.id %></td>
+            <td><a href="/post/<%= Recruitment.dataValues.id %>?board_id=<%= Recruitment.dataValues.board_id %>"><%= Recruitment.dataValues.title %></a></td>
+            <td><%= Recruitment.dataValues.creator_id %></td>
+            <td><%= Recruitment.dataValues.view_count %></td>
+            <td><%= Recruitment.dataValues.created_at %></td>
+            <td><%= Recruitment.dataValues.deadline %></td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+<div>
+    <label>나의 지원현황</label>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>모집글</th>
+        <th>모집글 작성자</th>
+        <th>지원 메세지</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let Applicant of MyApplicantList){ %>
+        <tr>
+            <td><a href="/post/<%= Applicant.Recruitment.dataValues.id %>?board_id=<%= Applicant.Recruitment.dataValues.board_id %>"><%= Applicant.Recruitment.dataValues.title %></a></td>
+            <td><%= Applicant.Recruitment.dataValues.creator_id %></td>
+            <td><%= Applicant.dataValues.message %></td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+<div>
+    <label>내가 쓴 댓글</label>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>댓글을 쓴 글</th>
+        <th>글 작성자</th>
+        <th>댓글 내용</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let Comment of MyCommentList){ %>
+        <tr>
+            <td><a href="/post/<%= Comment.Post.dataValues.id %>?board_id=<%= Comment.Post.dataValues.board_id %>"><%= Comment.Post.dataValues.title %></a></td>
+            <td><%= Comment.Post.dataValues.creator_id %></td>
+            <td><%= Comment.dataValues.content %></td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+<div>
+    <label>내가 쓴 답글</label>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>답글의 글</th>
+        <th>글 작성자</th>
+        <th>답글을 쓴 댓글</th>
+        <th>댓글 작성자</th>
+        <th>답글 내용</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let ReplyComment of MyReplyCommentList) { %>
+        <tr>
+            <td><a href="/post/<%= ReplyComment.Comment.Post.dataValues.id %>?board_id=<%= ReplyComment.Comment.Post.dataValues.board_id %>"><%= ReplyComment.Comment.Post.dataValues.title %></a></td>
+            <td><%= ReplyComment.Comment.Post.dataValues.creator_id %></td>
+            <td><%= ReplyComment.Comment.dataValues.content %></td>
+            <td><%= ReplyComment.Comment.dataValues.creator_id %></td>
+            <td><%= ReplyComment.dataValues.content %></td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+</body>
+</html>

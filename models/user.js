@@ -54,6 +54,10 @@ module.exports = class User extends Sequelize.Model {
             session_id: {
                 type: Sequelize.STRING(50),
                 allowNull: true
+            },
+            session_deadline: {
+                type: Sequelize.DATE,
+                allowNull: true
             }
         }, {
             sequelize,
