@@ -33,9 +33,9 @@
                 <td><%= Post.dataValues.id %></td>
             <% } %>
             <td><a href="/post/<%= Post.dataValues.id %>?board_id=<%= Post.dataValues.board_id %>"><%= Post.dataValues.title %></a></td>
-            <td><%= Post.dataValues.creator_id %></td>
+            <td><a href="/profile/<%= Post.User.dataValues.nickname %>"><%= Post.User.dataValues.nickname %></a></td>
+            <td><%= Post.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
             <td><%= Post.dataValues.view_count %></td>
-            <td><%= Post.dataValues.created_at %></td>
             <td><%= Post.dataValues.like %></td>
         </tr>
     <% } %>
@@ -60,9 +60,9 @@
         <tr>
             <td><%= Recruitment.dataValues.id %></td>
             <td><a href="/post/<%= Recruitment.dataValues.id %>?board_id=<%= Recruitment.dataValues.board_id %>"><%= Recruitment.dataValues.title %></a></td>
-            <td><%= Recruitment.dataValues.creator_id %></td>
+            <td><a href="/profile/<%= Recruitment.User.dataValues.nickname %>"><%= Recruitment.User.dataValues.nickname %></a></td>
+            <td><%= Recruitment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
             <td><%= Recruitment.dataValues.view_count %></td>
-            <td><%= Recruitment.dataValues.created_at %></td>
             <td><%= Recruitment.dataValues.deadline %></td>
         </tr>
     <% } %>
@@ -83,7 +83,7 @@
     <% for(let Applicant of MyApplicantList){ %>
         <tr>
             <td><a href="/post/<%= Applicant.Recruitment.dataValues.id %>?board_id=<%= Applicant.Recruitment.dataValues.board_id %>"><%= Applicant.Recruitment.dataValues.title %></a></td>
-            <td><%= Applicant.Recruitment.dataValues.creator_id %></td>
+            <td><a href="/profile/<%= Applicant.Recruitment.User.dataValues.nickname %>"><%= Applicant.Recruitment.User.dataValues.nickname %></a></td>
             <td><%= Applicant.dataValues.message %></td>
         </tr>
     <% } %>
@@ -104,7 +104,7 @@
     <% for(let Comment of MyCommentList){ %>
         <tr>
             <td><a href="/post/<%= Comment.Post.dataValues.id %>?board_id=<%= Comment.Post.dataValues.board_id %>"><%= Comment.Post.dataValues.title %></a></td>
-            <td><%= Comment.Post.dataValues.creator_id %></td>
+            <td><a href="/profile/<%= Comment.Post.User.dataValues.nickname %>"><%= Comment.Post.User.dataValues.nickname %></a></td>
             <td><%= Comment.dataValues.content %></td>
         </tr>
     <% } %>
@@ -127,7 +127,7 @@
     <% for(let ReplyComment of MyReplyCommentList) { %>
         <tr>
             <td><a href="/post/<%= ReplyComment.Comment.Post.dataValues.id %>?board_id=<%= ReplyComment.Comment.Post.dataValues.board_id %>"><%= ReplyComment.Comment.Post.dataValues.title %></a></td>
-            <td><%= ReplyComment.Comment.Post.dataValues.creator_id %></td>
+            <td><a href="/profile/<%= ReplyComment.Comment.Post.User.dataValues.nickname %>"><%= ReplyComment.Comment.Post.User.dataValues.nickname %></a></td>
             <td><%= ReplyComment.Comment.dataValues.content %></td>
             <td><%= ReplyComment.Comment.dataValues.creator_id %></td>
             <td><%= ReplyComment.dataValues.content %></td>

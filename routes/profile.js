@@ -13,27 +13,21 @@ const {sequelize,Message, Post, Board, User, Comment, Recruitment, ReplyComment,
 const router = express.Router();
 
 
-try {
-    fs.readdirSync('uploads');
-} catch (error) {
-    console.error('uploads 폴더가 없어 uploads 폴더를 생성합니다.');
-    fs.mkdirSync('uploads');
-}
-
-
 router.get('/:user_nickname', isLoggedIn, async (req, res) => {
     const Find_User = await User.findOne({where: {nickname: req.params.user_nickname}});
+    const birth =  moment(Find_User.birth_date).format('YYYY-MM-DD')
     res.render('profile', {
         title: '프로필',
         User: Find_User,
-        req_User: req.user
+        req_User: req.user,
+        birth : birth
     });
 });
 
 const upload = multer({
     storage: multer.diskStorage({
         destination: function (req, file, cb) {
-            cb(null, 'uploads/');
+            cb(null, 'uploads/profile/');
         },
         filename(req, file, cb) {
             const ext = path.extname(file.originalname);
@@ -48,7 +42,7 @@ router.post('/:user_nickname/edit/img', isLoggedIn, upload.single('img'), async 
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
     }
-    res.json({url: `/img/${req.file.filename}`});
+    res.json({url: `/uploads/profile/${req.file.filename}`});
 });
 
 router.get('/:user_nickname/edit', isLoggedIn, async (req, res) => {
@@ -182,23 +176,39 @@ router.get('/:user_nickname/my_activity', isLoggedIn, async (req, res) => {
         attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'creator_id','board_id',[
             sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
         ]],
-        where: {creator_id: req.user.id}
+        where: {creator_id: req.user.id},
+        include: {
+            model: User,
+            attributes: ['nickname']
+        }
     });
     const MyRecruitmentList = await Recruitment.findAll({
-        where: {creator_id: req.user.id}
+        where: {creator_id: req.user.id},
+        include: {
+            model: User,
+            attributes: ['nickname']
+        }
     });
     const MyApplicantList = await Applicant.findAll({
         where: {user_id: req.user.id},
         include: {
             model: Recruitment,
-            attributes: ['id','title','creator_id','board_id']
+            attributes: ['id','title','creator_id','board_id'],
+            include: {
+                model: User,
+                attributes: ['nickname']
+            }
         }
     });
     const MyCommentList = await Comment.findAll({
         where: {creator_id: req.user.id},
         include: {
             model: Post,
-            attributes: ['id','title','creator_id','board_id']
+            attributes: ['id','title','creator_id','board_id'],
+            include: {
+                model: User,
+                attributes: ['nickname']
+            }
         }
     });
     const MyReplyCommentList = await ReplyComment.findAll({
@@ -207,7 +217,11 @@ router.get('/:user_nickname/my_activity', isLoggedIn, async (req, res) => {
             model: Comment,
             include:{
                 model: Post,
-                attributes: ['id','title','creator_id','board_id']
+                attributes: ['id','title','creator_id','board_id'],
+                include: {
+                    model: User,
+                    attributes: ['nickname']
+                }
             }
         }
     });

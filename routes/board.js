@@ -7,20 +7,6 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-try {
-    fs.readdirSync('./uploads/post');
-} catch (error) {
-    console.error('uploads/post 폴더가 없어 uploads 폴더를 생성합니다.');
-    fs.mkdirSync('./uploads/post');
-}
-
-try {
-    fs.readdirSync('./uploads/post/img');
-} catch (error) {
-    console.error('uploads/post/img 폴더가 없어 uploads 폴더를 생성합니다.');
-    fs.mkdirSync('./uploads/post/img');
-}
-
 const img_upload = multer({
     storage: multer.diskStorage({
         destination: function (req, file, cb) {

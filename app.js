@@ -20,6 +20,7 @@ const {sequelize} = require('./models');
 const User = require('./models/user');
 const Grade = require('./models/grade')
 const bcrypt = require('bcrypt');
+const fs = require("fs");
 
 passportConfig();
 
@@ -115,6 +116,31 @@ async function make_admin() {
     } catch (error) {
         console.error(error);
     }
+}
+try {
+    fs.readdirSync('uploads');
+} catch (error) {
+    console.error('uploads 폴더가 없어 uploads 폴더를 생성합니다.');
+    fs.mkdirSync('uploads');
+}
+try {
+    fs.readdirSync('./uploads/profile');
+} catch (error) {
+    console.error('./uploads/profile 폴더가 없어 ./uploads/profile 폴더를 생성합니다.');
+    fs.mkdirSync('./uploads/profile');
+}
+try {
+    fs.readdirSync('./uploads/post');
+} catch (error) {
+    console.error('uploads/post 폴더가 없어 uploads 폴더를 생성합니다.');
+    fs.mkdirSync('./uploads/post');
+}
+
+try {
+    fs.readdirSync('./uploads/post/img');
+} catch (error) {
+    console.error('uploads/post/img 폴더가 없어 uploads 폴더를 생성합니다.');
+    fs.mkdirSync('./uploads/post/img');
 }
 
 set_default_database();
