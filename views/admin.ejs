@@ -30,7 +30,11 @@
             <td><%= User.nickname %></td>
             <td><%= User.sns_id %></td>
             <td><%= User.name %></td>
-            <td><%= User.birth_date %></td>
+            <% if(User.birth_date){ %>
+                <td><%= User.birth_date.toISOString().replace(/T/, ' ').replace(/\..+/, '').slice(0, 10) %></td>
+            <% }else{ %>
+                <td><%= User.birth_date%></td>
+            <% } %>
             <% if(User.gender){ %>
                 <td>남자</td>
             <% }else{ %>
