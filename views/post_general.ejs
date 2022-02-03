@@ -273,7 +273,7 @@
         reply_comment_delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
             const reply_comment_id = reply_comment_delete_tag.parentElement.id;
-            await axios.post(`/post<%= post.id%>/reply_comment/${reply_comment_id}/delete`)
+            await axios.post(`/post/<%= post.id%>/reply_comment/${reply_comment_id}/delete`)
                 .then((response) => {
                     if (response.data === 'success') {
                         location.reload();

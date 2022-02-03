@@ -1,6 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Post, Board, User, Comment, Like, Recruitment, ReplyComment, Grade, Applicant, Message} = require('../models');
+const {
+    sequelize,
+    Post,
+    Board,
+    User,
+    Comment,
+    Like,
+    Recruitment,
+    ReplyComment,
+    Grade,
+    Applicant,
+    Message
+} = require('../models');
 const {isLoggedIn} = require("./middlewares");
 const {Op} = require('sequelize');
 
@@ -223,12 +235,12 @@ router.post('/:post_id/notice', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
+router.get('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
     const applicant_id = req.query.applicant_id.split(',');
 
-    try{
+    try {
         const post = await Recruitment.findOne({
             attributes: ['id', 'title', 'creator_id', 'content', 'board_id'],
             where: {
@@ -236,7 +248,7 @@ router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
             }
         });
 
-        if(post.creator_id === user_id){
+        if (post.creator_id === user_id) {
             const applicants = await Applicant.findAll({
                 attributes: ['id', 'user_id', 'message', 'is_accepted'],
                 where: {
@@ -253,23 +265,22 @@ router.get('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
                 post: post,
                 user_id: user_id
             });
-        }
-        else{
+        } else {
             res.send('<script> alert("자신의 게시글만 선발할 수 있습니다.");</script>');
         }
 
-    } catch(err){
+    } catch (err) {
         console.error(err);
         next(err);
     }
 });
 
-router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
+router.post('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
     const applicant_id = req.body.applicant_id;
 
-    try{
+    try {
         const post = await Recruitment.findOne({
             attributes: ['id', 'title', 'content', 'board_id', 'creator_id'],
             where: {
@@ -292,7 +303,7 @@ router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
                 }
             });
 
-            for(let i of applicant_id){
+            for (let i of applicant_id) {
                 await Applicant.update({is_accepted: true}, {
                     where: {
                         recruitment_id: post_id
@@ -300,7 +311,7 @@ router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
                 });
             }
 
-            for(let i of applicants){
+            for (let i of applicants) {
                 await Message.create({
                     title: post.title,
                     sender_id: user_id,
@@ -311,11 +322,11 @@ router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
 
             res.send('success');
 
-        } else{
+        } else {
             res.send('not creator');
         }
 
-    } catch(err){
+    } catch (err) {
         console.error(err);
         next(err);
     }
@@ -454,11 +465,23 @@ router.post('/:post_id/comment/:comment_id/reply_comment/write', isLoggedIn, asy
     const comment_id = req.params.comment_id;
     const reply_comment_content = req.body.reply_comment_content;
     const user_id = req.user.id;
+    const post_id = req.params.post_id;
     try {
         await ReplyComment.create({
             content: reply_comment_content,
             comment_id: comment_id,
             creator_id: user_id
+        });
+        const post = await Post.findOne({
+            attributes: ['comment_count'],
+            where: {
+                id: post_id
+            }
+        });
+        await Post.update({comment_count: post.comment_count + 1}, {
+            where: {
+                id: post_id
+            }
         });
         res.send('success');
     } catch (err) {
@@ -468,33 +491,52 @@ router.post('/:post_id/comment/:comment_id/reply_comment/write', isLoggedIn, asy
 });
 
 router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res, next) => {
-    const post_id = req.params.post_id;
-    const comment_id = req.params.comment_id;
-    const user_id = req.user.id;
-    try {
-        const comment = await Comment.findOne({
-            attributes: ['creator_id'],
-            where: {
-                id: comment_id,
-                post_id: post_id
-            }
-        });
-        if (comment.creator_id === user_id) {
-            await Comment.destroy({
+        const post_id = req.params.post_id;
+        const comment_id = req.params.comment_id;
+        const user_id = req.user.id;
+        try {
+            const comment = await Comment.findOne({
+                attributes: ['creator_id'],
                 where: {
                     id: comment_id,
                     post_id: post_id
                 }
             });
-            res.send('success');
-        } else {
-            res.send('not creator');
+            if (comment.creator_id === user_id) {
+                const post = await Post.findOne({
+                    attributes: ['comment_count'],
+                    where: {
+                        id: post_id
+                    }
+                });
+                const reply_comment_count = await ReplyComment.count({
+                    where: {
+                        comment_id: comment_id
+                    }
+                });
+                await Post.update({comment_count: post.comment_count - (reply_comment_count + 1)}, {
+                    where: {
+                        id: post_id
+                    }
+                });
+                await Comment.destroy({
+                    where: {
+                        id: comment_id,
+                        post_id: post_id
+                    }
+                });
+                res.send('success');
+            } else {
+                res.send('not creator');
+            }
+        } catch
+            (err) {
+            console.error(err);
+            next(err);
         }
-    } catch (err) {
-        console.error(err);
-        next(err);
     }
-});
+)
+;
 
 router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
@@ -506,6 +548,19 @@ router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
             creator_id: user_id,
             post_id: post_id
         });
+        const post = await Post.findOne({
+            attributes: ['comment_count'],
+            where: {
+                id: post_id
+            }
+        });
+        await Post.update({
+            comment_count: post.comment_count + 1
+        }, {
+            where: {
+                id: post_id
+            }
+        });
         res.send('success');
     } catch (err) {
         console.error(err);
@@ -516,6 +571,7 @@ router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
 router.post('/:post_id/reply_comment/:reply_comment_id/delete', isLoggedIn, async (req, res, next) => {
     const reply_comment_id = req.params.reply_comment_id;
     const user_id = req.user.id;
+    const post_id = req.params.post_id;
     try {
         const reply_comment = await ReplyComment.findOne({
             attributes: ['creator_id'],
@@ -527,6 +583,17 @@ router.post('/:post_id/reply_comment/:reply_comment_id/delete', isLoggedIn, asyn
             await ReplyComment.destroy({
                 where: {
                     id: reply_comment_id,
+                }
+            });
+            const post = await Post.findOne({
+                attributes: ['comment_count'],
+                where: {
+                    id: post_id
+                }
+            });
+            await Post.update({comment_count: post.comment_count - 1}, {
+                where: {
+                    id: post_id
                 }
             });
             res.send('success');
@@ -589,7 +656,7 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
             const comment_list = await Comment.findAll({
                 attributes: ['id', 'content', 'created_at', 'creator_id'],
                 where: {
-                    post_id: post_id,
+                    post_id: post_id
                 },
                 include: {
                     model: User,

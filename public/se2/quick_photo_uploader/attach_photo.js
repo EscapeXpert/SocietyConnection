@@ -409,7 +409,7 @@ function makeArrayFromString(sResString) {
     if (aResult.length == nImageFileCount) {
         setPhotoToEditor(aResult);
         aResult = null;
-        //window.close();
+        window.close();
     }
 }
 

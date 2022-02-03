@@ -143,10 +143,8 @@ router.get('/:board_id', async (req, res, next) => {
                 order = [['is_notice', 'DESC'], ['id', 'DESC']]
             }
             const posts = await Post.findAll({
-                attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', [
+                attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'comment_count', [
                     sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
-                ], [
-                    sequelize.literal('(SELECT count(*) FROM `comment` WHERE `post_id` = `post`.`id`)'), 'comment'
                 ]],
                 where: {
                     board_id: board_id

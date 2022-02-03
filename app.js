@@ -17,8 +17,9 @@ const authRouter = require('./routes/auth');
 const mainRouter = require('./routes/main');
 const profileRouter = require('./routes/profile');
 const {sequelize} = require('./models');
-const User = require("./models/user");
-const bcrypt = require("bcrypt");
+const User = require('./models/user');
+const Grade = require('./models/grade')
+const bcrypt = require('bcrypt');
 
 passportConfig();
 
@@ -37,8 +38,8 @@ sequelize.sync({force: false})
 app.use(morgan('dev'))
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(express.json({ limit : "100mb" }));
-app.use(express.urlencoded({ limit:"100mb", extended: false }));
+app.use(express.json({limit: "100mb"}));
+app.use(express.urlencoded({limit: "100mb", extended: false}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(session({
     resave: false,
@@ -57,9 +58,9 @@ app.use('/admin', adminRouter);
 app.use('/message', messageRouter);
 app.use('/post', postRouter);
 app.use('/recruitment', recruitmentRouter);
-app.use('/auth',authRouter);
-app.use('/',mainRouter);
-app.use('/profile',profileRouter);
+app.use('/auth', authRouter);
+app.use('/', mainRouter);
+app.use('/profile', profileRouter);
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
     error.status = 404;
@@ -77,23 +78,45 @@ app.listen(app.get('port'), () => {
     console.log(app.get('port'), '번 포트에서 대기 중');
 });
 
-async function make_admin(){
+async function set_default_database() {
     try {
-        const ex_admin = await User.findOne({where: {id : 'admin'}});
-        if(!ex_admin){
-            console.log("admin 계정이 없어서 admin계정을 생성합니다.");
+        for (let i = 1; i <= 5; i++) {
+            const grade = await Grade.findOne({
+                where: {
+                    id: i
+                }
+            });
+            if (!grade) {
+                await Grade.create({
+                    id: i,
+                    name: String(i)
+                });
+            }
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function make_admin() {
+    try {
+        const ex_admin = await User.findOne({where: {id: 'admin'}});
+        if (!ex_admin) {
+            console.log('admin 계정이 없어서 admin계정을 생성합니다.');
             const password = 'admin';
             const hash = await bcrypt.hash(password, 12);
             await User.create({
-                id : 'admin',
+                id: 'admin',
                 password: hash,
-                nickname : 'admin',
-                grade : 5,
+                nickname: 'admin',
+                grade: 5,
             });
         }
     } catch (error) {
         console.error(error);
     }
 }
+
+set_default_database();
 make_admin();
 

@@ -22,6 +22,11 @@ module.exports = class Post extends Sequelize.Model {
                 allowNull: false,
                 defaultValue: 0,
             },
+            comment_count: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                defaultValue: 0
+            },
             created_at: {
                 type: Sequelize.DATE,
                 allowNull: false,
@@ -31,7 +36,7 @@ module.exports = class Post extends Sequelize.Model {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
                 defaultValue: false,
-            }
+            },
         }, {
             sequelize,
             timestamps: false,
