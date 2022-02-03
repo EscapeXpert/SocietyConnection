@@ -278,7 +278,7 @@ router.post('/:post_id/apply/complete', isLoggedIn, async(req, res, next) => {
         });
 
         if(post.creator_id === user_id){
-            const message = post.title + " 선발되셨습니다"
+            const message = post.title + "에 선발되었습니다"
             const applicants = await Applicant.findAll({
                 attributes: ['id', 'user_id', 'message', 'is_accepted'],
                 where: {

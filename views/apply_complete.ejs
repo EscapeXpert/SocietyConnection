@@ -47,7 +47,8 @@
         .then((response) => {
             if(response.data === 'success') {
                 alert("확정되었습니다.");
-                location.replace(`/post/<%= post.id %>?board_id=<%= post.board_id%>`);
+                window.opener.location.reload();
+                window.close();
             }
         })
        .catch((err) => {
