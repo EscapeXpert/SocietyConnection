@@ -19,6 +19,9 @@ module.exports = () => {
             if (exUser) {
                 const result = await bcrypt.compare(password, exUser.password);
                 if (result) {
+                    if(exUser.is_delete === true){
+                        throw new Error('탈퇴한 회원입니다.');
+                    }
                     done(null, {user: exUser , auto_login : req.body.auto_login});
                 } else {
                     done(null, false, { message: 'incorrect password' });

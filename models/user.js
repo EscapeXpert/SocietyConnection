@@ -22,7 +22,7 @@ module.exports = class User extends Sequelize.Model {
                 defaultValue: 'local',
             },
             nickname: {
-                type: Sequelize.STRING(15),
+                type: Sequelize.STRING(30),
                 allowNull: false,
                 unique: true
             },
@@ -57,6 +57,11 @@ module.exports = class User extends Sequelize.Model {
             },
             session_deadline: {
                 type: Sequelize.DATE,
+                allowNull: true
+            },
+            is_delete: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false,
                 allowNull: true
             }
         }, {

@@ -29,6 +29,9 @@ module.exports = () => {
                 where: {id: profile._json.kakao_account.email, login_type: 'kakao'},
             });
             if (exUser) {
+                if(exUser.is_delete === true){
+                    throw new Error('탈퇴한 회원입니다.');
+                }
                 const tokenUser = {
                     user: exUser,
                     accessToken: accessToken
@@ -45,7 +48,18 @@ module.exports = () => {
                 } else {
                     new_user_gender = false;
                 }
-                const new_user_nickname = 'KakaoUser_' + (await kakao_user_count).count;
+
+                let User_count = (await kakao_user_count).count;
+                let new_user_nickname = 'KakaoUser_' + User_count;
+                while(true){
+                    new_user_nickname = 'KakaoUser_' + User_count;
+                    const exUser = await User.findOne({
+                        where: {nickname : new_user_nickname}
+                    });
+                    if(!exUser)
+                        break;
+                    User_count++;
+                }
                 const newUser = await User.create({
                     id: profile._json.kakao_account.email,
                     sns_id: profile.id,

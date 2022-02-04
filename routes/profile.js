@@ -139,15 +139,47 @@ router.get('/:user_nickname/account_delete', isLoggedIn, async (req, res) => {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
     }
     try {
-        /*await Message.destroy({
-            where: {
-                sender_id: user_nickname,
-                receiver_id: null
-            }
-        });*/
-        await User.destroy({
-            where: {nickname: user_nickname}
+        await Message.update({
+            is_sender_delete : true
+        }, {
+            where: {sender_id: req.user.id},
         });
+        await Message.destroy({
+            where: {
+                is_receiver_delete : true,
+                is_sender_delete : true
+            }
+        });
+        const user_delete_count = User.findAndCountAll({
+            where: {
+                is_delete: true
+            }
+        });
+        let delete_count = (await user_delete_count).count;
+        let nickname_delete = req.user.nickname+'_delete'+ delete_count;
+        while(true){
+            nickname_delete = req.user.nickname+'_delete'+ delete_count;
+            const exUser = await User.findOne({
+                where: {nickname : nickname_delete}
+            });
+            if(!exUser)
+                break;
+            delete_count++;
+        }
+
+        await User.update({
+            sns_id: null,
+            name: null,
+            birth_date: null,
+            gender: null,
+            introduce: null,
+            profile_image: null,
+            nickname : nickname_delete,
+            is_delete: true
+        }, {
+            where: {id: req.user.id},
+        });
+
         if (req.user.login_type === 'kakao') {
             let unlink = await axios({
                 method: 'post',
