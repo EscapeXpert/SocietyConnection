@@ -28,7 +28,7 @@
         <% const date_string = new Date(post.deadline - offset).toISOString() %>
         <span><%= date_string.slice(0, 16).replace('T', ' ') %></span>
         <div class="content">
-            <%-post.content%>
+            <%- post.content %>
         </div>
     </div>
 </div>
@@ -80,6 +80,17 @@
             </div>
             <a href="#" id="complete">선발</a>
         <% } %>
+    <% } else if(post.is_complete === true) { %>
+        <div>
+            <span>선발 인원</span>
+            <ol>
+                <% for(var applicant of applicants) { %>
+                    <% if(applicant.is_accepted === true) { %>
+                    <li><%= applicant.User.nickname%></li>
+                    <% } %>
+                <% } %>
+            </ol>
+        </div>
     <% } %>
 </div>
 </body>
@@ -92,10 +103,10 @@
         event.preventDefault();
         const checked = document.querySelectorAll("input#check:checked");
         const applicant_ids = [];
-        for(let i of checked){
+        for (let i of checked) {
             applicant_ids.push(i.getAttribute("value"))
         }
-        window.open(`/post/<%=post.id%>/apply/complete?applicant_id=` + applicant_ids, '<%= post.id%>', 'status=no, toolbar=no, menubar=no, width=600, height=500');
+        window.open(`/post/<%= post.id %>/apply/complete?applicant_id=` + applicant_ids, '<%= post.id %>', 'status=no, toolbar=no, menubar=no, width=600, height=500');
 
     });
 

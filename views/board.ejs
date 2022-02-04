@@ -15,6 +15,14 @@
     <a href="#" id="sort_by_deadline">마감기한순</a>
     <a href="#" id="sort_by_after_deadline">마감기한 종료</a>
 <% } %>
+
+<form name="searchForm" action="/board/<%= board.id%>" method="get">
+    <div class="search_area">
+        <input type="text" name="keyword" id="keyword" placeholder="검색어를 입력해주세요" value="<%= keyword %>" required>
+        <button id="search">검색</button>
+    </div>
+</form>
+
 <table>
     <thead>
     <tr>
@@ -79,49 +87,51 @@
     <% max_page = parseInt(parseInt(post_count / 10) + Math.ceil((post_count % 10) / 10)) %>
     <% const start_page = Math.floor((parseInt(page) - 1) / 10) * 10 + 1 %>
     <% if (start_page !== 1) { %>
-        <a href="/board/<%= board.id %>?page=<%= start_page - 10 %>&sort=<%=sort%>">이전</a>
+        <a href="/board/<%= board.id %>?page=<%= start_page - 10 %>&sort=<%=sort%>&keyword=<%=keyword%>">이전</a>
     <% } %>
     <% for(let i = start_page; (i < start_page + 10) && i <= max_page; i++) { %>
-        <a href="/board/<%= board.id %>?page=<%= i %>&sort=<%=sort%>"><%= i %></a>
+        <a href="/board/<%= board.id %>?page=<%= i %>&sort=<%=sort%>&keyword=<%=keyword%>"><%= i %></a>
     <% } %>
     <% if ((start_page + 10) <= max_page) { %>
-        <a href="/board/<%= board.id %>?page=<%= start_page + 10 %>&sort=<%=sort%>">다음</a>
+        <a href="/board/<%= board.id %>?page=<%= start_page + 10 %>&sort=<%=sort%>&keyword=<%=keyword%>">다음</a>
     <% } %>
 </div>
 <a href="/board/<%= board.id %>/write">글쓰기</a>
 </body>
 <input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
 <input type="hidden" id="board_type" name="board_type" value="<%= board.board_type %>">
+<input type="hidden" id="keyword" name="keyword" value="<%= keyword %>">
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     const board_id = document.querySelector('#board_id').value;
     const board_type = document.querySelector('#board_type').value;
-
+    const keyword = document.querySelector('#keyword').value;
     const sort_by_create_tag = document.querySelector('#sort_by_created_at');
     sort_by_create_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        location.href = `/board/${board_id}/?sort=created_at`;
+        location.href = `/board/${board_id}/?sort=created_at&keyword=${keyword}`;
     });
 
     if(board_type === 'general') {
         const sort_by_like_tag = document.querySelector('#sort_by_like');
         sort_by_like_tag.addEventListener('click', async function (event) {
             event.preventDefault();
-            location.href = `/board/${board_id}/?sort=like`;
+            location.href = `/board/${board_id}/?sort=like&keyword=${keyword}`;
         });
     }
     else if(board_type === 'recruitment') {
         const sort_by_deadline_tag = document.querySelector('#sort_by_deadline');
         sort_by_deadline_tag.addEventListener('click', async function (event) {
             event.preventDefault();
-            location.href = `/board/${board_id}/?sort=deadline`;
+            location.href = `/board/${board_id}/?sort=deadline&keyword=${keyword}`;
         });
 
         const sort_by_after_deadline_tag = document.querySelector('#sort_by_after_deadline');
         sort_by_after_deadline_tag.addEventListener('click', async function (event) {
             event.preventDefault();
-            location.href = `/board/${board_id}/?sort=after_deadline`;
+            location.href = `/board/${board_id}/?sort=after_deadline&keyword=${keyword}`;
         });
     }
+
 </script>
 </html>
