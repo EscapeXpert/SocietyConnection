@@ -111,8 +111,8 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
 router.get('/:board_id', async (req, res, next) => {
     const board_id = req.params.board_id;
     const sort = req.query.sort || 'created_at';
-    console.log(sort);
     const page = req.query.page || 1;
+    const keyword = req.query.keyword || '';
     const start_post_number = page * 10 - 10;
     try {
         const board = await Board.findOne({
@@ -133,7 +133,10 @@ router.get('/:board_id', async (req, res, next) => {
                     sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
                 ]],
                 where: {
-                    board_id: board_id
+                    board_id: board_id,
+                    title: {
+                        [Op.like]: `%${keyword}%`
+                    }
                 },
                 include: [{
                     model: User,
@@ -145,7 +148,10 @@ router.get('/:board_id', async (req, res, next) => {
             });
             const post_count = await Post.count({
                 where: {
-                    board_id: board_id
+                    board_id: board_id,
+                    title: {
+                        [Op.like]: `%${keyword}%`
+                    }
                 }
             });
             res.render('board', {
@@ -153,7 +159,8 @@ router.get('/:board_id', async (req, res, next) => {
                     posts: posts,
                     post_count: post_count,
                     page: page,
-                    sort: sort
+                    sort: sort,
+                    keyword: keyword
                 }
             );
         } else if (board.board_type === 'recruitment') {
@@ -172,7 +179,10 @@ router.get('/:board_id', async (req, res, next) => {
                 recruitments = await Recruitment.findAll({
                     attributes: ['id', 'title', 'created_at', 'view_count', 'deadline'],
                     where: {
-                        board_id: board_id
+                        board_id: board_id,
+                        title: {
+                            [Op.like]: `%${keyword}%`
+                        }
                     },
                     include: [{
                         model: User,
@@ -194,6 +204,9 @@ router.get('/:board_id', async (req, res, next) => {
                         board_id: board_id,
                         deadline: {
                             [Op.gt]: date
+                        },
+                        title: {
+                            [Op.like]: `%${keyword}%`
                         }
                     },
                     include: [{
@@ -210,6 +223,9 @@ router.get('/:board_id', async (req, res, next) => {
                         board_id: board_id,
                         deadline: {
                             [Op.gt]: date
+                        },
+                        title: {
+                            [Op.like]: `%${keyword}%`
                         }
                     }
                 });
@@ -222,6 +238,9 @@ router.get('/:board_id', async (req, res, next) => {
                         board_id: board_id,
                         deadline: {
                             [Op.lte]: date
+                        },
+                        title: {
+                            [Op.like]: `%${keyword}%`
                         }
                     },
                     include: [{
@@ -238,6 +257,9 @@ router.get('/:board_id', async (req, res, next) => {
                         board_id: board_id,
                         deadline: {
                             [Op.lte]: date
+                        },
+                        title: {
+                            [Op.like]: `%${keyword}%`
                         }
                     }
                 });
@@ -248,7 +270,8 @@ router.get('/:board_id', async (req, res, next) => {
                 posts: recruitments,
                 post_count: recruitment_count,
                 page: page,
-                sort: sort
+                sort: sort,
+                keyword: keyword
             });
         }
     } catch (err) {

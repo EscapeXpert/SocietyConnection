@@ -297,7 +297,9 @@ router.post('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
                 }
             });
 
-            await Recruitment.update({is_complete: true}, {
+            await Recruitment.update({
+                is_complete: true
+            }, {
                 where: {
                     id: post_id
                 }
