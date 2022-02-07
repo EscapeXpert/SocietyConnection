@@ -334,7 +334,7 @@ function addImage(ofile) {
 function html5Upload() {
     var tempFile, sUploadURL;
 
-    sUploadURL = '/board/upload';
+    sUploadURL = '/board/upload_img';
 
     setTimeout(function htmlStarted() {
         //파일을 하나씩 보내고, 결과를 받음.

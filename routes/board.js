@@ -20,7 +20,20 @@ const img_upload = multer({
     limits: {fileSize: 10 * 1024 * 1024},
 });
 
-router.post('/upload', img_upload.single('img'), async (req, res, next) => {
+const file_upload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'uploads/post/file/');
+        },
+        filename(req, file, cb) {
+            const ext = path.extname(file.originalname);
+            cb(null, path.basename(file.originalname, ext) + ext);
+        },
+    }),
+    limits: {fileSize: 10 * 1024 * 1024},
+});
+
+router.post('/upload_img', img_upload.single('img'), async (req, res, next) => {
     const filename = req.file.filename;
     let fileInfo = "";
     fileInfo += "&bNewLine=true";
@@ -64,13 +77,13 @@ router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
+router.post('/:board_id/write', isLoggedIn, file_upload.array('files'), async (req, res, next) => {
     const board_id = req.params.board_id;
     const title = req.body.title;
     const content = req.body.ir1;
     const deadline = req.body.deadline;
     const creator_id = req.user.id;
-    console.log(content);
+    const files = req.body.files;
     try {
         const board = await Board.findOne({
             attributes: ['board_type'],
