@@ -5,18 +5,18 @@
     <title>게시글 쓰기</title>
 </head>
 <body>
-<form id="post_write" action="/board/<%= board.id %>/write" method="post">
+<form id="post_write" action="/board/<%= board.id %>/write" enctype="multipart/form-data" method="post">
     <div>
         <label for="title"></label>
         <input type="text" name="title" id="title" placeholder="제목을 입력해 주세요." maxlength="100" required>
     </div>
     <div>
         <label for="ir1"></label>
-        <!--textarea rows="10" cols="50" style="resize: none" name="content" id="content" placeholder="내용을 입력하세요." maxlength="1000"
-                  required></textarea-->
         <textarea name="ir1" id="ir1" rows="10" cols="100"></textarea>
     </div>
-    <!-- 첨부파일 및 이미지-->
+    <div>
+        <input type="file" id="files" name="files" multiple>
+    </div>
     <% if(board.board_type === 'recruitment') { %>
         <div>
             <label for="deadline"></label>
@@ -34,6 +34,7 @@
     </div>
 </form>
 </body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script type="text/javascript" src="/public/se2/js/service/HuskyEZCreator.js" charset="utf-8"></script>
 <script type="text/javascript">
     var oEditors = [];
