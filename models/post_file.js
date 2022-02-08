@@ -3,8 +3,12 @@ const Sequelize = require('sequelize');
 module.exports = class PostFile extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
+            file_name: {
+                type: Sequelize.STRING(255),
+                allowNull: false
+            },
             file_path: {
-                type: Sequelize.STRING(200),
+                type: Sequelize.STRING(255),
                 allowNull: false,
             }
         }, {

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {isLoggedIn} = require('./middlewares');
-const {sequelize, Post, Board, Recruitment, User, Grade} = require('../models');
+const {sequelize, Post, Board, Recruitment, User, Grade, PostFile} = require('../models');
 const {Op} = require('sequelize');
 const multer = require("multer");
 const path = require("path");
@@ -14,7 +14,7 @@ const img_upload = multer({
         },
         filename(req, file, cb) {
             const ext = path.extname(file.originalname);
-            cb(null, path.basename(file.originalname, ext) + ext);
+            cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
         },
     }),
     limits: {fileSize: 10 * 1024 * 1024},
@@ -27,11 +27,11 @@ const file_upload = multer({
         },
         filename(req, file, cb) {
             const ext = path.extname(file.originalname);
-            cb(null, path.basename(file.originalname, ext) + ext);
+            cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
         },
     }),
-    limits: {fileSize: 10 * 1024 * 1024},
-});
+    limits: {fileSize: 50 * 1024 * 1024},
+}).array('files');
 
 router.post('/upload_img', img_upload.single('img'), async (req, res, next) => {
     const filename = req.file.filename;
@@ -77,49 +77,73 @@ router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:board_id/write', isLoggedIn, file_upload.array('files'), async (req, res, next) => {
-    const board_id = req.params.board_id;
-    const title = req.body.title;
-    const content = req.body.ir1;
-    const deadline = req.body.deadline;
-    const creator_id = req.user.id;
-    const files = req.body.files;
-    try {
-        const board = await Board.findOne({
-            attributes: ['board_type'],
-            where: {
-                id: board_id
-            }
-        });
-        let post;
-        if (board.board_type === 'general') {
-            post = await Post.create({
-                title: title,
-                content: content,
-                board_id: board_id,
-                creator_id: creator_id
+router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
+    await file_upload(req, res, async function(err) {
+        if(err) {
+            res.send('<script>alert("파일당 최대 50MB까지 업로드하실 수 있습니다.");history.back();</script>');
+            return;
+        }
+        const board_id = req.params.board_id;
+        const title = req.body.title;
+        const content = req.body.ir1;
+        const deadline = req.body.deadline;
+        const creator_id = req.user.id;
+        const files = req.files;
+        try {
+            const board = await Board.findOne({
+                attributes: ['board_type'],
+                where: {
+                    id: board_id
+                }
             });
-        } else if (board.board_type === 'recruitment') {
-            const offset = new Date().getTimezoneOffset() * 60000;
-            const date = new Date(Date.now() - offset);
-            if (deadline < date)
-                return res.send('<script>alert("마감 기한은 현재 시각 이전으로 설정할 수 없습니다.");history.back();</script>');
-            else {
-                post = await Recruitment.create({
+            let post;
+            if (board.board_type === 'general') {
+                post = await Post.create({
                     title: title,
                     content: content,
                     board_id: board_id,
-                    creator_id: creator_id,
-                    deadline: deadline
+                    creator_id: creator_id
                 });
+                for(file of files)
+                {
+                    await PostFile.create({
+                        post_id: post.id,
+                        file_name: file.originalname,
+                        file_path: '/' + file.path,
+                        board_id: board_id
+                    });
+                }
+            } else if (board.board_type === 'recruitment') {
+                const offset = new Date().getTimezoneOffset() * 60000;
+                const date = new Date(Date.now() - offset);
+                if (deadline < date)
+                    return res.send('<script>alert("마감 기한은 현재 시각 이전으로 설정할 수 없습니다.");history.back();</script>');
+                else {
+                    post = await Recruitment.create({
+                        title: title,
+                        content: content,
+                        board_id: board_id,
+                        creator_id: creator_id,
+                        deadline: deadline
+                    });
+                    for(file of files)
+                    {
+                        await PostFile.create({
+                            post_id: post.id,
+                            file_name: file.originalname,
+                            file_path: '/' + file.path,
+                            board_id: board_id
+                        });
+                    }
+                }
             }
+            res.redirect(`/post/${post.id}?board_id=${board_id}`);
+        } catch (err) {
+            console.error(err);
+            next(err);
         }
-        res.redirect(`/post/${post.id}?board_id=${board_id}`);
-    } catch (err) {
-        console.error(err);
-        next(err);
-    }
-})
+    });
+});
 
 router.get('/:board_id', async (req, res, next) => {
     const board_id = req.params.board_id;
