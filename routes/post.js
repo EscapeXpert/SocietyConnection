@@ -11,7 +11,8 @@ const {
     ReplyComment,
     Grade,
     Applicant,
-    Message
+    Message,
+    PostFile
 } = require('../models');
 const {isLoggedIn} = require("./middlewares");
 const {Op} = require('sequelize');
@@ -288,7 +289,7 @@ router.post('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
             }
         });
 
-        if(post.creator_id === user_id){
+        if (post.creator_id === user_id) {
             const message = post.title + "에 선발되었습니다"
             const applicants = await Applicant.findAll({
                 attributes: ['id', 'user_id', 'message', 'is_accepted'],
@@ -624,6 +625,14 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                 id: user_id
             }
         });
+
+        const files = await PostFile.findAll({
+            attributes: ['file_name', 'file_path'],
+            where: {
+                post_id: post_id,
+                board_id: board_id
+            }
+        });
         if (board.board_type === 'general') {
             const post = await Post.findOne({
                 attributes: ['id', 'title', 'content', 'is_notice', 'created_at', 'creator_id', 'view_count', 'board_id', [
@@ -690,7 +699,8 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                     is_like: is_like,
                     like_list: like_list,
                     comment_list: comment_list,
-                    reply_comment_map: reply_comment_map
+                    reply_comment_map: reply_comment_map,
+                    files: files
                 });
             } else {
                 const grade = await Grade.findOne({
@@ -751,7 +761,8 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                     user: user,
                     already: already,
                     applicants: applicants,
-                    applicant_count: applicant_count
+                    applicant_count: applicant_count,
+                    files: files
                 });
             } else {
                 const grade = await Grade.findOne({
