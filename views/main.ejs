@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 <div id="main">
@@ -11,15 +15,15 @@
             <label for="id">닉네임</label>
             <label for="id"><%= User.nickname %></label>
         </div>
-        <%if(User.login_type==='kakao'){%>
+        <% if(User.login_type === 'kakao'){ %>
             <a href="/auth/kakao_logout">로그아웃</a>
         <% }else{ %>
             <a href="/auth/logout">로그아웃</a>
-        <%}%>
+        <% } %>
         <a href="/profile/<%= User.nickname %>">프로필</a>
-        <%if(User.grade==5){%>
+        <% if(User.grade == 5){ %>
             <a href="/admin">admin 페이지</a>
-        <%}%>
+        <% } %>
         <% if(BoardList){ %>
             <div>
                 <label>게시판 목록</label>
@@ -31,29 +35,92 @@
             <% } %>
         <% } %>
     <% }else{ %>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#login" id="openJoinBtn">
+            sign in
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#join" id="openJoinBtn">
+            sign up
+        </button>
         <form id="main-form" action="/auth/login" method="post">
-            <div>
-                <label for="id">아이디</label>
-                <input id="id" name="id" type="text" maxlength="30" required>
-            </div>
-            <div>
-                <label for="password">비밀번호</label>
-                <input id="password" name="password" type="password" maxlength="15" required>
-            </div>
-            <label><input type="checkbox" name="auto_login" value="true"> 자동로그인</label>
-            <button id="login" type="submit">로그인</button>
-            <a href="/auth/join">회원가입</a>
-            <a href="/auth/kakao">카카오톡</a>
-            <% if(BoardList){ %>
-                <div>
-                    <label>게시판 목록</label>
-                </div>
-                <% for(let list_of_board of BoardList) { %>
-                    <div>
-                        <a href="/board/<%= list_of_board.dataValues.id %>"><%= list_of_board.dataValues.name %></a>
+            <div class="modal fade" id="login" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">로그인</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <label for="id" class="form-label">아이디</label>
+                                <input class="form-control" id="id" name="id" type="text" maxlength="30" required>
+                            </div>
+                            <div>
+                                <label for="password" class="form-label">비밀번호</label>
+                                <input class="form-control" id="password" name="password" type="password" maxlength="15"
+                                       required>
+                            </div>
+                            <label class="form-check-label"><input class="form-check-input" type="checkbox"
+                                                                   name="auto_login" value="true"> 자동로그인</label>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeJoinBtn">
+                                Close
+                            </button>
+                            <a href="/auth/kakao">카카오톡</a>
+                            <button id="register_button" type="submit" class="btn btn-primary">
+                                로그인
+                            </button>
+                        </div>
                     </div>
-                <% } %>
-            <% } %>
+                </div>
+            </div>
+        </form>
+        <form id="join-form" action="/auth/join" method="post">
+            <div class="modal fade" id="join" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">회원가입</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <label for="id" class="form-label">아이디</label>
+                                <input class="form-control" id="id" name="id" type="text"
+                                       maxlength="30" required value="">
+                            </div>
+                            <div>
+                                <label for="password" class="form-label">비밀번호</label>
+                                <input class="form-control" id="password" name="password"
+                                       type="password" maxlength="15" required value="">
+                            </div>
+                            <div>
+                                <label for="verify_password" class="form-label">비밀번호 확인</label>
+                                <input class="form-control" id="verify_password"
+                                       name="verify_password" type="password" max="15" required
+                                       value="">
+                            </div>
+                            <div>
+                                <label for="nickname" class="form-label">닉네임</label>
+                                <input class="form-control" id="nickname" name="nickname"
+                                       type="text" maxlength="15" required value="">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeJoinBtn">
+                                Close
+                            </button>
+                            <button id="register_button" type="submit" class="btn btn-primary">
+                                회원가입
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
     <% } %>
 </div>
