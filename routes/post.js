@@ -1,4 +1,6 @@
 const express = require('express');
+const multer = require("multer");
+const fs = require("fs");
 const router = express.Router();
 const {
     sequelize,
@@ -16,6 +18,20 @@ const {
 } = require('../models');
 const {isLoggedIn} = require("./middlewares");
 const {Op} = require('sequelize');
+const path = require("path");
+
+const file_upload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'uploads/post/file/');
+        },
+        filename(req, file, cb) {
+            const ext = path.extname(file.originalname);
+            cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
+        },
+    }),
+    limits: {fileSize: 50 * 1024 * 1024},
+}).array('files');
 
 router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
@@ -122,78 +138,99 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
 });
 
 router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
-    const post_id = req.params.post_id;
-    const board_id = req.body.board_id;
-    const title = req.body.title;
-    const content = req.body.ir1;
-    const deadline = req.body.deadline;
-    const user_id = req.user.id;
-
-    try {
-        const board = await Board.findOne({
-            attributes: ['board_type'],
-            where: {
-                id: board_id
-            }
-        });
-        if (board.board_type === 'general') {
-            const post = await Post.findOne({
-                attributes: ['creator_id'],
+    await file_upload(req, res, async function(err) {
+        if(err) {
+            res.send('<script>alert("파일당 최대 50MB까지 업로드하실 수 있습니다.");history.back();</script>');
+            return;
+        }
+        const post_id = req.params.post_id;
+        const board_id = req.body.board_id;
+        const title = req.body.title;
+        const content = req.body.ir1;
+        const deadline = req.body.deadline;
+        const user_id = req.user.id;
+        const files = req.files;
+        try {
+            const board = await Board.findOne({
+                attributes: ['board_type'],
                 where: {
-                    id: post_id,
+                    id: board_id
+                }
+            });
+            await PostFile.destroy({
+                where: {
+                    post_id: post_id,
                     board_id: board_id
                 }
             });
-            if (post.creator_id === user_id) {
-                await Post.update({
-                    title: title,
-                    content: content
-                }, {
+            for(file of files)
+            {
+                await PostFile.create({
+                    post_id: post_id,
+                    file_name: file.originalname,
+                    file_path: '/' + file.path,
+                    board_id: board_id
+                });
+            }
+            if (board.board_type === 'general') {
+                const post = await Post.findOne({
+                    attributes: ['creator_id'],
                     where: {
                         id: post_id,
                         board_id: board_id
                     }
                 });
-                res.redirect(`/post/${post_id}?board_id=${board_id}`);
-            } else {
-                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");history.back()</script>');
-            }
-        } else if (board.board_type === 'recruitment') {
-            const post = await Recruitment.findOne({
-                attributes: ['creator_id', 'created_at'],
-                where: {
-                    id: post_id,
-                    board_id: board_id
-                }
-            });
-            if (post.creator_id === user_id) {
-                const offset = new Date().getTimezoneOffset() * 60000;
-                const date = new Date(Date.now() - offset);
-                const max_date = new Date(post.created_at - offset);
-                max_date.setFullYear(max_date.getFullYear() + 1)
-                if (deadline < date)
-                    return res.send('<script>alert("마감 기한은 현재 시각 이전으로 설정할 수 없습니다.");history.back();</script>');
-                else {
-                    await Recruitment.update({
+                if (post.creator_id === user_id) {
+                    await Post.update({
                         title: title,
-                        content: content,
-                        deadline: deadline
+                        content: content
                     }, {
                         where: {
                             id: post_id,
                             board_id: board_id
                         }
                     });
+                    res.redirect(`/post/${post_id}?board_id=${board_id}`);
+                } else {
+                    res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");history.back()</script>');
                 }
-                res.redirect(`/post/${post_id}?board_id=${board_id}`);
-            } else {
-                res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");</script>');
+            } else if (board.board_type === 'recruitment') {
+                const post = await Recruitment.findOne({
+                    attributes: ['creator_id', 'created_at'],
+                    where: {
+                        id: post_id,
+                        board_id: board_id
+                    }
+                });
+                if (post.creator_id === user_id) {
+                    const offset = new Date().getTimezoneOffset() * 60000;
+                    const date = new Date(Date.now() - offset);
+                    const max_date = new Date(post.created_at - offset);
+                    max_date.setFullYear(max_date.getFullYear() + 1)
+                    if (deadline < date)
+                        return res.send('<script>alert("마감 기한은 현재 시각 이전으로 설정할 수 없습니다.");history.back();</script>');
+                    else {
+                        await Recruitment.update({
+                            title: title,
+                            content: content,
+                            deadline: deadline
+                        }, {
+                            where: {
+                                id: post_id,
+                                board_id: board_id
+                            }
+                        });
+                    }
+                    res.redirect(`/post/${post_id}?board_id=${board_id}`);
+                } else {
+                    res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");</script>');
+                }
             }
+        } catch (err) {
+            console.error(err);
+            next(err);
         }
-    } catch (err) {
-        console.error(err);
-        next(err);
-    }
+    });
 });
 
 router.post('/:post_id/notice', isLoggedIn, async (req, res, next) => {

@@ -131,8 +131,8 @@ app.listen(app.get('port'), () => {
 
 cron.schedule('0 0 * * *', async () => {
     try {
-        const files = fs.readdirSync('./uploads/post/img');
-        for(file of files)
+        const img_files = fs.readdirSync('./uploads/post/img');
+        for(file of img_files)
         {
             const post = await Post.findAll({
                 attributes: ['id'],
@@ -153,6 +153,22 @@ cron.schedule('0 0 * * *', async () => {
             if(recruitment[0] === undefined && post[0] === undefined)
             {
                 fs.unlinkSync('./uploads/post/img/' + file);
+            }
+        }
+        const post_files = fs.readdirSync('./uploads/post/file');
+        for(file of post_files)
+        {
+            const post_file = await PostFile.findAll({
+                attributes: ['id'],
+                where: {
+                    file_path: {
+                        [Op.like]: `%${file}%`
+                    }
+                }
+            });
+            if(post_file[0] === undefined)
+            {
+                fs.unlinkSync('./uploads/post/file/' + file);
             }
         }
     } catch(error) {

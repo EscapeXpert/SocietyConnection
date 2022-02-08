@@ -14,9 +14,6 @@
         <label for="ir1"></label>
         <textarea name="ir1" id="ir1" rows="10" cols="100"></textarea>
     </div>
-    <div>
-        <input type="file" id="files" name="files" multiple>
-    </div>
     <% if(board.board_type === 'recruitment') { %>
         <div>
             <label for="deadline"></label>
@@ -29,6 +26,9 @@
                    required>
         </div>
     <% } %>
+    <div>
+        <input type="file" id="files" name="files" multiple>
+    </div>
     <div>
         <a href="#" onclick="submitContents()">등록</a>
     </div>
