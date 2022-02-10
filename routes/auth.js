@@ -35,6 +35,13 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
         if (exUser) {
             return res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
         }
+        if(password.search(/\s/) !== -1) {
+            return res.send('<script> alert("비밀번호에 공백이 입력되었습니다.");history.back()</script>');
+        }
+        const PwRules = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,}$/;
+        if(!PwRules.test(password)) {
+            return res.send('<script> alert("비밀번호는 8자리 이상 문자, 숫자, 특수문자로 구성하여야 합니다.");history.back()</script>');
+        }
 
         const hash = await bcrypt.hash(password, 12);
         await User.create({
