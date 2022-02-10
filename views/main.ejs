@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title><%= title %></title>
-    <link rel="stylesheet" type="text/css" href="/public/css/main_page.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
@@ -69,7 +68,9 @@
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeJoinBtn">
                                 Close
                             </button>
-                            <a href="/auth/kakao">카카오톡</a>
+                            <a href="/auth/kakao">
+                                <img width="76" height="38" src="\public\icon\kakao_login_large.png">
+                            </a>
                             <button id="register_button" type="submit" class="btn btn-primary">
                                 로그인
                             </button>
@@ -98,6 +99,9 @@
                                 <label for="password" class="form-label">비밀번호</label>
                                 <input class="form-control" id="password" name="password"
                                        type="password" maxlength="15" required value="">
+                                <div id="passwordHelpBlock" class="form-text">
+                                    비밀번호는 8자리 이상 문자, 숫자, 특수문자로 구성하여야 합니다.
+                                </div>
                             </div>
                             <div>
                                 <label for="verify_password" class="form-label">비밀번호 확인</label>
