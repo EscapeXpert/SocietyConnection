@@ -12,8 +12,8 @@ const LocalStrategy = require('passport-local').Strategy;
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    const BoardList = await Board.findAll({
-        attributes: ['id','name']
+    const boards = await Board.findAll({
+        attributes: ['id', 'name']
     });
     /*const MyUser = await User.findOne({
         where: {id: 'wodon'},
@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
     res.render('main', {
         title: '메인' ,
         User: req.user,
-        BoardList:BoardList
+        boards: boards
     });
 });
 
