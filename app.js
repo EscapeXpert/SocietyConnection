@@ -26,12 +26,15 @@ const Post = require('./models/post');
 const Recuritment = require('./models/recruitment');
 const bcrypt = require('bcrypt');
 const fs = require("fs");
+const expressLayouts = require('express-ejs-layouts');
 
 passportConfig();
 
 const app = express();
 app.set('port', process.env.PORT || 3001);
 app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+app.use(expressLayouts);
 
 async function set_default_database() {
     try {
