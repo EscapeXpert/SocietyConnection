@@ -13,19 +13,24 @@ const {sequelize,Message, Post, Board, User, Comment, Recruitment, ReplyComment,
 const router = express.Router();
 
 
-router.get('/:user_nickname', isLoggedIn, async (req, res) => {
+router.get('/:user_nickname', isLoggedIn, async (req, res, next) => {
     const Find_User = await User.findOne({where: {nickname: req.params.user_nickname}});
     const birth =  moment(Find_User.birth_date).format('YYYY-MM-DD')
-    const boards = await Board.findAll({
-        attributes: ['id', 'name']
-    });
-    res.render('profile', {
-        title: '프로필',
-        boards: boards,
-        User: Find_User,
-        req_User: req.user,
-        birth : birth
-    });
+    try {
+        const boards = await Board.findAll({
+            attributes: ['id', 'name']
+        });
+        res.locals.user = req.user;
+        res.render('profile', {
+            title: '프로필',
+            boards: boards,
+            User: Find_User,
+            birth : birth
+        });
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
 });
 
 const upload = multer({

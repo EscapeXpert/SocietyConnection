@@ -78,8 +78,8 @@ router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
 });
 
 router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
-    await file_upload(req, res, async function(err) {
-        if(err) {
+    await file_upload(req, res, async function (err) {
+        if (err) {
             res.send('<script>alert("파일당 최대 50MB까지 업로드하실 수 있습니다.");history.back();</script>');
             return;
         }
@@ -104,8 +104,7 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
                     board_id: board_id,
                     creator_id: creator_id
                 });
-                for(file of files)
-                {
+                for (file of files) {
                     await PostFile.create({
                         post_id: post.id,
                         file_name: file.originalname,
@@ -126,8 +125,7 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
                         creator_id: creator_id,
                         deadline: deadline
                     });
-                    for(file of files)
-                    {
+                    for (file of files) {
                         await PostFile.create({
                             post_id: post.id,
                             file_name: file.originalname,
@@ -157,6 +155,9 @@ router.get('/:board_id', async (req, res, next) => {
             where: {
                 id: board_id
             }
+        });
+        const boards = await Board.findAll({
+            attributes: ['id', 'name']
         });
         if (board.board_type === 'general') {
             let order;
@@ -192,6 +193,8 @@ router.get('/:board_id', async (req, res, next) => {
                 }
             });
             res.render('board', {
+                    title: board.name,
+                    boards: boards,
                     board: board,
                     posts: posts,
                     post_count: post_count,
@@ -266,9 +269,7 @@ router.get('/:board_id', async (req, res, next) => {
                         }
                     }
                 });
-            }
-
-            else if (sort === 'after_deadline') {
+            } else if (sort === 'after_deadline') {
                 recruitments = await Recruitment.findAll({
                     attributes: ['id', 'title', 'created_at', 'view_count', 'deadline'],
                     where: {
@@ -303,6 +304,8 @@ router.get('/:board_id', async (req, res, next) => {
             }
 
             res.render('board', {
+                title: board.name,
+                boards: boards,
                 board: board,
                 posts: recruitments,
                 post_count: recruitment_count,
