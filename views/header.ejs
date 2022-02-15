@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">@Xpert</a>
+        <a class="navbar-brand" href="/">@Xpert</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -16,8 +16,8 @@
                         게시판
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <% for (board of boards) { %>
-                            <li><a class="dropdown-item" href="#"><%= board.name %></a></li>
+                        <% for (board of locals.boards) { %>
+                            <li><a class="dropdown-item" href="/board/<%= board.id%>"><%= board.name %></a></li>
                         <% } %>
                     </ul>
                 </li>
@@ -27,8 +27,7 @@
             </ul>
         </div>
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <% console.log(User) %>
-            <% if(!User) { %>
+            <% if(!locals.user) { %>
                 <button type="button" class="btn btn-outline-primary me-md-2" data-bs-toggle="modal"
                         data-bs-target="#login" id="openJoinBtn">
                     로그인
@@ -128,8 +127,8 @@
                     </div>
                 </form>
             <% } else { %>
-                <a class="btn btn-outline-primary me-md-2" href="/profile/<%= User.nickname %>">프로필</a>
-                <% if(User.login_type === 'kakao'){ %>
+                <a class="btn btn-outline-primary me-md-2" href="/profile/<%= locals.user.nickname %>">프로필</a>
+                <% if(locals.user.login_type === 'kakao'){ %>
                     <a class="btn btn-outline-primary" href="/auth/kakao_logout">로그아웃</a>
                 <% }else{ %>
                     <a class="btn btn-outline-primary" href="/auth/logout">로그아웃</a>

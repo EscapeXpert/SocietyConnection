@@ -42,7 +42,7 @@
             <img id="img-preview" src=<%= User.profile_image %>  width="250" alt="미리보기">
         </div>
     <% } %>
-    <% if(User.nickname == req_User.nickname){ %>
+    <% if(User.nickname === locals.user.nickname){ %>
         <div>
             <a href="/profile/<%= User.nickname %>/change_password">비밀번호 변경</a>
             <a href="/profile/<%= User.nickname %>/edit">프로필 수정</a>

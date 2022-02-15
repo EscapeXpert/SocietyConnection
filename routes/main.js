@@ -45,10 +45,10 @@ router.get('/', async (req, res) => {
             }
         }
     }
+    res.locals.user = req.user;
+    res.locals.boards = boards;
     res.render('main', {
-        title: '메인' ,
-        User: req.user,
-        boards: boards
+        title: '메인'
     });
 });
 
