@@ -59,9 +59,13 @@ router.get('/:user_nickname/edit', isLoggedIn, async (req, res) => {
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
     }
+    const boards = await Board.findAll({
+        attributes: ['id', 'name']
+    });
     res.render('edit', {
         title: '프로필 수정',
         User: req.user,
+        boards:boards,
         birth: moment(req.user.birth_date).format('YYYY-MM-DD')
     });
 });
@@ -73,7 +77,9 @@ router.post('/:user_nickname/edit', isLoggedIn, upload2.none(), async (req, res,
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
     }
     const {sns_id, nickname, name, birth_date, gender, introduce, profile_image} = req.body;
-
+    let input_birth_date = null;
+    if(birth_date)
+        input_birth_date = birth_date;
     try {
         if (!nickname) {
             return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
@@ -86,7 +92,7 @@ router.post('/:user_nickname/edit', isLoggedIn, upload2.none(), async (req, res,
             sns_id: sns_id,
             nickname: nickname,
             name: name,
-            birth_date: birth_date,
+            birth_date: input_birth_date,
             gender: gender,
             introduce: introduce,
             profile_image: profile_image

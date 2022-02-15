@@ -5,53 +5,67 @@
     <title><%= title %></title>
 </head>
 <body>
-<div id="edit">
+
+<div class="container">
     <form id="edit-form" action="/profile/<%= User.nickname %>/edit" method="post">
-        <div>
-            <label for="sns_id">sns_id</label>
-            <input id="sns_id" name="sns_id" type="text" maxlength="30" value=<%=User.sns_id%>>
+        <div class="row" style="float: none; margin:10% auto;">
+            <div class="card" style="width: 18rem;">
+                <img id="img-preview" src="<%= User.profile_image %>" class="card-img-top" width="250" height="250" alt="미리보기">
+                <input id="img-url" type="hidden" name="profile_image" value=<%= User.profile_image %>>
+                <div class="card-body">
+                    <h5 class="card-title">닉네임</h5>
+                    <input id="nickname" name="nickname" class="form-control" type="text" maxlength="15" required
+                           value=<%= User.nickname %>>
+                    <p class="card-text">자기소개</p>
+                    <input id="introduce" name="introduce" class="form-control" type="text" max="200"
+                           value="<%= User.introduce %>">
+                    <label id="img-label" for="img" class="form-label">사진 업로드</label>
+                    <input id="img" name="img" type="file" accept="image/*" class="form-control" >
+                </div>
+            </div>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h6 class="mb-0">이름</h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input id="name" name="name" class="form-control" type="text" max="15"
+                                   value=<%= User.name %>>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h6 class="mb-0">성별</h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <% if(User.gender){ %>
+                                <input id="gender" type="radio" name="gender" value="true" checked="checked"/>남성
+                                <input type="radio" name="gender" value='false'/>여성
+                            <% }else{ %>
+                                <input id="gender" type="radio" name="gender" value="true"/>남성
+                                <input type="radio" name="gender" value="false" checked="checked"/>여성
+                            <% } %>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h6 class="mb-0">생년월일</h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input id="birth_date" name="birth_date" type="date" class="form-control"  value=<%= birth %>>
+                        </div>
+                    </div>
+                    <hr>
+                    <button id="edit_button" type="submit" class="btn btn-primary">수정</button>
+                </div>
+            </div>
         </div>
-        <div>
-            <label for="nickname">닉네임</label>
-            <input id="nickname" name="nickname" type="text" maxlength="15" required value=<%=User.nickname%>>
-        </div>
-        <div>
-            <label for="name">이름</label>
-            <input id="name" name="name" type="text" max="15" value=<%=User.name%>>
-        </div>
-        <div>
-            <label for="birth_date">생년월일</label>
-            <input id="birth_date" name="birth_date" type="date" value=<%=birth%>>
-        </div>
-        <div>
-            <label for="gender">성별</label>
-            <% if(User.gender){ %>
-                <input id="gender" type="radio" name="gender" value="true" checked = "checked"/>남성
-                <input type="radio" name="gender" value='false' />여성
-            <% }else{ %>
-                <input id="gender" type="radio" name="gender" value="true" />남성
-                <input type="radio" name="gender" value="false" checked = "checked"/>여성
-            <% } %>
-        </div>
-        <div>
-            <label for="introduce">자기소개</label>
-            <input id="introduce" name="introduce" type="text" max="200" value="<%= User.introduce %>">
-        </div>
-        <div class="img-preview">
-            <%if(User.profile_image){%>
-                <img id="img-preview" src=<%= User.profile_image %> width="250" alt="미리보기">
-            <% }else{ %>
-                <img id="img-preview" src="" style="display: none;" width="250" alt="미리보기">
-            <% } %>
-            <input id="img-url" type="hidden" name="profile_image" value=<%=User.profile_image%>>
-        </div>
-        <div>
-            <label id="img-label" for="img">사진 업로드</label>
-            <input id="img" name="img" type="file" accept="image/*">
-        </div>
-        <button id="edit_button" type="submit">수정</button>
     </form>
 </div>
+
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
@@ -59,7 +73,7 @@
         document.getElementById('img').addEventListener('change', function (e) {
             const formData = new FormData();
             formData.append('img', this.files[0]);
-            axios.post('/profile/<%=User.nickname%>/edit/img', formData)
+            axios.post('/profile/<%= User.nickname %>/edit/img', formData)
                 .then((res) => {
                     document.getElementById('img-url').value = res.data.url;
                     document.getElementById('img-preview').src = res.data.url;
