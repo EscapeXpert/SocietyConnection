@@ -35,6 +35,7 @@ app.set('port', process.env.PORT || 3001);
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.use(expressLayouts);
+app.set("layout extractScripts", true);
 
 async function set_default_database() {
     try {
