@@ -8,6 +8,7 @@ const passport = require("passport");
 const {Op} = require("sequelize");
 const cookieParser = require('cookie-parser');
 const {Applicant, Recruitment} = require("../models");
+const fs = require("fs");
 const LocalStrategy = require('passport-local').Strategy;
 const router = express.Router();
 
@@ -47,8 +48,12 @@ router.get('/', async (req, res) => {
     }
     res.locals.user = req.user;
     res.locals.boards = boards;
+    const image_files = fs.readdirSync('./public/main_image');
     res.render('main', {
-        title: '메인'
+        title: '메인' ,
+        User: req.user,
+        boards: boards,
+        image_files: image_files
     });
 });
 
