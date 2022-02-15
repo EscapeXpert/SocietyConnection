@@ -1,0 +1,17 @@
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="/message/receive">받은 쪽지함</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="/message/send">보낸 쪽지함</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="/message/receive?filter=is_not_read">안읽은 쪽지</a>
+    </li>
+</ul>
+<script>
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var target = $(e.target).attr("href") // activated tab
+        alert(target);
+    });
+</script>

@@ -3,6 +3,7 @@ const router = express.Router();
 const {sequelize, Message, User} = require('../models');
 const {Op} = require('sequelize');
 const {isLoggedIn} = require("./middlewares");
+const Board = require("../models/board");
 
 router.get('/write', isLoggedIn, async (req, res, next) => {
     const target_nickname = req.query.target_nickname;
@@ -84,10 +85,15 @@ router.get('/send', isLoggedIn, async (req, res, next) => {
             limit: 10,
         });
 
+        const boards = await Board.findAll({
+            attributes: ['id', 'name']
+        });
         res.render("message_send", {
+            layout: `layout_message.ejs`,
             title: user.nickname,
             messages: messages,
             page: page,
+            boards: boards,
             message_count: message_count
         });
     } catch (err) {
@@ -101,7 +107,6 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
     const filter = req.query.filter;
     const start_message_number = page * 10 - 10;
 
-    console.log(filter);
     const user_id = req.user.id;
     try {
         const user = await User.findOne({
@@ -134,11 +139,15 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
             offset: start_message_number,
             limit: 10,
         });
-
+        const boards = await Board.findAll({
+            attributes: ['id', 'name']
+        });
         res.render("message_receive", {
+            layout: `layout_message.ejs`,
             title: user.nickname,
             messages: messages,
             filter: filter,
+            boards: boards,
             page: page,
             message_count: message_count
         });
