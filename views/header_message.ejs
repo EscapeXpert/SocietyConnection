@@ -1,22 +1,24 @@
 <ul class="nav nav-tabs">
-    <li class="nav-item" id="myTab">
-        <a class="nav-link active" data-toggle="tab" id ="receive" href="/message/receive">받은 쪽지함</a>
-    </li>
+    <% if(locals.link === 'receive') { %>
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="/message/receive">받은 쪽지함</a>
+        </li>
+    <% }else{ %>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="/message/receive">받은 쪽지함</a>
+        </li>
+    <% } %>
+    <% if(locals.link === 'send') { %>
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="/message/send">보낸 쪽지함</a>
+        </li>
+    <% }else{ %>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="/message/send">보낸 쪽지함</a>
+        </li>
+    <% } %>
+
     <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" id="send" href="/message/send">보낸 쪽지함</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" id="not_read" href="/message/receive?filter=is_not_read">안읽은 쪽지</a>
+        <a class="nav-link" data-toggle="tab" href="/message/receive?filter=is_not_read">안읽은 쪽지</a>
     </li>
 </ul>
-<script>
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-       var target = $(e.target).attr("href");
-       alert(target);
-       var activeTab = $(e.target).text();
-       var previousTab = $(e.relatedTarget).text();
-       activeTab.addClass("active");
-       previousTab.removeClass("active");
-       console.log("hi");
-    });
-</script>

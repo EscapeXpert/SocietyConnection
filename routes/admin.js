@@ -12,15 +12,20 @@ router.get('/', isLoggedIn, async (req, res) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
+    const boards = await Board.findAll({
+        attributes: ['id', 'name']
+    });
     const UserList = await User.findAll({
         where: { id: {
                 [Op.not]: req.user.id
             }
         }
     });
+    res.locals.user = req.user;
     const BoardList = await Board.findAll();
     res.render('admin', {
         title: 'admin',
+        boards:boards,
         UserList : UserList,
         BoardList : BoardList
     });
@@ -70,11 +75,16 @@ router.post('/:User_nickname/edit', isLoggedIn, async (req, res, next) => {
 router.get('/board_create', isLoggedIn, async (req, res) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
-    }const GradeList = await Grade.findAll({
+    }
+    const GradeList = await Grade.findAll({
         order: [['id']]
+    });
+    const boards = await Board.findAll({
+        attributes: ['id', 'name']
     });
     res.render('admin_board_create', {
         title: 'admin_board_create',
+        boards:boards,
         GradeList : GradeList
     });
 });

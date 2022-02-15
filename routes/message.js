@@ -88,6 +88,8 @@ router.get('/send', isLoggedIn, async (req, res, next) => {
         const boards = await Board.findAll({
             attributes: ['id', 'name']
         });
+
+        res.locals.link = 'send';
         res.render("message_send", {
             layout: `layout_message.ejs`,
             title: user.nickname,
@@ -142,6 +144,7 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
         const boards = await Board.findAll({
             attributes: ['id', 'name']
         });
+        res.locals.link = 'receive';
         res.render("message_receive", {
             layout: `layout_message.ejs`,
             title: user.nickname,

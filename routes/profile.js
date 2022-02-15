@@ -62,6 +62,7 @@ router.get('/:user_nickname/edit', isLoggedIn, async (req, res) => {
     const boards = await Board.findAll({
         attributes: ['id', 'name']
     });
+    res.locals.user = req.user;
     res.render('edit', {
         title: '프로필 수정',
         User: req.user,
