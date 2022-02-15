@@ -651,6 +651,9 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
     const board_id = req.query.board_id;
     const user_id = req.user.id;
     try {
+        const boards = await Board.findAll({
+            attributes: ['id', 'name']
+        });
         const board = await Board.findOne({
             attributes: ['id', 'name', 'board_type', 'min_read_grade'],
             where: {
@@ -731,9 +734,12 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                         id: post_id,
                     }
                 });
+                res.locals.user = req.user;
                 res.render('post_general', {
+                    title: post.title,
                     post: post,
                     board: board,
+                    boards: boards,
                     user: user,
                     is_like: is_like,
                     like_list: like_list,
@@ -794,9 +800,12 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                     }
                 });
 
+                res.locals.user = req.user;
                 res.render('post_recruitment', {
+                    title: post.title,
                     post: post,
                     board: board,
+                    boards: boards,
                     user: user,
                     already: already,
                     applicants: applicants,

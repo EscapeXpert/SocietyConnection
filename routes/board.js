@@ -46,6 +46,9 @@ router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
     const board_id = req.params.board_id;
     const user_id = req.user.id;
     try {
+        const boards = await Board.findAll({
+            attributes: ['id', 'name']
+        });
         const board = await Board.findOne({
             attributes: ['id', 'board_type', 'name', 'min_write_grade'],
             where: {
@@ -59,8 +62,11 @@ router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
             }
         })
         if (user.grade >= board.min_write_grade) {
+            res.locals.user = req.user;
             res.render('post_write', {
-                board: board
+                board: board,
+                boards: boards,
+                title: "게시글 쓰기"
             });
         } else {
             const grade = await Grade.findOne({
@@ -192,6 +198,7 @@ router.get('/:board_id', async (req, res, next) => {
                     }
                 }
             });
+            res.locals.user = req.user;
             res.render('board', {
                     title: board.name,
                     boards: boards,
@@ -303,6 +310,7 @@ router.get('/:board_id', async (req, res, next) => {
                 });
             }
 
+            res.locals.user = req.user;
             res.render('board', {
                 title: board.name,
                 boards: boards,

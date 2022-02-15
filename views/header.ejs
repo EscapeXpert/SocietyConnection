@@ -17,7 +17,7 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         <% for (board of locals.boards) { %>
-                            <li><a class="dropdown-item" href="/board/<%= board.id%>"><%= board.name %></a></li>
+                            <li><a class="dropdown-item" href="/board/<%= board.id %>"><%= board.name %></a></li>
                         <% } %>
                     </ul>
                 </li>
@@ -47,19 +47,19 @@
                                             aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <div>
+                                    <div class="mb-3">
                                         <label for="id" class="form-label">아이디</label>
                                         <input class="form-control" id="id" name="id" type="text" maxlength="30"
                                                required>
                                     </div>
-                                    <div>
+                                    <div class="mb-3">
                                         <label for="password" class="form-label">비밀번호</label>
                                         <input class="form-control" id="password" name="password" type="password"
                                                maxlength="15"
                                                required>
                                     </div>
-                                    <label class="form-check-label"><input class="form-check-input" type="checkbox"
-                                                                           name="auto_login" value="true"> 자동로그인</label>
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox" name="auto_login" value="true">자동로그인</label>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
