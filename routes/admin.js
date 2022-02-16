@@ -21,27 +21,16 @@ router.get('/', isLoggedIn, async (req, res) => {
             }
         }
     });
+    const GradeList = await Grade.findAll({
+        order: [['id']]
+    });
     res.locals.user = req.user;
     const BoardList = await Board.findAll();
     res.render('admin', {
         title: 'admin',
         boards:boards,
         UserList : UserList,
-        BoardList : BoardList
-    });
-});
-router.get('/:User_nickname/edit', isLoggedIn, async (req, res) => {
-    if(req.user.grade!==5){
-        return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
-    }
-    const User_nickname = req.params.User_nickname;
-    const FindUser = await User.findOne({ where: { nickname : User_nickname } });
-    const GradeList = await Grade.findAll({
-        order: [['id']]
-    });
-    res.render('admin_edit', {
-        title: 'admin_edit',
-        FindUser: FindUser,
+        BoardList : BoardList,
         GradeList : GradeList
     });
 });
@@ -72,22 +61,6 @@ router.post('/:User_nickname/edit', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/board_create', isLoggedIn, async (req, res) => {
-    if(req.user.grade!==5){
-        return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
-    }
-    const GradeList = await Grade.findAll({
-        order: [['id']]
-    });
-    const boards = await Board.findAll({
-        attributes: ['id', 'name']
-    });
-    res.render('admin_board_create', {
-        title: 'admin_board_create',
-        boards:boards,
-        GradeList : GradeList
-    });
-});
 router.post('/board_create', isLoggedIn, async (req, res, next) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
@@ -106,21 +79,6 @@ router.post('/board_create', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/:Board_id/board_edit', isLoggedIn, async (req, res) => {
-    if(req.user.grade!==5){
-        return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
-    }
-    const Board_id = req.params.Board_id;
-    const FindBoard = await Board.findOne({where: {id : Board_id}});
-    const GradeList = await Grade.findAll({
-        order: [['id']]
-    });
-    res.render('admin_board_edit', {
-        title: 'admin_edit',
-        FindBoard: FindBoard,
-        GradeList : GradeList
-    });
-});
 router.post('/:Board_id/board_edit', isLoggedIn, async (req, res, next) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');

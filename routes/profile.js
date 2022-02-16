@@ -107,17 +107,6 @@ router.post('/:user_nickname/edit', isLoggedIn, upload2.none(), async (req, res,
     }
 });
 
-
-router.get('/:user_nickname/change_password', isLoggedIn, async (req, res) => {
-    const user_nickname = req.params.user_nickname;
-    if (user_nickname !== req.user.nickname) {
-        return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
-    }
-    res.render('change_password', {
-        title: '비밀번호 변경',
-        user_nickname: user_nickname
-    });
-});
 router.post('/:user_nickname/change_password', isLoggedIn, async (req, res, next) => {
     const user_nickname = req.params.user_nickname;
     if (user_nickname !== req.user.nickname) {
@@ -136,6 +125,15 @@ router.post('/:user_nickname/change_password', isLoggedIn, async (req, res, next
         if (password === new_password) {
             return res.send('<script> alert("새 비밀번호를 기존 비밀번호와 일치하게 설정할 수 없습니다.");history.back()</script>');
         }
+
+        if(new_password.search(/\s/) !== -1) {
+            return res.send('<script> alert("비밀번호에 공백이 입력되었습니다.");history.back()</script>');
+        }
+        const PwRules = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,}$/;
+        if(!PwRules.test(new_password)) {
+            return res.send('<script> alert("비밀번호는 8자리 이상 문자, 숫자, 특수문자로 구성하여야 합니다.");history.back()</script>');
+        }
+
         const hash = await bcrypt.hash(new_password, 12);
         await User.update({
             password: hash,
@@ -273,23 +271,13 @@ router.get('/:user_nickname/my_activity', isLoggedIn, async (req, res) => {
             }
         }
     });
-    /*
-    console.log("MyPostListMyPostListMyPostList",MyPostList);
-    console.log("MyRecruitmentListMyRecruitmentListMyRecruitmentList",MyRecruitmentList);
-    for(let Applicant of MyApplicantList){
-        console.log('Applicant',Applicant);
-        console.log('Applicant.Recruitment',Applicant.Recruitment);
-    }
-    for(let Comment of MyCommentList){
-        console.log('Comment.dataValues.Post',Comment.dataValues.Post);
-        console.log('Comment.Post',Comment.Post);
-    }
-    console.log("MyCommentListMyCommentListMyCommentList",MyCommentList);
-    for(let ReplyComment of MyReplyCommentList) {
-        console.log('ReplyComment', ReplyComment);
-    }*/
+    const boards = await Board.findAll({
+        attributes: ['id', 'name']
+    });
+    res.locals.user = req.user;
     res.render('my_activity', {
         title: '나의 활동',
+        boards : boards,
         MyPostList : MyPostList,
         MyRecruitmentList : MyRecruitmentList,
         MyApplicantList : MyApplicantList,
