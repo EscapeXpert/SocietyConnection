@@ -60,8 +60,48 @@
                 <hr>
                 <% if(User.nickname == locals.user.nickname){ %>
                     <div>
-                        <a href="/profile/<%= User.nickname %>/change_password" class="btn btn-primary btn-sm">비밀번호 변경</a>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#change_password" id="openJoinBtn">
+                            비밀번호 변경
+                        </button>
                         <a href="/profile/<%= User.nickname %>/edit" class="btn btn-primary btn-sm">프로필 수정</a>
+                        <form id="change_password-form" action="/profile/<%= User.nickname %>/change_password" method="post">
+                            <div class="modal fade" id="change_password" tabindex="-1" aria-labelledby="exampleModalLabel"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">비밀번호 변경</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="password" class="form-label">기존 비밀번호</label>
+                                                <input class="form-control" id="password" name="password" type="password" maxlength="255" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="new_password" class="form-label">새로운 비밀번호</label>
+                                                <input class="form-control" id="new_password" name="new_password" type="password" maxlength="255"
+                                                       required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="verify_new_password" class="form-label">새로운 비밀번호 확인</label>
+                                                <input class="form-control" id="verify_new_password" name="verify_new_password" type="password"
+                                                       max="255" required>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                    id="closeJoinBtn">
+                                                Close
+                                            </button>
+                                            <button id="register_button" type="submit" class="btn btn-primary">비밀번호 변경</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 <% } %>
             </div>
