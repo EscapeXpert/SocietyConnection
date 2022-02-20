@@ -6,16 +6,16 @@
     </div>
     <div class="mb-3 mx-3">
         <label for="ir1" class="form-label">내용</label>
-        <textarea name="ir1" class="form-control" id="ir1" rows="10" cols="100" placeholder="내용을 입력해 주세요."></textarea>
+        <textarea name="ir1" class="form-control" id="ir1" rows="10" placeholder="내용을 입력해 주세요." style="min-width:260px;"></textarea>
     </div>
     <% if(board.board_type === 'recruitment') { %>
         <div class="mb-3 mx-3">
-            <label for="deadline">마감기한</label>
+            <label for="deadline" class="form-label">마감기한</label>
             <% const offset = new Date().getTimezoneOffset() * 60000 %>
             <% const date = new Date(Date.now() - offset) %>
             <% const max_date = new Date(Date.now() - offset) %>
             <% max_date.setFullYear(max_date.getFullYear() + 1) %>
-            <input type="datetime-local" name="deadline" id="deadline" min="<%= date.toISOString().slice(0, 16) %>"
+            <input class="form-control" type="datetime-local" name="deadline" id="deadline" min="<%= date.toISOString().slice(0, 16) %>"
                    max="<%= max_date.toISOString().slice(0, 16) %>" , value="<%= date.toISOString().slice(0, 16) %>"
                    required>
         </div>
