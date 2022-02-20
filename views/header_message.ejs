@@ -17,8 +17,14 @@
             <a class="nav-link" data-toggle="tab" href="/message/send">보낸 쪽지함</a>
         </li>
     <% } %>
+    <% if(locals.link === 'receive_is_not_read') { %>
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="/message/receive?filter=is_not_read">안읽은 쪽지</a>
+        </li>
+    <% }else{ %>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="/message/receive?filter=is_not_read">안읽은 쪽지</a>
+        </li>
+    <% } %>
 
-    <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="/message/receive?filter=is_not_read">안읽은 쪽지</a>
-    </li>
 </ul>

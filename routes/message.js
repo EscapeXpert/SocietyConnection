@@ -144,7 +144,12 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
         const boards = await Board.findAll({
             attributes: ['id', 'name']
         });
-        res.locals.link = 'receive';
+        if(filter === "is_not_read"){
+            res.locals.link = 'receive_is_not_read';
+        }
+        else{
+            res.locals.link = 'receive';
+        }
         res.render("message_receive", {
             layout: `layout_message.ejs`,
             title: user.nickname,
