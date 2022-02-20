@@ -41,7 +41,12 @@ function checkDragAndDropAPI() {
             if (!!oNavigator.safari && oNavigator.version <= 5) {
                 bSupportDragAndDropAPI = false;
             } else {
-                bSupportDragAndDropAPI = true;
+                if ( oNavigator.mobile || oNavigator.msafari || oNavigator.mopera || oNavigator.mie)
+                {
+                    bSupportDragAndDropAPI = false;
+                } else {
+                    bSupportDragAndDropAPI = true;
+                }
             }
         } else {
             bSupportDragAndDropAPI = false;
