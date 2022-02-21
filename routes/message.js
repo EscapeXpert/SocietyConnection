@@ -8,7 +8,9 @@ const Board = require("../models/board");
 router.get('/write', isLoggedIn, async (req, res, next) => {
     const target_nickname = req.query.target_nickname;
     try {
+        res.locals.user = req.user;
         res.render("message_write", {
+            layout: false,
             target_nickname: target_nickname
         });
     } catch (err) {
@@ -90,6 +92,7 @@ router.get('/send', isLoggedIn, async (req, res, next) => {
         });
 
         res.locals.link = 'send';
+        res.locals.user = req.user;
         res.render("message_send", {
             layout: `layout_message.ejs`,
             title: user.nickname,
@@ -150,6 +153,8 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
         else{
             res.locals.link = 'receive';
         }
+
+        res.locals.user = req.user;
         res.render("message_receive", {
             layout: `layout_message.ejs`,
             title: user.nickname,
