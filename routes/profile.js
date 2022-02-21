@@ -14,7 +14,8 @@ const router = express.Router();
 
 
 router.get('/:user_nickname', isLoggedIn, async (req, res, next) => {
-    const Find_User = await User.findOne({where: {nickname: req.params.user_nickname}});
+    const req_params_user_nickname = req.params.user_nickname;
+    const Find_User = await User.findOne({where: {nickname: req_params_user_nickname}});
     const birth =  moment(Find_User.birth_date).format('YYYY-MM-DD')
     const user_id = req.user.id;
 
@@ -29,14 +30,71 @@ router.get('/:user_nickname', isLoggedIn, async (req, res, next) => {
                 is_read: false
             }
         });
-
+        const MyPostList = await Post.findAll({
+            attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'creator_id','board_id',[
+                sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
+            ]],
+            where: {creator_id: req_params_user_nickname},
+            include: {
+                model: User,
+                attributes: ['nickname']
+            }
+        });
+        const MyRecruitmentList = await Recruitment.findAll({
+            where: {creator_id: req_params_user_nickname},
+            include: {
+                model: User,
+                attributes: ['nickname']
+            }
+        });
+        const MyApplicantList = await Applicant.findAll({
+            where: {user_id: req_params_user_nickname},
+            include: {
+                model: Recruitment,
+                attributes: ['id','title','creator_id','board_id'],
+                include: {
+                    model: User,
+                    attributes: ['nickname']
+                }
+            }
+        });
+        const MyCommentList = await Comment.findAll({
+            where: {creator_id: req_params_user_nickname},
+            include: {
+                model: Post,
+                attributes: ['id','title','creator_id','board_id'],
+                include: {
+                    model: User,
+                    attributes: ['nickname']
+                }
+            }
+        });
+        const MyReplyCommentList = await ReplyComment.findAll({
+            where: {creator_id: req_params_user_nickname},
+            include: {
+                model: Comment,
+                include:{
+                    model: Post,
+                    attributes: ['id','title','creator_id','board_id'],
+                    include: {
+                        model: User,
+                        attributes: ['nickname']
+                    }
+                }
+            }
+        });
         res.locals.user = req.user;
         res.render('profile', {
             title: '프로필',
             boards: boards,
             User: Find_User,
             birth : birth,
-            not_read_message: not_read_message
+            not_read_message: not_read_message,
+            MyPostList : MyPostList,
+            MyRecruitmentList : MyRecruitmentList,
+            MyApplicantList : MyApplicantList,
+            MyCommentList : MyCommentList,
+            MyReplyCommentList : MyReplyCommentList
         });
     } catch (err) {
         console.error(err);
@@ -88,10 +146,14 @@ router.post('/:user_nickname/edit', isLoggedIn, upload2.none(), async (req, res,
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
     }
-    const {sns_id, nickname, name, birth_date, gender, introduce, profile_image} = req.body;
+    const {sns_id, nickname, name, birth_date, gender, introduce, profile_image,default_profile_image} = req.body;
+    let input_profile_image = null;
     let input_birth_date = null;
     if(birth_date)
         input_birth_date = birth_date;
+    if(!default_profile_image){
+        input_profile_image = profile_image;
+    }
     try {
         if (!nickname) {
             return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
@@ -107,7 +169,7 @@ router.post('/:user_nickname/edit', isLoggedIn, upload2.none(), async (req, res,
             birth_date: input_birth_date,
             gender: gender,
             introduce: introduce,
-            profile_image: profile_image
+            profile_image: input_profile_image
         }, {
             where: {id: req.user.id},
         });
@@ -224,78 +286,6 @@ router.get('/:user_nickname/account_delete', isLoggedIn, async (req, res) => {
     }
 });
 
-router.get('/:user_nickname/my_activity', isLoggedIn, async (req, res) => {
-    const user_nickname = req.params.user_nickname;
-    if (user_nickname !== req.user.nickname) {
-        return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
-    }
-    const MyPostList = await Post.findAll({
-        attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'creator_id','board_id',[
-            sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
-        ]],
-        where: {creator_id: req.user.id},
-        include: {
-            model: User,
-            attributes: ['nickname']
-        }
-    });
-    const MyRecruitmentList = await Recruitment.findAll({
-        where: {creator_id: req.user.id},
-        include: {
-            model: User,
-            attributes: ['nickname']
-        }
-    });
-    const MyApplicantList = await Applicant.findAll({
-        where: {user_id: req.user.id},
-        include: {
-            model: Recruitment,
-            attributes: ['id','title','creator_id','board_id'],
-            include: {
-                model: User,
-                attributes: ['nickname']
-            }
-        }
-    });
-    const MyCommentList = await Comment.findAll({
-        where: {creator_id: req.user.id},
-        include: {
-            model: Post,
-            attributes: ['id','title','creator_id','board_id'],
-            include: {
-                model: User,
-                attributes: ['nickname']
-            }
-        }
-    });
-    const MyReplyCommentList = await ReplyComment.findAll({
-        where: {creator_id: req.user.id},
-        include: {
-            model: Comment,
-            include:{
-                model: Post,
-                attributes: ['id','title','creator_id','board_id'],
-                include: {
-                    model: User,
-                    attributes: ['nickname']
-                }
-            }
-        }
-    });
-    const boards = await Board.findAll({
-        attributes: ['id', 'name']
-    });
-    res.locals.user = req.user;
-    res.render('my_activity', {
-        title: '나의 활동',
-        boards : boards,
-        MyPostList : MyPostList,
-        MyRecruitmentList : MyRecruitmentList,
-        MyApplicantList : MyApplicantList,
-        MyCommentList : MyCommentList,
-        MyReplyCommentList : MyReplyCommentList
-    });
-});
 
 
 
