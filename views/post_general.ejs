@@ -1,18 +1,13 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title><%= post.title %></title>
-</head>
-<body>
-<a href="/board/<%= board.id %>"><%= board.name %></a>
-<div>
+<div class="d-flex mx-2 my-2">
+    <a class="text-decoration-none text-primary " href="/board/<%= board.id %>"><%= board.name %></a>
+</div>
+<div class="d-flex mx-2 my-1">
     <% if(post.creator_id === user.id) { %>
-        <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
-        <a href="#" id="delete">삭제</a>
+        <a class="btn btn-outline-primary me-2" href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
+        <a class="btn btn-outline-primary me-2" href="#" id="delete">삭제</a>
     <% } %>
     <% if(user.grade === 5) { %>
-        <a href="#" id="notice">
+        <a class="btn btn-outline-primary me-2" href="#" id="notice">
             <% if(post.is_notice) { %>
                 공지 해제
             <% } else { %>
@@ -21,12 +16,14 @@
         </a>
     <% } %>
 </div>
-<div>
-    <% if(post.User.profile_image != null) { %>
-        <img src="<%= post.User.profile_image %>" alt="" width="32" height="32">
-    <% } else { %>
-        <img src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
-    <% } %>
+<div class="d-flex">
+    <div>
+        <% if(post.User.profile_image != null) { %>
+            <img class="img-thumbnail" src="<%= post.User.profile_image %>" alt="" width="32" height="32">
+        <% } else { %>
+            <img class="" src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+        <% } %>
+    </div>
     <a href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
     <span><%= post.toJSON().grade %></span>
     <% if(post.creator_id !== user.id) { %>
@@ -38,9 +35,9 @@
     <div>
         <h3><%= post.title %></h3>
         <div>
-            <% if(files.length > 0) {%>
+            <% if(files.length > 0) { %>
                 <p>첨부파일</p>
-            <%}%>
+            <% } %>
             <ul>
                 <% for(file of files) { %>
                     <li><a href="<%= file.file_path %>" download="<%= file.file_name %>"><%= file.file_name %></a></li>
@@ -129,7 +126,6 @@
         </div>
     </div>
 </div>
-</body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     <% if (post.creator_id === user.id) { %>
