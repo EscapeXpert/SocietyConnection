@@ -1,7 +1,9 @@
 <style>
-    .table-color {
-        background-color: rgba(230, 230, 250, 0.9);
-        color: black;
+    .btn-info, .btn-info:hover, .btn-info:active, .btn-info:visited {
+        background-color:rgba(207, 226, 255, 1.0);
+    }
+    .btn-outline-info:hover {
+        background-color:rgba(207, 226, 255, 1.0);
     }
 </style>
 <div class="d-flex justify-content-between mx-2 my-2">
@@ -24,8 +26,8 @@
 
 <div class="d-flex justify-content-center mx-2">
     <table class="table table-responsive table-borderless table-hover">
-        <thead class="table table-color">
-        <tr>
+        <thead>
+        <tr class="table-primary">
             <th class="text-center" style="width:7%" scope="col">번호</th>
             <th class="text-center" scope="col">제목</th>
             <th class="text-center" style="width:15%" scope="col">작성자</th>
@@ -42,23 +44,28 @@
         <% for(let post of posts) { %>
             <tr>
                 <% if(board.board_type === 'general' && post.is_notice) { %>
-                    <th class="text-center" style="width:7%" scope="row"><span class="notice_prefix">공지</span></th>
+                    <th class="text-center text-primary" style="width:7%" scope="row"><span
+                                class="notice_prefix">공지</span></th>
                 <% } else { %>
                     <th class="text-center" style="width:7%" scope="row"><%= post.id %></th>
                 <% } %>
                 <td>
                     <div class="title">&nbsp
-                        <a class="text-decoration-none text-reset" href="/post/<%= post.id %>?board_id=<%= board.id %>"><%= post.title %></a>
+                        <a class="text-decoration-none text-reset"
+                           href="/post/<%= post.id %>?board_id=<%= board.id %>"><%= post.title %></a>
                         <% if(board.board_type === 'general') { %>
                             <% if(post.comment_count > 0) { %>
-                                <a class="text-decoration-none text-danger" href="/post/<%= post.id %>?board_id=<%= board.id %>#commnet_list">
+                                <a class="text-decoration-none text-danger"
+                                   href="/post/<%= post.id %>?board_id=<%= board.id %>#commnet_list">
                                     [<%= post.comment_count %>]
                                 </a>
                             <% } %>
                         <% } %>
                     </div>
                 </td>
-                <td style="width:15%">&nbsp<a class="text-decoration-none text-reset" href="/profile/<%=post.User.nickname%>"><%= post.User.nickname %></a></td>
+                <td style="width:15%">&nbsp<a class="text-decoration-none text-reset"
+                                              href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
+                </td>
                 <% const date = new Date(post.created_at) %>
                 <% const current_date = new Date() %>
                 <% const offset = new Date().getTimezoneOffset() * 60000 %>
@@ -88,15 +95,21 @@
     <% max_page = parseInt(parseInt(post_count / 10) + Math.ceil((post_count % 10) / 10)) %>
     <% const start_page = Math.floor((parseInt(page) - 1) / 10) * 10 + 1 %>
     <% if (start_page !== 1) { %>
-        <a class="mx-1"
-           href="/board/<%= board.id %>?page=<%= start_page - 10 %>&sort=<%= sort %>&keyword=<%= keyword %>">이전</a>
+        <a class="mx-1 text-decoration-none"
+           href="/board/<%= board.id %>?page=<%= start_page - 10 %>&sort=<%= sort %>&keyword=<%= keyword %>"><</a>
     <% } %>
     <% for(let i = start_page; (i < start_page + 10) && i <= max_page; i++) { %>
-        <a class="mx-1" href="/board/<%= board.id %>?page=<%= i %>&sort=<%= sort %>&keyword=<%= keyword %>"><%= i %></a>
+        <% if(i === parseInt(page)) { %>
+            <a class="mx-1 text-decoration-none text-black btn btn-info rounded-circle border border-0"
+               href="/board/<%= board.id %>?page=<%= i %>&sort=<%= sort %>&keyword=<%= keyword %>"><%= i %></a>
+        <% } else { %>
+            <a class="mx-1 text-decoration-none text-black btn btn-outline-info rounded-circle border border-0"
+               href="/board/<%= board.id %>?page=<%= i %>&sort=<%= sort %>&keyword=<%= keyword %>"><%= i %></a>
+        <% } %>
     <% } %>
     <% if ((start_page + 10) <= max_page) { %>
-        <a class="mx-1"
-           href="/board/<%= board.id %>?page=<%= start_page + 10 %>&sort=<%= sort %>&keyword=<%= keyword %>">다음</a>
+        <a class="mx-1 text-decoration-none"
+           href="/board/<%= board.id %>?page=<%= start_page + 10 %>&sort=<%= sort %>&keyword=<%= keyword %>">></a>
     <% } %>
 </div>
 <form class="d-flex justify-content-end">
