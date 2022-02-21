@@ -16,16 +16,27 @@ const router = express.Router();
 router.get('/:user_nickname', isLoggedIn, async (req, res, next) => {
     const Find_User = await User.findOne({where: {nickname: req.params.user_nickname}});
     const birth =  moment(Find_User.birth_date).format('YYYY-MM-DD')
+    const user_id = req.user.id;
+
     try {
         const boards = await Board.findAll({
             attributes: ['id', 'name']
         });
+
+        const not_read_message = await Message.count({
+            where:{
+                receiver_id: user_id,
+                is_read: false
+            }
+        });
+
         res.locals.user = req.user;
         res.render('profile', {
             title: '프로필',
             boards: boards,
             User: Find_User,
-            birth : birth
+            birth : birth,
+            not_read_message: not_read_message
         });
     } catch (err) {
         console.error(err);
