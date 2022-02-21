@@ -2,22 +2,56 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title><%= message.title %></title>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 <% if(type === "send") { %>
-    <a href="/message/send">목록</a>
+    <a href="/message/send" class="btn btn-outline-primary btn-sm">목록</a>
 <% } else { %>
-    <a href="/message/receive">목록</a>
+    <a href="/message/receive" class="btn btn-outline-primary btn-sm">목록</a>
     <a href='#'
-       onclick="window.open('/message/write?target_nickname=<%= sender_nickname %>','<%= sender_nickname %>>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">답장</a>
+       onclick="window.open('/message/write?target_nickname=<%= sender_nickname.nickname %>','<%= sender_nickname.nickname %>>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false"
+       class="btn btn-outline-primary btn-sm">답장</a>
 <% } %>
-<div>
-    <input type="hidden" id="message_id" name="message_id" value="<%=message.id%>">
-    <h3><%= message.title %></h3>
-    <p><%= message.message %></p>
+<div class="d-flex flex-column align-items-center">
+    <input type="hidden" id="message_id" name="message_id" value="<%= message.id %>">
+    <p class="h3 my-1"><%= message.title %></p>
+    <div class="d-flex my-2">
+        <div>
+            <% if(sender_nickname.profile_image != null) { %>
+                <img class="me-2" src="<%= sender_nickname.profile_image %>" alt="" width="64" height="64">
+            <% } else { %>
+                <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="64" height="64">
+            <% } %>
+        </div>
+        <div class="d-flex flex-column">
+            <div class="my-1">
+                <a class="text-decoration-none text-reset fw-bold"
+                   href="/profile/<%= sender_nickname.nickname %>"><%= sender_nickname.nickname %></a>
+                <span><%= sender_nickname.toJSON().grade %></span>
+                <% if(sender_nickname.id !== user.id) { %>
+                    <a class="text-decoration-none badge bg-light text-dark" href='#'
+                       onclick="window.open('/message/write?target_nickname=<%= sender_nickname.nickname %>','<%= sender_nickname.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">답장</a>
+                <% } %>
+            </div>
+            <div class="my-1">
+                <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                <% const date = new Date(message.created_at - offset) %>
+                <span class="text-secondary"><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex flex-column">
+        <div class="content my-1">
+            <%- message.message %>
+        </div>
+    </div>
 </div>
-<a href="#" id="delete">삭제</a>
+<a href="#" id="delete" class="btn btn-outline-danger btn-sm">삭제</a>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     delete_tag = document.querySelector("#delete");
@@ -30,5 +64,4 @@
     });
 </script>
 </body>
-
 </html>
