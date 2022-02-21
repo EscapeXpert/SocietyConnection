@@ -5,107 +5,138 @@
     <title><%= title %>의 수신함</title>
 </head>
 <body>
-<a href="/message/send">보낸 쪽지함</a>
-<% if(filter === "is_not_read") { %>
-    <a href="/message/receive">수신함 목록</a>
-<% } else { %>
-    <a href="/message/receive?filter=is_not_read">안읽은 쪽지</a>
-<% } %>
-<div>
-    <ul>
-        <li>
-            <span>체크</span>
-            <span>날짜</span>
-            <span>읽음</span>
-            <span>보낸 사람</span>
-            <span>제목</span>
-        </li>
-    </ul>
-</div>
-
-<div>
-    <ol>
+<style>
+    .btn-info, .btn-info:hover, .btn-info:active, .btn-info:visited {
+        background-color:rgba(207, 226, 255, 1.0);
+    }
+    .btn-outline-info:hover {
+        background-color:rgba(207, 226, 255, 1.0);
+    }
+</style>
+<div class="d-flex justify-content-center mx-2">
+    <table class="table table-responsive table-borderless table-hover">
+        <thead>
+        <tr class="table-primary">
+            <th class="text-center" style="width:7%" scope="col">
+                <input type="checkbox" id="selectall" name="selectall" value="selectall">
+            </th>
+            <th class="text-center" scope="col">제목</th>
+            <th class="text-center" style="width:20%" scope="col">보낸 사람</th>
+            <th class="text-center" style="width:20%" scope="col">날짜</th>
+        </tr>
+        </thead>
+        <tbody>
         <% for(var message of messages) { %>
             <% if (filter === "is_not_read" && message.is_read == true) {
                 continue
             } %>
-            <li>
-            <span>
-                <input type="checkbox" id="check" name="check" value="<%= message.id %>">
-            </span>
-                <span>
+            <% if(message.is_read === false) { %>
+                <tr class="text-primary">
+                    <th class="text-center" style="width:7%" scope="row">
+                        <input type="checkbox" id="check" name="check" value="<%= message.id %>">
+                    </th>
+                    <td>
+                        <div class="title">&nbsp
+                            <a class="text-decoration-none text-reset"
+                               href="/message/<%= message.id %>?type=receive"><%= message.title %></a>
+                        </div>
+                    </td>
+                    <td style="width:15%">&nbsp<a class="text-decoration-none text-reset"
+                                                  href="/profile/<%= message.User.nickname %>"><%= message.User.nickname %></a>
+                    </td>
                     <% const date = new Date(message.created_at) %>
                     <% const current_date = new Date() %>
                     <% const offset = new Date().getTimezoneOffset() * 60000 %>
                     <% const date_string = new Date(message.created_at - offset).toISOString() %>
                     <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
-                        <span><%= date_string.slice(11, 16)%></span>
-                    <% } else if(date.getFullYear() === current_date.getFullYear()){ %>
-                        <span><%= date_string.slice(5, 10) %></span>
+                        <td class="text-center" style="width:10%"><%= date_string.slice(11, 16) %></td>
+                    <% } else if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth()){ %>
+                        <td class="text-center" style="width:10%"><%= date_string.slice(5, 10) %></td>
                     <% } else { %>
-                        <span><%= date_string.slice(0, 10)%></span>
+                        <td class="text-center" style="width:10%"><%= date_string.slice(0, 10) %></td>
                     <% } %>
-                </span>
-                <span>
-                    <% if(message.is_read == false) { %>
-                        읽지 않음
+                </tr>
+            <% } else { %>
+                <tr>
+                    <th class="text-center" style="width:7%" scope="row">
+                        <input type="checkbox" id="check" name="check" value="<%= message.id %>">
+                    </th>
+                    <td>
+                        <div class="title">&nbsp
+                            <a class="text-decoration-none text-reset"
+                               href="/message/<%= message.id %>?type=receive"><%= message.title %></a>
+                        </div>
+                    </td>
+                    <td style="width:15%">&nbsp<a class="text-decoration-none text-reset"
+                                                  href="/profile/<%= message.User.nickname %>"><%= message.User.nickname %></a>
+                    </td>
+                    <% const date = new Date(message.created_at) %>
+                    <% const current_date = new Date() %>
+                    <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                    <% const date_string = new Date(message.created_at - offset).toISOString() %>
+                    <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                        <td class="text-center" style="width:10%"><%= date_string.slice(11, 16) %></td>
+                    <% } else if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth()){ %>
+                        <td class="text-center" style="width:10%"><%= date_string.slice(5, 10) %></td>
                     <% } else { %>
-                        읽음
+                        <td class="text-center" style="width:10%"><%= date_string.slice(0, 10) %></td>
                     <% } %>
-                </span>
-                <span>
-                    <a href="/profile/<%= message.User.nickname%>"><%= message.User.nickname%></a>
-                </span>
-                <span>
-                    <a href="/message/<%= message.id %>?type=receive"><%= message.title %></a>
-                </span>
-            </li>
+                </tr>
+            <% } %>
         <% } %>
-    </ol>
-
+        </tbody>
+    </table>
 </div>
-<div>
-    <% const max_page = parseInt(parseInt(message_count / 10) + Math.ceil((message_count % 10)/10))%>
+
+<div class="d-flex justify-content-center mb-3">
+    <% const max_page = parseInt(parseInt(message_count / 10) + Math.ceil((message_count % 10) / 10)) %>
     <% const start_page = Math.floor((parseInt(page) - 1) / 10) * 10 + 1 %>
     <% if (start_page != 1) { %>
-        <a href="/message/receive?page=<%= start_page - 10 %>">이전</a>
+        <a class="mx-1 text-decoration-none"
+           href="/message/receive?page=<%= start_page - 10 %>"><</a>
     <% } %>
     <% for(let i = start_page; (i < start_page + 10) && i <= max_page; i++) { %>
-        <a href="/message/receive?page=<%= i %>"><%= i %></a>
+        <% if(i === parseInt(page)) { %>
+            <a class="mx-1 text-decoration-none text-black btn btn-info rounded-circle border border-0"
+               href="/message/receive?page=<%= i %>"><%= i %></a>
+        <% } else { %>
+            <a class="mx-1 text-decoration-none text-black btn btn-outline-info rounded-circle border border-0"
+               href="/message/receive?page=<%= i %>"><%= i %></a>
+        <% } %>
     <% } %>
     <% if ((start_page + 10) <= max_page) { %>
-    <a href="/message/receive?page=<%= start_page + 10 %>">다음</a>
+        <a class="mx-1 text-decoration-none"
+           href="/message/receive?page=<%= start_page + 10 %>">></a>
     <% } %>
 </div>
 <div>
     <a href='#'
-       onclick="window.open('/message/write','message','status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지
+       onclick="window.open('/message/write','message','status=no, toolbar=no, menubar=no, width=400, height=300');return false" class="btn btn-outline-primary btn-sm">쪽지
         보내기</a>
-    <a href="#" id="delete">삭제</a>
+    <a href="#" id="delete" class="btn btn-outline-primary btn-sm">삭제</a>
 </div>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    const delete_tag = document.querySelector("#delete")
+    const delete_tag = document.querySelector("#delete");
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
         const checked = document.querySelectorAll("input#check:checked");
         const message_ids = [];
-        for(let i of checked)
-        {
+        for (let i of checked) {
             message_ids.push(i.getAttribute("value"))
         }
         await axios.post('/message/delete', {
             message_ids: message_ids
         }).then((response) => {
-            if(response.data === 'success'){
-                location.href = '/message/receive/?page=<%=page%>';
-            } else if(response.data === 'not creator'){
+            if (response.data === 'success') {
+                location.href = '/message/receive/?page=<%= page %>';
+            } else if (response.data === 'not creator') {
                 alert("자신의 쪽지만 삭제하실 수 있습니다.");
             }
         })
-        .catch((err) =>{
-            console.error(err);
-        });
+            .catch((err) => {
+                console.error(err);
+            });
     });
 </script>
 </body>

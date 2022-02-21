@@ -234,7 +234,7 @@ router.get('/:message_id', isLoggedIn, async (req, res, next) => {
         });
 
         const sender_nickname = await User.findOne({
-            attributes: ['nickname'],
+            attributes: ['id', 'nickname', 'profile_image', 'grade'],
             where: {id: message.sender_id}
         });
 
@@ -244,9 +244,13 @@ router.get('/:message_id', isLoggedIn, async (req, res, next) => {
                 id: message_id
             }
         });
+
+        res.locals.user = req.user;
         res.render("message", {
+            layout: false,
+            title: message.title,
             message: message,
-            sender_nickname: sender_nickname.nickname,
+            sender_nickname: sender_nickname,
             type: type
         });
 
