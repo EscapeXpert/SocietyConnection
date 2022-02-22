@@ -12,6 +12,17 @@ const fs = require("fs");
 const LocalStrategy = require('passport-local').Strategy;
 const router = express.Router();
 
+router.get('/introduce', async (req, res, next) => {
+    const boards = await Board.findAll({
+        attributes: ['id', 'name']
+    });
+    res.locals.user = req.user;
+    res.render('introduce', {
+        title: '동아리 소개',
+        boards: boards
+    });
+});
+
 router.get('/', async (req, res) => {
     const boards = await Board.findAll({
         attributes: ['id', 'name']
@@ -26,16 +37,16 @@ router.get('/', async (req, res) => {
     for(let MyUser_Post of MyUser.Posts){
         console.log(MyUser_Post);
     }*/
-    if(req.cookies.auto_login){
+    if (req.cookies.auto_login) {
         if (!req.isAuthenticated()) {
             const exUser = await User.findOne({where: {session_id: req.cookies.auto_login}});
-            if(exUser){
+            if (exUser) {
                 const offset = new Date().getTimezoneOffset() * 60000;
                 const now_date = new Date(Date.now() - offset);
                 const session_deadline = exUser.session_deadline;
-                if(now_date.getTime()<=session_deadline.getTime()){
-                    const user = {user : exUser};
-                    return req.login(user,async (loginError) => {
+                if (now_date.getTime() <= session_deadline.getTime()) {
+                    const user = {user: exUser};
+                    return req.login(user, async (loginError) => {
                         if (loginError) {
                             console.error(loginError);
                             return;
@@ -50,7 +61,7 @@ router.get('/', async (req, res) => {
     res.locals.boards = boards;
     const image_files = fs.readdirSync('./public/main_image');
     res.render('main', {
-        title: '메인' ,
+        title: '메인',
         User: req.user,
         boards: boards,
         image_files: image_files
