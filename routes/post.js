@@ -90,6 +90,9 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     const board_id = req.query.board_id;
     const user_id = req.user.id;
     try {
+        const boards = await Board.findAll({
+            attributes: ['id', 'name']
+        });
         const board = await Board.findOne({
             attributes: ['id', 'board_type'],
             where: {
@@ -104,8 +107,11 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                 }
             });
             if (user_id === post.creator_id) {
+                res.locals.user = req.user;
                 res.render('post_modify', {
+                    title: '게시글 수정',
                     board: board,
+                    boards: boards,
                     post: post
                 });
             } else {
@@ -120,8 +126,11 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
             });
             if (user_id === post.creator_id) {
                 if (new Date().getTime() < post.deadline.getTime()) {
+                    res.locals.user = req.user;
                     res.render('post_modify', {
+                        title: '게시글 수정',
                         board: board,
+                        boards: boards,
                         post: post
                     });
                 } else {

@@ -1,46 +1,35 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>게시글 수정</title>
-</head>
-<body>
 <form id="post_modify" action="/post/<%= post.id %>/modify" enctype="multipart/form-data" method="post">
     <input type="hidden" name="board_id" id="board_id" value="<%= board.id %>">
-    <div>
-        <label for="title"></label>
-        <input type="text" name="title" id="title" placeholder="제목을 입력해 주세요." maxlength="100"
+    <div class="my-3 mx-3">
+        <label for="title" class="form-label">제목</label>
+        <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력해 주세요." maxlength="100"
                value="<%= post.title %>" required>
     </div>
-    <div>
-        <label for="content"></label>
-        <div>
-            <label for="ir1"></label>
-            <!--textarea rows="10" cols="50" style="resize: none" name="content" id="content" placeholder="내용을 입력하세요." maxlength="1000"
-                      required></textarea-->
-            <textarea name="ir1" id="ir1" rows="10" cols="100"><%= post.content %></textarea>
-        </div>
+    <div class="mb-3 mx-3">
+        <label class="mb-2" for="ir1">내용</label>
+        <textarea name="ir1" id="ir1" rows="10" cols="100" placeholder="내용을 입력해 주세요."><%= post.content %></textarea>
     </div>
     <% if(board.board_type === 'recruitment') { %>
-        <div>
-            <label for="deadline"></label>
+        <div class="mb-3 mx-3">
+            <label class="form-label" for="deadline">마감기한</label>
             <% const offset = new Date().getTimezoneOffset() * 60000 %>
             <% const date = new Date(Date.now() - offset) %>
             <% const max_date = new Date(post.created_at - offset) %>
             <% max_date.setFullYear(max_date.getFullYear() + 1) %>
-            <input type="datetime-local" name="deadline" id="deadline" min="<%= date.toISOString().slice(0, 16) %>"
+            <input class="form-control" type="datetime-local" name="deadline" id="deadline" min="<%= date.toISOString().slice(0, 16) %>"
                    max="<%= max_date.toISOString().slice(0, 16) %>" value="<%= date.toISOString().slice(0, 16) %>"
                    required>
         </div>
     <% } %>
-    <div>
-        <input type="file" id="files" name="files" multiple>
+    <div class="mb-2 mx-3">
+        <label for="files" class="form-label">첨부파일</label>
+        <input type="file" class="form-control" id="files" name=ㅡ"files" multiple>
     </div>
-    <div>
-        <a href="#" onclick="submitContents()">등록</a>
+    <p class="mx-3 mb-3 text-secondary">파일당 50MB까지 첨부 가능합니다.</p>
+    <div class="mb-3 mx-3">
+        <a class="btn btn-primary" href="#" onclick="submitContents()">등록</a>
     </div>
 </form>
-</body>
 <script type="text/javascript" src="/public/se2/js/service/HuskyEZCreator.js" charset="utf-8"></script>
 <script type="text/javascript">
     var oEditors = [];
@@ -52,13 +41,9 @@
     });
 
     function submitContents() {
-        // 에디터의 내용이 textarea에 적용된다.
+        if(!document.getElementById('title').validity.valid)
+            return;
         oEditors.getById["ir1"].exec("UPDATE_CONTENTS_FIELD", []);
-        //const title = document.querySelector('#title').value;
-        //const content = document.querySelector('#ir1').value;
-        // 에디터의 내용에 대한 값 검증은 이곳에서
-        // document.getElementById("ir1").value를 이용해서 처리한다.
-
         try {
             document.querySelector('#post_modify').submit();
         } catch (e) {
@@ -66,4 +51,3 @@
         }
     }
 </script>
-</html>

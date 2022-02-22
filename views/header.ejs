@@ -6,7 +6,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/introduce">동아리소개</a>
                 </li>
@@ -25,115 +25,115 @@
                     <a class="nav-link" href="#">도서</a>
                 </li>
             </ul>
-        </div>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <% if(!locals.user) { %>
-                <button type="button" class="btn btn-outline-primary me-md-2" data-bs-toggle="modal"
-                        data-bs-target="#login" id="openJoinBtn">
-                    로그인
-                </button>
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#join"
-                        id="openJoinBtn">
-                    회원가입
-                </button>
-                <form id="main-form" action="/auth/login" method="post">
-                    <div class="modal fade" id="login" tabindex="-1" aria-labelledby="exampleModalLabel"
-                         aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">로그인</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="id" class="form-label">아이디</label>
-                                        <input class="form-control" id="id" name="id" type="text" maxlength="30"
-                                               required>
+            <form class="d-flex">
+                <% if(!locals.user) { %>
+                    <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal"
+                            data-bs-target="#login" id="openJoinBtn">
+                        로그인
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#join"
+                            id="openJoinBtn">
+                        회원가입
+                    </button>
+                    <form id="main-form" action="/auth/login" method="post">
+                        <div class="modal fade" id="login" tabindex="-1" aria-labelledby="exampleModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">로그인</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="password" class="form-label">비밀번호</label>
-                                        <input class="form-control" id="password" name="password" type="password"
-                                               maxlength="15"
-                                               required>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="id" class="form-label">아이디</label>
+                                            <input class="form-control" id="id" name="id" type="text" maxlength="30"
+                                                   required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label">비밀번호</label>
+                                            <input class="form-control" id="password" name="password" type="password"
+                                                   maxlength="15"
+                                                   required>
+                                        </div>
+                                        <label class="form-check-label">
+                                            <input class="form-check-input" type="checkbox" name="auto_login" value="true">자동로그인</label>
                                     </div>
-                                    <label class="form-check-label">
-                                        <input class="form-check-input" type="checkbox" name="auto_login" value="true">자동로그인</label>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                            id="closeJoinBtn">
-                                        Close
-                                    </button>
-                                    <a href="/auth/kakao">
-                                        <img width="76" height="38" src="\public\icon\kakao_login_large.png">
-                                    </a>
-                                    <button id="register_button" type="submit" class="btn btn-primary">
-                                        로그인
-                                    </button>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                id="closeJoinBtn">
+                                            Close
+                                        </button>
+                                        <a href="/auth/kakao">
+                                            <img width="76" height="38" src="\public\icon\kakao_login_large.png">
+                                        </a>
+                                        <button id="register_button" type="submit" class="btn btn-primary">
+                                            로그인
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-                <form id="join-form" action="/auth/join" method="post">
-                    <div class="modal fade" id="join" tabindex="-1" aria-labelledby="exampleModalLabel"
-                         aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">회원가입</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div>
-                                        <label for="id" class="form-label">아이디</label>
-                                        <input class="form-control" id="id" name="id" type="text"
-                                               maxlength="30" required value="">
+                    </form>
+                    <form id="join-form" action="/auth/join" method="post">
+                        <div class="modal fade" id="join" tabindex="-1" aria-labelledby="exampleModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">회원가입</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
                                     </div>
-                                    <div>
-                                        <label for="password" class="form-label">비밀번호</label>
-                                        <input class="form-control" id="password" name="password"
-                                               type="password" maxlength="15" required value="">
-                                        <div id="passwordHelpBlock" class="form-text">
-                                            비밀번호는 8자리 이상 문자, 숫자, 특수문자로 구성하여야 합니다.
+                                    <div class="modal-body">
+                                        <div>
+                                            <label for="id" class="form-label">아이디</label>
+                                            <input class="form-control" id="id" name="id" type="text"
+                                                   maxlength="30" required value="">
+                                        </div>
+                                        <div>
+                                            <label for="password" class="form-label">비밀번호</label>
+                                            <input class="form-control" id="password" name="password"
+                                                   type="password" maxlength="15" required value="">
+                                            <div id="passwordHelpBlock" class="form-text">
+                                                비밀번호는 8자리 이상 문자, 숫자, 특수문자로 구성하여야 합니다.
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label for="verify_password" class="form-label">비밀번호 확인</label>
+                                            <input class="form-control" id="verify_password"
+                                                   name="verify_password" type="password" max="15" required
+                                                   value="">
+                                        </div>
+                                        <div>
+                                            <label for="nickname" class="form-label">닉네임</label>
+                                            <input class="form-control" id="nickname" name="nickname"
+                                                   type="text" maxlength="15" required value="">
                                         </div>
                                     </div>
-                                    <div>
-                                        <label for="verify_password" class="form-label">비밀번호 확인</label>
-                                        <input class="form-control" id="verify_password"
-                                               name="verify_password" type="password" max="15" required
-                                               value="">
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                id="closeJoinBtn">
+                                            Close
+                                        </button>
+                                        <button id="register_button" type="submit" class="btn btn-primary">
+                                            회원가입
+                                        </button>
                                     </div>
-                                    <div>
-                                        <label for="nickname" class="form-label">닉네임</label>
-                                        <input class="form-control" id="nickname" name="nickname"
-                                               type="text" maxlength="15" required value="">
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                            id="closeJoinBtn">
-                                        Close
-                                    </button>
-                                    <button id="register_button" type="submit" class="btn btn-primary">
-                                        회원가입
-                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            <% } else { %>
-                <a class="btn btn-outline-primary me-md-2" href="/profile/<%= locals.user.nickname %>">프로필</a>
-                <% if(locals.user.login_type === 'kakao'){ %>
-                    <a class="btn btn-outline-primary" href="/auth/kakao_logout">로그아웃</a>
-                <% }else{ %>
-                    <a class="btn btn-outline-primary" href="/auth/logout">로그아웃</a>
+                    </form>
+                <% } else { %>
+                    <a class="btn btn-outline-primary me-2" href="/profile/<%= locals.user.nickname %>">프로필</a>
+                    <% if(locals.user.login_type === 'kakao'){ %>
+                        <a class="btn btn-outline-primary" href="/auth/kakao_logout">로그아웃</a>
+                    <% }else{ %>
+                        <a class="btn btn-outline-primary" href="/auth/logout">로그아웃</a>
+                    <% } %>
                 <% } %>
-            <% } %>
+            </div>
         </div>
     </div>
 </nav>
