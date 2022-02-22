@@ -1,10 +1,10 @@
-<div class="d-flex flex-column align-items-center">
-    <div class="container w-50">
-        <div class="d-flex my-2">
+<div class="d-flex flex-column align-items-center mx-3">
+    <div class="d-flex flex-column">
+        <div class="d-flex my-3">
             <a class="text-decoration-none text-primary " href="/board/<%= board.id %>"><%= board.name %></a>
         </div>
-        <p class="h3 my-1"><%= post.title %></p>
-        <div class="d-flex my-2">
+        <p class="h3 mb-3"><%= post.title %></p>
+        <div class="d-flex mb-3">
             <div>
                 <% if(post.User.profile_image != null) { %>
                     <img class="me-2" src="<%= post.User.profile_image %>" alt="" width="64" height="64">
@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="d-flex flex-column">
-            <div class="my-1">
+            <div class="mb-3">
                 <% if(files.length > 0) { %>
                     <p class="h5">첨부파일</p>
                 <% } %>
@@ -48,11 +48,11 @@
                     </p>
                 <% } %>
             </div>
-            <div class="content my-1">
+            <div class="content mb-3">
                 <%- post.content %>
             </div>
         </div>
-        <div class="d-flex justify-content-start my-1">
+        <div class="d-flex justify-content-start mb-3">
             <% if(post.creator_id === user.id) { %>
                 <a class="btn btn-outline-primary me-2" href="/post/<%= post.id %>/modify?board_id=<%= board.id %>"
                    id="modify">수정</a>
@@ -68,82 +68,110 @@
                 </a>
             <% } %>
         </div>
-        <div>
-            <div>
-                <a href="#" id="like">
-                    <% if(is_like == null) { %>
-                        <img src="/public/icon/red-empty-heart.svg" width="16" height="16" alt="">
+        <div class="d-flex justify-content-start mb-3">
+            <a class="text-decoration-none text-danger me-2" href="#" id="like">
+                <% if(is_like == null) { %>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-heart" viewBox="0 0 16 16">
+                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                    </svg>
+                <% } else { %>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-heart-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                              d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                    </svg>
+                <% } %>
+            </a>
+            <a href="#" class="text-decoration-none text-reset me-2" id="go_like_list">좋아요 <span
+                        class="fw-bold"><%= like_list.length %></span></a>
+            <a href="#" class="text-decoration-none text-reset" id="go_comment_list">댓글 <span
+                        class="fw-bold"><%= comment_list.length %></span></a>
+        </div>
+        <div id="like_list" class="container like_list mb-3" style="display: none">
+            <div class="row">
+                <% for(let like_user of like_list) { %>
+                    <div class="col-3 mb-2">
+                        <% if(like_user.User.profile_image != null) { %>
+                            <img class="me-2" src="<%= like_user.User.profile_image %>" alt="" width="32" height="32">
+                        <% } else { %>
+                            <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+                        <% } %>
+                        <a class="text-decoration-none text-reset" href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        <div id="comment_list" class="comment_list mb-3">
+            <p class="h5">댓글</p>
+            <% for(let comment of comment_list) { %>
+                <div id="<%= comment.id %>" class="d-flex my-1 comment_box">
+                    <% if(comment.User.profile_image != null) { %>
+                        <img class="me-2" src="<%= comment.User.profile_image %>" alt="" width="64" height="64">
                     <% } else { %>
-                        <img src="/public/icon/red-heart.svg" width="16" height="16" alt="">
+                        <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="64"
+                             height="64">
                     <% } %>
-                </a>
-                <a href="#" id="go_like_list">좋아요 <%= like_list.length %></a>
-                <a href="#" id="go_comment_list">댓글 <%= comment_list.length %></a>
-            </div>
-            <div id="like_list" class="like_list" style="display: none">
-                <ul>
-                    <% for(let like_user of like_list) { %>
-                        <li>
-                            <% if(like_user.User.profile_image != null) { %>
-                                <img src="<%= like_user.User.profile_image %>" alt="" width="32" height="32">
-                            <% } else { %>
-                                <img src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
-                            <% } %>
-                            <a href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
-                        </li>
-                    <% } %>
-                </ul>
-            </div>
-            <div id="comment_list" class="comment_list" style="display: block">
-                <p class="h5">댓글</p>
-                <ul>
-                    <% for(let comment of comment_list) { %>
-                        <li id="<%= comment.id %>" class="comment_box">
-                            <% if(comment.User.profile_image != null) { %>
-                                <img src="<%= comment.User.profile_image %>" alt="" width="32" height="32">
-                            <% } else { %>
-                                <img src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
-                            <% } %>
-                            <a href="/profile/<%= comment.User.nickname %>"><%= comment.User.nickname %></a>
-                            <p><%= comment.content %></p>
+                    <div class="d-flex flex-column">
+                        <div class="my-1">
+                            <a class="text-decoration-none text-reset fw-bold"
+                               href="/profile/<%= comment.User.nickname %>"><%= comment.User.nickname %></a>
+                        </div>
+                        <div class="my-1">
+                            <span><%= comment.content %></span>
+                        </div>
+                        <div class="my-1">
                             <% const offset = new Date().getTimezoneOffset() * 60000 %>
                             <% const date = new Date(comment.created_at - offset) %>
-                            <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
-                            <a href="#" id="open_reply_comment">답글</a>
+                            <span class="text-secondary"><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+                            <a class="text-decoration-none text-secondary" href="#" id="open_reply_comment">답글</a>
                             <% if(user.id === comment.creator_id) { %>
-                                <a href="#" id="comment_delete">삭제</a>
+                                <a class="text-decoration-none text-secondary" href="#" id="comment_delete">삭제</a>
                             <% } %>
-                        </li>
-                        <% if(reply_comment_map.has(comment.id)) { %>
-                            <% const reply_comment_list = reply_comment_map.get(comment.id) %>
-                            <% for(let reply_comment of reply_comment_list) { %>
-                                <li id="<%= reply_comment.id %>" class="reply_comment_box" style="padding-left: 30px">
-                                    <% if(reply_comment.User.profile_image != null) { %>
-                                        <img src="<%= reply_comment.User.profile_image %>" alt="" width="32"
-                                             height="32">
-                                    <% } else { %>
-                                        <img src="/public/icon/default-user-profile-image.svg" alt="" width="32"
-                                             height="32">
-                                    <% } %>
-                                    <a href="/profile/<%= reply_comment.User.nickname %>"><%= reply_comment.User.nickname %></a>
-                                    <p><%= reply_comment.content %></p>
+                        </div>
+                    </div>
+                </div>
+                <% if(reply_comment_map.has(comment.id)) { %>
+                    <% const reply_comment_list = reply_comment_map.get(comment.id) %>
+                    <% for(let reply_comment of reply_comment_list) { %>
+                        <div id="<%= reply_comment.id %>" class="d-flex my-1 ps-5 reply_comment_box">
+                            <% if(reply_comment.User.profile_image != null) { %>
+                                <img class="me-2" src="<%= reply_comment.User.profile_image %>" alt="" width="64"
+                                     height="64">
+                            <% } else { %>
+                                <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt=""
+                                     width="64"
+                                     height="64">
+                            <% } %>
+                            <div class="d-flex flex-column">
+                                <div class="my-1">
+                                    <a class="text-decoration-none text-reset fw-bold"
+                                       href="/profile/<%= reply_comment.User.nickname %>"><%= reply_comment.User.nickname %></a>
+                                </div>
+                                <div class="my-1">
+                                    <span><%= reply_comment.content %></span>
+                                </div>
+                                <div class="my-1">
                                     <% const offset = new Date().getTimezoneOffset() * 60000 %>
                                     <% const date = new Date(reply_comment.created_at - offset) %>
-                                    <span><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
-                                    <a href="#" id="open_reply_comment">답글</a>
+                                    <span class="text-secondary"><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+                                    <a class="text-decoration-none text-secondary" href="#"
+                                       id="open_reply_comment">답글</a>
                                     <% if(user.id === comment.creator_id) { %>
-                                        <a href="#" id="reply_comment_delete">삭제</a>
+                                        <a class="text-decoration-none text-secondary" href="#"
+                                           id="reply_comment_delete">삭제</a>
                                     <% } %>
-                                </li>
-                            <% } %>
-                        <% } %>
+                                </div>
+                            </div>
+                        </div>
                     <% } %>
-                </ul>
-                <label class="form-label" for="comment_content"><%= user.nickname %></label>
-                <textarea class="form-control mb-3" name="comment_content" id="comment_content" placeholder="댓글을 남겨보세요." rows="5" cols="50"></textarea>
-                <div class="comment_button_box">
-                    <a class="btn btn-primary" href="#" id="submit_comment">등록</a>
-                </div>
+                <% } %>
+            <% } %>
+            <label class="form-label" for="comment_content"><%= user.nickname %></label>
+            <textarea class="form-control mb-2" name="comment_content" id="comment_content" placeholder="댓글을 남겨보세요."
+                      rows="5" cols="50" style="resize: none"></textarea>
+            <div class="comment_button_box mb-2">
+                <a class="btn btn-outline-primary" href="#" id="submit_comment">등록</a>
             </div>
         </div>
     </div>
@@ -208,7 +236,7 @@
     comment_delete_tags.forEach(comment_delete_tag => {
         comment_delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
-            const comment_id = comment_delete_tag.parentElement.id;
+            const comment_id = comment_delete_tag.parentElement.parentElement.parentElement.id;
             await axios.post(`/post/<%= post.id %>/comment/${comment_id}/delete`)
                 .then((response) => {
                     if (response.data === 'success') {
@@ -250,29 +278,30 @@
                 reply_comment_tag.remove();
             }
             let comment_id;
-            let reply_comment_box_tag = open_reply_comment_tag.parentElement;
+            let reply_comment_box_tag = open_reply_comment_tag.parentElement.parentElement.parentElement;
             while (true) {
-                if (reply_comment_box_tag.className === 'comment_box') {
+                console.log(reply_comment_box_tag.classList);
+                if (reply_comment_box_tag.classList.contains('comment_box')) {
                     comment_id = reply_comment_box_tag.id;
                     break;
                 }
                 reply_comment_box_tag = reply_comment_box_tag.previousElementSibling;
             }
-            let new_li_tag = document.createElement('li');
-            new_li_tag.id = 'reply_comment';
-            new_li_tag.innerHTML = '' +
-                '<label for="reply_comment_content"></label>' +
-                '<textarea name="reply_comment_content" id="reply_comment_content" placeholder="답글을 남겨주세요." rows="5" cols="50" style="resize: none" "></textarea>' +
-                '<div class="reply_comment_button_box">' +
-                '<a href="#" id="reply_comment_close">취소 </a>' +
-                '<a href="#" id="submit_reply_comment">등록</a>' +
+            let new_div_tag = document.createElement('div');
+            new_div_tag.id = 'reply_comment';
+            new_div_tag.innerHTML = '' +
+                '<label class="form-label" for="reply_comment_content"><%= user.nickname %></label>' +
+                '<textarea class="form-control mb-2" name="reply_comment_content" id="reply_comment_content" placeholder="답글을 남겨주세요." rows="5" cols="50" style="resize: none" "></textarea>' +
+                '<div class="reply_comment_button_box mb-2">' +
+                '<a class="btn btn-outline-primary me-2" href="#" id="reply_comment_close">취소 </a>' +
+                '<a class="btn btn-outline-primary" href="#" id="submit_reply_comment">등록</a>' +
                 '</div>';
-            open_reply_comment_tag.parentElement.after(new_li_tag)
+            open_reply_comment_tag.parentElement.after(new_div_tag)
 
             const reply_comment_close_tag = document.querySelector('#reply_comment_close');
             reply_comment_close_tag.addEventListener('click', function (event) {
                 event.preventDefault();
-                new_li_tag.remove();
+                new_div_tag.remove();
                 is_open_reply_comment = false;
             });
 
@@ -300,7 +329,7 @@
     reply_comment_delete_tags.forEach(reply_comment_delete_tag => {
         reply_comment_delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
-            const reply_comment_id = reply_comment_delete_tag.parentElement.id;
+            const reply_comment_id = reply_comment_delete_tag.parentElement.parentElement.parentElement.id;
             await axios.post(`/post/<%= post.id %>/reply_comment/${reply_comment_id}/delete`)
                 .then((response) => {
                     if (response.data === 'success') {
@@ -334,4 +363,3 @@
     });
     <% } %>
 </script>
-</html>
