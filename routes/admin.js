@@ -6,6 +6,7 @@ const Grade = require("../models/grade");
 const bcrypt = require("bcrypt");
 const {Op} = require("sequelize");
 const Board = require("../models/board");
+const {sequelize} = require("../models");
 const router = express.Router();
 
 router.get('/', isLoggedIn, async (req, res) => {
@@ -16,10 +17,12 @@ router.get('/', isLoggedIn, async (req, res) => {
         attributes: ['id', 'name']
     });
     const UserList = await User.findAll({
-        where: { id: {
+        where: {
+            id: {
                 [Op.not]: req.user.id
             }
-        }
+        },
+        order: [['is_delete', 'ASC'], ['grade', 'ASC']]
     });
     const GradeList = await Grade.findAll({
         order: [['id']]

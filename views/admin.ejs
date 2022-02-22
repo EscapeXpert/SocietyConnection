@@ -37,7 +37,12 @@
                             </thead>
                             <tbody>
                             <% for(let User of UserList) { %>
-                                <tr>
+                                <% if(User.is_delete === true){ %>
+                                    <tr class="table-danger">
+                                <% }else{ %>
+                                    <tr>
+                                <% } %>
+
                                     <td><%= User.nickname %></td>
                                     <td><%= User.sns_id %></td>
                                     <td><%= User.name %></td>
@@ -46,10 +51,14 @@
                                     <% }else{ %>
                                         <td><%= User.birth_date %></td>
                                     <% } %>
-                                    <% if(User.gender){ %>
-                                        <td>남자</td>
+                                    <% if(User.gender === null){ %>
+                                        <td>설정안함</td>
                                     <% }else{ %>
-                                        <td>여자</td>
+                                        <% if(User.gender === true){ %>
+                                            <td>남자</td>
+                                        <% }else{ %>
+                                                <td>여자</td>
+                                        <% } %>
                                     <% } %>
                                     <td><%= User.introduce %></td>
                                     <% if(User.profile_image){ %>
