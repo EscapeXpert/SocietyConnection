@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {sequelize, Message, User} = require('../models');
+const {sequelize, Message, User, Post, Recruitment, Applicant, Comment, ReplyComment} = require('../models');
 const {Op} = require('sequelize');
 const {isLoggedIn} = require("./middlewares");
 const Board = require("../models/board");
+const moment = require("moment");
 
 router.get('/write', isLoggedIn, async (req, res, next) => {
     const target_nickname = req.query.target_nickname;
@@ -259,5 +260,96 @@ router.get('/:message_id', isLoggedIn, async (req, res, next) => {
         next(err);
     }
 })
+
+
+router.get('/profile/:user_nickname', isLoggedIn, async (req, res, next) => {
+    const req_params_user_nickname = req.params.user_nickname;
+    const Find_User = await User.findOne({where: {nickname: req_params_user_nickname}});
+    const birth =  moment(Find_User.birth_date).format('YYYY-MM-DD')
+    const user_id = req.user.id;
+
+    try {
+        const boards = await Board.findAll({
+            attributes: ['id', 'name']
+        });
+
+        const not_read_message = await Message.count({
+            where:{
+                receiver_id: user_id,
+                is_read: false
+            }
+        });
+        const MyPostList = await Post.findAll({
+            attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'creator_id','board_id',[
+                sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
+            ]],
+            where: {creator_id: req_params_user_nickname},
+            include: {
+                model: User,
+                attributes: ['nickname']
+            }
+        });
+        const MyRecruitmentList = await Recruitment.findAll({
+            where: {creator_id: req_params_user_nickname},
+            include: {
+                model: User,
+                attributes: ['nickname']
+            }
+        });
+        const MyApplicantList = await Applicant.findAll({
+            where: {user_id: req_params_user_nickname},
+            include: {
+                model: Recruitment,
+                attributes: ['id','title','creator_id','board_id'],
+                include: {
+                    model: User,
+                    attributes: ['nickname']
+                }
+            }
+        });
+        const MyCommentList = await Comment.findAll({
+            where: {creator_id: req_params_user_nickname},
+            include: {
+                model: Post,
+                attributes: ['id','title','creator_id','board_id'],
+                include: {
+                    model: User,
+                    attributes: ['nickname']
+                }
+            }
+        });
+        const MyReplyCommentList = await ReplyComment.findAll({
+            where: {creator_id: req_params_user_nickname},
+            include: {
+                model: Comment,
+                include:{
+                    model: Post,
+                    attributes: ['id','title','creator_id','board_id'],
+                    include: {
+                        model: User,
+                        attributes: ['nickname']
+                    }
+                }
+            }
+        });
+        res.locals.user = req.user;
+        res.render('profile', {
+            layout:false,
+            title: '프로필',
+            boards: boards,
+            User: Find_User,
+            birth : birth,
+            not_read_message: not_read_message,
+            MyPostList : MyPostList,
+            MyRecruitmentList : MyRecruitmentList,
+            MyApplicantList : MyApplicantList,
+            MyCommentList : MyCommentList,
+            MyReplyCommentList : MyReplyCommentList
+        });
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
+});
 
 module.exports = router;
