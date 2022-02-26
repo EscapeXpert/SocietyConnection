@@ -1,45 +1,70 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title><%= post.title %></title>
-</head>
-<body>
-<a href="/board/<%= board.id %>"><%= board.name %></a>
-
-<div>
-    <% if(post.User.profile_image != null) { %>
-        <img src="<%= post.User.profile_image %>" alt="" width="32" height="32">
-    <% } else { %>
-        <img src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
-    <% } %>
-    <a href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
-    <span><%= post.toJSON().grade %></span>
-    <% if(post.creator_id !== user.id) { %>
-        <a href='#'
-           onclick="window.open('/message/write?target_nickname=<%= post.User.nickname %>','<%= post.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
-    <% } %>
-</div>
-<div>
-    <div>
-        <h3><%= post.title %></h3>
-        <div>
-            <% if(files.length > 0) {%>
-                <p>첨부파일</p>
-            <%}%>
-            <ul>
-                <% for(file of files) { %>
-                    <li><a href="<%= file.file_path %>" download="<%= file.file_name %>"><%= file.file_name %></a></li>
+<div class="d-flex flex-column align-items-center mx-3">
+    <div class="d-flex flex-column">
+        <div class="d-flex my-3">
+            <a class="text-decoration-none text-primary" href="/board/<%= board.id %>"><%= board.name %></a>
+        </div>
+        <p class="h3 mb-3"><%= post.title %></p>
+        <div class="d-flex mb-3">
+            <div>
+                <% if(post.User.profile_image != null) { %>
+                    <img class="me-2" src="<%= post.User.profile_image %>" alt="" width="32" height="32">
+                <% } else { %>
+                    <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
                 <% } %>
-            </ul>
+            </div>
+            <div class="d-flex flex-column">
+                <div class="my-1">
+                    <a class="text-decoration-none text-reset fw-bold"
+                       href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
+                    <span><%= post.toJSON().grade %></span>
+                    <% if(post.creator_id !== user.id) { %>
+                        <a href='#' class="text-decoration-none badge bg-light text-dark"
+                           onclick="window.open('/message/write?target_nickname=<%= post.User.nickname %>','<%= post.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
+                    <% } %>
+                </div>
+                <div class="my-1">
+                    <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                    <% const date = new Date(post.created_at - offset) %>
+                    <span class="text-secondary"><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+                    <span class="text-secondary">조회&nbsp<%= post.view_count %></span>
+                </div>
+            </div>
         </div>
-        <div class="content">
-            <%-post.content%>
+        <div class="d-flex flex-column">
+            <div class="mb-3">
+                <p class="h5">마감기한</p>
+                <% const offset1 = new Date().getTimezoneOffset() * 60000 %>
+                <% const date_string = new Date(post.deadline - offset1).toISOString() %>
+                <span><%= date_string.slice(0, 16).replace('T', ' ') %></span>
+            </div>
+            <div class="mb-3">
+                <% if(files.length > 0) { %>
+                    <p class="h5">첨부파일</p>
+                <% } %>
+                <% for(file of files) { %>
+                    <p>
+                        <a class="btn btn-primary" href="<%= file.file_path %>" download="<%= file.file_name %>">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-download" viewBox="0 0 16 16">
+                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                            </svg>
+                            &nbsp<%= file.file_name %>
+                        </a>
+                    </p>
+                <% } %>
+            </div>
+            <div class="content mb-3">
+                <%- post.content %>
+            </div>
         </div>
-        <span>마감기한</span>
-        <% const offset = new Date().getTimezoneOffset() * 60000 %>
-        <% const date_string = new Date(post.deadline - offset).toISOString() %>
-        <span><%= date_string.slice(0, 16).replace('T', ' ') %></span>
+        <div class="d-flex justify-content-start mb-3">
+            <% if(post.creator_id === user.id) { %>
+                <a class="btn btn-outline-primary me-2" href="/post/<%= post.id %>/modify?board_id=<%= board.id %>"
+                   id="modify">수정</a>
+                <a class="btn btn-outline-danger me-2" href="#" id="delete">삭제</a>
+            <% } %>
+        </div>
     </div>
 </div>
 <% if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime() ) { %>
@@ -74,7 +99,8 @@
                     <% for(var applicant of applicants) { %>
                         <li>
                 <span>
-                    <input type="checkbox" id="check" name="check" value="<%= applicant.id %>"
+                    <label for="check"></label><input type="checkbox" id="check" name="check"
+                                                      value="<%= applicant.id %>"
                     <% if(applicant.is_accepted === true) { %> checked
                             <% } %>
                     >
@@ -92,7 +118,6 @@
         <% } %>
     <% } %>
 </div>
-</body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     <% if(post.creator_id === user.id) { %>
@@ -102,10 +127,10 @@
         event.preventDefault();
         const checked = document.querySelectorAll("input#check:checked");
         const applicant_ids = [];
-        for(let i of checked){
+        for (let i of checked) {
             applicant_ids.push(i.getAttribute("value"))
         }
-        window.open(`/post/<%=post.id%>/apply/complete?applicant_id=` + applicant_ids, '<%= post.id%>', 'status=no, toolbar=no, menubar=no, width=600, height=500');
+        window.open(`/post/<%= post.id %>/apply/complete?applicant_id=` + applicant_ids, '<%= post.id %>', 'status=no, toolbar=no, menubar=no, width=600, height=500');
 
     });
 
