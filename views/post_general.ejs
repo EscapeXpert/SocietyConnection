@@ -1,3 +1,6 @@
+<style>
+    p {word-break: break-all}
+</style>
 <div class="d-flex flex-column align-items-center mx-3">
     <div class="d-flex flex-column">
         <div class="d-flex my-3">
@@ -91,7 +94,15 @@
         <div id="like_list" class="container like_list mb-3" style="display: none">
             <div class="row">
                 <% for(let like_user of like_list) { %>
-                    <div class="col-3 mb-2">
+                    <div class="d-none d-md-block col-4 mb-2">
+                        <% if(like_user.User.profile_image != null) { %>
+                            <img class="me-2" src="<%= like_user.User.profile_image %>" alt="" width="32" height="32">
+                        <% } else { %>
+                            <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+                        <% } %>
+                        <a class="text-decoration-none text-reset" href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
+                    </div>
+                    <div class="d-md-none col-6 mb-2">
                         <% if(like_user.User.profile_image != null) { %>
                             <img class="me-2" src="<%= like_user.User.profile_image %>" alt="" width="32" height="32">
                         <% } else { %>
@@ -157,7 +168,7 @@
                                     <span class="text-secondary"><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
                                     <a class="text-decoration-none text-secondary" href="#"
                                        id="open_reply_comment">답글</a>
-                                    <% if(user.id === comment.creator_id) { %>
+                                    <% if(user.id === reply_comment.creator_id) { %>
                                         <a class="text-decoration-none text-secondary" href="#"
                                            id="reply_comment_delete">삭제</a>
                                     <% } %>
@@ -169,7 +180,7 @@
             <% } %>
             <label class="form-label" for="comment_content"><%= user.nickname %></label>
             <textarea class="form-control mb-2" name="comment_content" id="comment_content" placeholder="댓글을 남겨보세요."
-                      rows="5" cols="50" style="resize: none"></textarea>
+                      rows="5" cols="30" style="resize: none"></textarea>
             <div class="comment_button_box mb-2">
                 <a class="btn btn-outline-primary" href="#" id="submit_comment">등록</a>
             </div>
