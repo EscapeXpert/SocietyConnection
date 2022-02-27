@@ -27,26 +27,24 @@
     </div>
 </div>
 <div class="d-sm-none">
-    <div class="d-flex flex-column mx-3">
-        <form class="d-flex my-3">
-            <% if(board.board_type === 'general') { %>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_created_at">최신순</a>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_like">추천순</a>
-            <% } else if(board.board_type === 'recruitment') { %>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_created_at">최신순</a>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_deadline">마감기한순</a>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_after_deadline">마감기한 종료</a>
-            <% } %>
-        </form>
-        <form class="d-flex mb-3">
-            <input class="form-control me-2" type="search" name="keyword" id="keyword" placeholder="검색어를 입력해주세요"
-                   aria-label="Search" required>
-            <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-    </div>
+    <form class="d-flex mx-3 my-3">
+        <% if(board.board_type === 'general') { %>
+            <a class="btn btn-outline-primary me-2" href="#" id="sort_by_created_at_m">최신순</a>
+            <a class="btn btn-outline-primary me-2" href="#" id="sort_by_like_m">추천순</a>
+        <% } else if(board.board_type === 'recruitment') { %>
+            <a class="btn btn-outline-primary me-2" href="#" id="sort_by_created_at_m">최신순</a>
+            <a class="btn btn-outline-primary me-2" href="#" id="sort_by_deadline_m">마감기한순</a>
+            <a class="btn btn-outline-primary me-2" href="#" id="sort_by_after_deadline_m">마감기한 종료</a>
+        <% } %>
+    </form>
+    <form class="d-flex mx-3 mb-3">
+        <input class="form-control me-2" type="search" name="keyword" id="keyword_m" placeholder="검색어를 입력해주세요"
+               aria-label="Search" required>
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
 </div>
 
-<div class="d-flex justify-content-center mx-3 mb-3">
+<div class="d-flex d-none d-md-block justify-content-center mx-3 mb-3">
     <table class="table table-responsive table-borderless table-hover">
         <thead>
         <tr class="table-primary">
@@ -78,7 +76,7 @@
                         <% if(board.board_type === 'general') { %>
                             <% if(post.comment_count > 0) { %>
                                 <a class="text-decoration-none text-danger"
-                                   href="/post/<%= post.id %>?board_id=<%= board.id %>#commnet_list">
+                                   href="/post/<%= post.id %>?board_id=<%= board.id %>#comment_list">
                                     [<%= post.comment_count %>]
                                 </a>
                             <% } %>
@@ -112,6 +110,44 @@
         </tbody>
     </table>
 </div>
+<div class="d-flex d-md-none flex-column justify-content-center mx-3 mb-3">
+    <table class="table table-responsive table-hover">
+        <tbody>
+        <% for(let post of posts) { %>
+            <tr>
+                <td>
+                    <div onclick="location.href = `/post/<%= post.id %>?board_id=<%= board.id %>`" class="d-flex my-1">
+                        <div class="d-flex flex-column me-2">
+                            <div class="my-1">
+                                <% if(board.board_type === 'general' && post.is_notice) { %>
+                                    <span class="badge bg-primary">공지</span>
+                                <% } %>
+                                <span class="text-decoration-none text-reset fw-bold"><%= post.title %></span>
+                            </div>
+                            <div class="my-1">
+                                <span><%= post.User.nickname %></span>
+                                <% const date = new Date(post.created_at) %>
+                                <% const current_date = new Date() %>
+                                <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                                <% const date_string = new Date(post.created_at - offset).toISOString() %>
+                                <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                                    <span><%= date_string.slice(11, 16) %></span>
+                                <% } else if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth()){ %>
+                                    <span><%= date_string.slice(5, 10) %></span>
+                                <% } else { %>
+                                    <span><%= date_string.slice(0, 10) %></span>
+                                <% } %>
+                                <span>조회</span>
+                                <sapn><%= post.view_count %></sapn>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        <% } %>
+        </tbody>
+    </table>
+</div>
 <div class="d-flex justify-content-center mb-3">
     <% let max_page %>
     <% max_page = parseInt(parseInt(post_count / 10) + Math.ceil((post_count % 10) / 10)) %>
@@ -140,34 +176,52 @@
 <input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
 <input type="hidden" id="board_type" name="board_type" value="<%= board.board_type %>">
 <input type="hidden" id="keyword" name="keyword" value="<%= keyword %>">
+<input type="hidden" id="keyword_m" name="keyword" value="<%= keyword %>">
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     const board_id = document.querySelector('#board_id').value;
     const board_type = document.querySelector('#board_type').value;
     const keyword = document.querySelector('#keyword').value;
+    const keyword_m = document.querySelector('#keyword_m').value;
+    console.log(keyword);
+    console.log(keyword_m);
     const sort_by_create_tag = document.querySelector('#sort_by_created_at');
     sort_by_create_tag.addEventListener('click', async function (event) {
         event.preventDefault();
         location.href = `/board/${board_id}/?sort=created_at&keyword=${keyword}`;
     });
+    const sort_by_create_m_tag = document.querySelector('#sort_by_created_at_m');
+    sort_by_create_m_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        location.href = `/board/${board_id}/?sort=created_at&keyword=${keyword_m}`;
+    });
 
     if (board_type === 'general') {
         const sort_by_like_tag = document.querySelector('#sort_by_like');
         sort_by_like_tag.addEventListener('click', async function (event) {
+                event.preventDefault();
+                location.href = `/board/${board_id}/?sort=like&keyword=${keyword}`;
+            });
+
+        const sort_by_like_m_tag = document.querySelector('#sort_by_like_m');
+        sort_by_like_m_tag.addEventListener('click', async function (event) {
             event.preventDefault();
-            location.href = `/board/${board_id}/?sort=like&keyword=${keyword}`;
+            location.href = `/board/${board_id}/?sort=like&keyword=${keyword_m}`;
         });
     } else if (board_type === 'recruitment') {
-        const sort_by_deadline_tag = document.querySelector('#sort_by_deadline');
-        sort_by_deadline_tag.addEventListener('click', async function (event) {
-            event.preventDefault();
-            location.href = `/board/${board_id}/?sort=deadline&keyword=${keyword}`;
+        const sort_by_deadline_tags = document.querySelectorAll('#sort_by_deadline');
+        sort_by_deadline_tags.forEach(sort_by_deadline_tag => {
+            sort_by_deadline_tag.addEventListener('click', async function (event) {
+                event.preventDefault();
+                location.href = `/board/${board_id}/?sort=deadline&keyword=${keyword}`;
+            });
         });
-
-        const sort_by_after_deadline_tag = document.querySelector('#sort_by_after_deadline');
-        sort_by_after_deadline_tag.addEventListener('click', async function (event) {
-            event.preventDefault();
-            location.href = `/board/${board_id}/?sort=after_deadline&keyword=${keyword}`;
+        const sort_by_after_deadline_tags = document.querySelectorAll('#sort_by_after_deadline');
+        sort_by_after_deadline_tags.forEach(sort_by_after_deadline_tag => {
+            sort_by_after_deadline_tag.addEventListener('click', async function (event) {
+                event.preventDefault();
+                location.href = `/board/${board_id}/?sort=after_deadline&keyword=${keyword}`;
+            });
         });
     }
 
