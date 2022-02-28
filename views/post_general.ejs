@@ -2,9 +2,24 @@
     p {
         word-break: break-all
     }
+    a {
+        word-break: keep-all;
+    }
 </style>
-<div class="d-flex flex-column align-items-center mx-3">
-    <div class="d-flex flex-column">
+<div class="d-flex">
+    <div class="d-flex flex-column ms-3 d-none d-sm-block">
+        <div class="my-3 bg-primary bg-opacity-10 rounded-3">
+            <% for(let board of boards) { %>
+                <div class="mx-5 my-3">
+                    <a class="text-decoration-none text-reset fw-bold "
+                       href="/board/<%= board.id %>"><%= board.name %></a>
+                </div>
+            <% } %>
+        </div>
+        <div>
+        </div>
+    </div>
+    <div class="d-flex flex-column mx-3">
         <div class="d-flex my-3">
             <a class="text-decoration-none text-primary" href="/board/<%= board.id %>"><%= board.name %></a>
         </div>
@@ -195,7 +210,7 @@
         </div>
     </div>
 </div>
-<input type="hidden" id="board_id" name="board_id" value="<%= board.id%>">
+<input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     const board_id = document.querySelector('#board_id').value;
