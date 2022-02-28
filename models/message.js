@@ -8,7 +8,7 @@ module.exports = class Message extends Sequelize.Model {
                 allowNull: false,
             },
             message: {
-                type: Sequelize.STRING(100),
+                type: Sequelize.TEXT,
                 allowNull: false,
             },
             is_read: {
