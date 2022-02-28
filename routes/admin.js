@@ -29,6 +29,9 @@ router.get('/', isLoggedIn, async (req, res) => {
     });
     res.locals.user = req.user;
     const BoardList = await Board.findAll();
+
+    console.log(GradeList);
+
     res.render('admin', {
         title: 'admin',
         boards:boards,
@@ -87,13 +90,12 @@ router.post('/:Board_id/board_edit', isLoggedIn, async (req, res, next) => {
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
     const Board_id = req.params.Board_id;
-    const {name,min_read_grade,min_write_grade,board_type}= req.body;
+    const {name,min_read_grade,min_write_grade}= req.body;
     try {
         await Board.update({
             name : name,
             min_read_grade: min_read_grade,
-            min_write_grade : min_write_grade,
-            board_type : board_type
+            min_write_grade : min_write_grade
         }, {
             where: {id : Board_id},
         });

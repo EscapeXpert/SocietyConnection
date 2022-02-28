@@ -1,5 +1,7 @@
 <style>
-    p {word-break: break-all}
+    p {
+        word-break: break-all
+    }
 </style>
 <div class="d-flex flex-column align-items-center mx-3">
     <div class="d-flex flex-column">
@@ -59,6 +61,8 @@
             <% if(post.creator_id === user.id) { %>
                 <a class="btn btn-outline-primary me-2" href="/post/<%= post.id %>/modify?board_id=<%= board.id %>"
                    id="modify">수정</a>
+            <% } %>
+            <% if(post.creator_id === user.id || user.grade === 5) { %>
                 <a class="btn btn-outline-danger me-2" href="#" id="delete">삭제</a>
             <% } %>
             <% if(user.grade === 5) { %>
@@ -98,17 +102,21 @@
                         <% if(like_user.User.profile_image != null) { %>
                             <img class="me-2" src="<%= like_user.User.profile_image %>" alt="" width="32" height="32">
                         <% } else { %>
-                            <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+                            <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32"
+                                 height="32">
                         <% } %>
-                        <a class="text-decoration-none text-reset" href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
+                        <a class="text-decoration-none text-reset"
+                           href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
                     </div>
                     <div class="d-md-none col-6 mb-2">
                         <% if(like_user.User.profile_image != null) { %>
                             <img class="me-2" src="<%= like_user.User.profile_image %>" alt="" width="32" height="32">
                         <% } else { %>
-                            <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
+                            <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32"
+                                 height="32">
                         <% } %>
-                        <a class="text-decoration-none text-reset" href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
+                        <a class="text-decoration-none text-reset"
+                           href="/profile/<%= like_user.User.nickname %>"><%= like_user.User.nickname %></a>
                     </div>
                 <% } %>
             </div>
@@ -136,7 +144,7 @@
                             <% const date = new Date(comment.created_at - offset) %>
                             <span class="text-secondary"><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
                             <a class="text-decoration-none text-secondary" href="#" id="open_reply_comment">답글</a>
-                            <% if(user.id === comment.creator_id) { %>
+                            <% if(user.id === comment.creator_id || user.grade === 5) { %>
                                 <a class="text-decoration-none text-secondary" href="#" id="comment_delete">삭제</a>
                             <% } %>
                         </div>
@@ -168,7 +176,7 @@
                                     <span class="text-secondary"><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
                                     <a class="text-decoration-none text-secondary" href="#"
                                        id="open_reply_comment">답글</a>
-                                    <% if(user.id === reply_comment.creator_id) { %>
+                                    <% if(user.id === reply_comment.creator_id || user.grade === 5) { %>
                                         <a class="text-decoration-none text-secondary" href="#"
                                            id="reply_comment_delete">삭제</a>
                                     <% } %>
@@ -187,21 +195,22 @@
         </div>
     </div>
 </div>
+<input type="hidden" id="board_id" name="board_id" value="<%= board.id%>">
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    <% if (post.creator_id === user.id) { %>
+    const board_id = document.querySelector('#board_id').value;
+    <% if (post.creator_id === user.id || user.grade === 5) { %>
     const delete_tag = document.querySelector('#delete');
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
         await axios.post('/post/<%= post.id %>/delete', {
-            board_id: <%= board.id %>
+            board_id: board_id
         })
             .then((response) => {
                 if (response.data === 'success') {
                     location.href = '/board/<%= board.id %>';
                 } else if (response.data === 'not creator') {
                     alert("자신의 게시글만 삭제하실 수 있습니다.");
-                    history.back();
                 }
             })
             .catch((err) => {
@@ -254,7 +263,6 @@
                         location.reload();
                     } else if (response.data === 'not creator') {
                         alert("자신의 댓글만 삭제할 수 있습니다.");
-                        history.back();
                     }
                 })
                 .catch((err) => {
@@ -291,7 +299,6 @@
             let comment_id;
             let reply_comment_box_tag = open_reply_comment_tag.parentElement.parentElement.parentElement;
             while (true) {
-                console.log(reply_comment_box_tag.classList);
                 if (reply_comment_box_tag.classList.contains('comment_box')) {
                     comment_id = reply_comment_box_tag.id;
                     break;
@@ -347,7 +354,6 @@
                         location.reload();
                     } else if (response.data === 'not creator') {
                         alert("자신의 답글만 삭제할 수 있습니다.");
-                        history.back();
                     }
                 })
                 .catch((err) => {

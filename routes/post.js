@@ -37,6 +37,7 @@ router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
     const user_id = req.user.id;
+    const user_grade = req.user.grade;
     try {
         const board = await Board.findOne({
             attributes: ['board_type'],
@@ -51,7 +52,7 @@ router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
                     id: post_id,
                 }
             });
-            if (post.creator_id === user_id) {
+            if (post.creator_id === user_id || user_grade === 5) {
                 await Post.destroy({
                     where: {
                         id: post_id,
@@ -68,7 +69,7 @@ router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
                     id: post_id,
                 }
             });
-            if (post.creator_id === user_id) {
+            if (post.creator_id === user_id || user_grade === 5) {
                 await Recruitment.destroy({
                     where: {
                         id: post_id,
@@ -543,6 +544,7 @@ router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res,
         const post_id = req.params.post_id;
         const comment_id = req.params.comment_id;
         const user_id = req.user.id;
+        const user_grade = req.user.grade;
         try {
             const comment = await Comment.findOne({
                 attributes: ['creator_id'],
@@ -551,7 +553,7 @@ router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res,
                     post_id: post_id
                 }
             });
-            if (comment.creator_id === user_id) {
+            if (comment.creator_id === user_id || user_grade === 5) {
                 const post = await Post.findOne({
                     attributes: ['comment_count'],
                     where: {
@@ -621,6 +623,7 @@ router.post('/:post_id/reply_comment/:reply_comment_id/delete', isLoggedIn, asyn
     const reply_comment_id = req.params.reply_comment_id;
     const user_id = req.user.id;
     const post_id = req.params.post_id;
+    const user_grade = req.user.grade;
     try {
         const reply_comment = await ReplyComment.findOne({
             attributes: ['creator_id'],
@@ -628,7 +631,7 @@ router.post('/:post_id/reply_comment/:reply_comment_id/delete', isLoggedIn, asyn
                 id: reply_comment_id,
             }
         });
-        if (reply_comment.creator_id === user_id) {
+        if (reply_comment.creator_id === user_id || user_grade === 5) {
             await ReplyComment.destroy({
                 where: {
                     id: reply_comment_id,

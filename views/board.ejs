@@ -21,7 +21,7 @@
         </form>
         <form class="d-flex">
             <input class="form-control me-2" type="search" name="keyword" id="keyword" placeholder="검색어를 입력해주세요"
-                   aria-label="Search" required>
+                   aria-label="Search" value="<%= keyword %>" required>
             <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
     </div>
@@ -39,12 +39,12 @@
     </form>
     <form class="d-flex mx-3 mb-3">
         <input class="form-control me-2" type="search" name="keyword" id="keyword_m" placeholder="검색어를 입력해주세요"
-               aria-label="Search" required>
+               aria-label="Search" value="<%= keyword %>" required>
         <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
 </div>
 
-<div class="d-flex d-none d-md-block justify-content-center mx-3 mb-3">
+<div class="d-flex d-none d-sm-block justify-content-center mx-3 mb-3">
     <table class="table table-responsive table-borderless table-hover">
         <thead>
         <tr class="table-primary">
@@ -110,7 +110,7 @@
         </tbody>
     </table>
 </div>
-<div class="d-flex d-md-none flex-column justify-content-center mx-3 mb-3">
+<div class="d-flex d-sm-none flex-column justify-content-center mx-3 mb-3">
     <table class="table table-responsive table-hover">
         <tbody>
         <% for(let post of posts) { %>
@@ -183,8 +183,6 @@
     const board_type = document.querySelector('#board_type').value;
     const keyword = document.querySelector('#keyword').value;
     const keyword_m = document.querySelector('#keyword_m').value;
-    console.log(keyword);
-    console.log(keyword_m);
     const sort_by_create_tag = document.querySelector('#sort_by_created_at');
     sort_by_create_tag.addEventListener('click', async function (event) {
         event.preventDefault();
@@ -199,9 +197,9 @@
     if (board_type === 'general') {
         const sort_by_like_tag = document.querySelector('#sort_by_like');
         sort_by_like_tag.addEventListener('click', async function (event) {
-                event.preventDefault();
-                location.href = `/board/${board_id}/?sort=like&keyword=${keyword}`;
-            });
+            event.preventDefault();
+            location.href = `/board/${board_id}/?sort=like&keyword=${keyword}`;
+        });
 
         const sort_by_like_m_tag = document.querySelector('#sort_by_like_m');
         sort_by_like_m_tag.addEventListener('click', async function (event) {
