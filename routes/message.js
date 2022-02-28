@@ -174,7 +174,7 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
 router.post('/delete', isLoggedIn, async (req, res, next) => {
     const message_ids = req.body.message_ids;
     const user_id = req.user.id;
-    console.log(message_ids);
+    let flag = false;
     try {
         for (let message_id of message_ids) {
             const message = await Message.findOne({
@@ -184,21 +184,22 @@ router.post('/delete', isLoggedIn, async (req, res, next) => {
 
             if (user_id === message.receiver_id && user_id === message.sender_id) {
                 await Message.destroy({where: {id: message_id}});
-                res.send('success');
             } else if (user_id === message.receiver_id) {
                 await Message.update({is_receiver_delete: true}, {where: {id: message_id}});
                 if (message.is_sender_delete === true)
                     await Message.destroy({where: {id: message_id}});
-                res.send('success');
             } else if (user_id === message.sender_id) {
                 await Message.update({is_sender_delete: true}, {where: {id: message_id}});
                 if (message.is_receiver_delete === true)
                     await Message.destroy({where: {id: message_id}});
-                res.send('success');
             } else {
-                res.send('not creator');
+                flag = true;
             }
         }
+        if(flag === true)
+            res.send('not creator');
+        else
+            res.send('success');
 
     } catch (err) {
         console.error(err);

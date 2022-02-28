@@ -114,6 +114,7 @@
         const message_ids = [];
         for (let i of checked) {
             message_ids.push(i.getAttribute("value"))
+            console.log(message_ids);
         }
         await axios.post('/message/delete', {
             message_ids: message_ids

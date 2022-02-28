@@ -27,7 +27,8 @@ router.get('/:user_nickname', isLoggedIn, async (req, res, next) => {
         const not_read_message = await Message.count({
             where:{
                 receiver_id: user_id,
-                is_read: false
+                is_read: false,
+                is_receiver_delete: false
             }
         });
         const MyPostList = await Post.findAll({
