@@ -96,7 +96,7 @@ router.get('/send', isLoggedIn, async (req, res, next) => {
         res.locals.user = req.user;
         res.render("message_send", {
             layout: `layout_message.ejs`,
-            title: user.nickname,
+            title: user.nickname + '의 발신함',
             messages: messages,
             page: page,
             boards: boards,
@@ -158,7 +158,7 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
         res.locals.user = req.user;
         res.render("message_receive", {
             layout: `layout_message.ejs`,
-            title: user.nickname,
+            title: user.nickname + '의 수신함',
             messages: messages,
             filter: filter,
             boards: boards,

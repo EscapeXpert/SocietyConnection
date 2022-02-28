@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title><%= title %>의 수신함</title>
-</head>
-<body>
 <style>
     .btn-info, .btn-info:hover, .btn-info:active, .btn-info:visited {
         background-color:rgba(207, 226, 255, 1.0);
@@ -18,7 +11,7 @@
         <thead>
         <tr class="table-primary">
             <th class="text-center" style="width:7%" scope="col">
-                <input type="checkbox" id="selectall" name="selectall" value="selectall">
+                <input type="checkbox" id="select_all" name="select_all" value="select_all" onclick="selectAll(this)">
             </th>
             <th class="text-center" scope="col">제목</th>
             <th class="text-center" style="width:20%" scope="col">보낸 사람</th>
@@ -33,7 +26,7 @@
             <% if(message.is_read === false) { %>
                 <tr class="text-primary">
                     <th class="text-center" style="width:7%" scope="row">
-                        <input type="checkbox" id="check" name="check" value="<%= message.id %>">
+                        <input type="checkbox" id="check" name="check" value="<%= message.id %>" onclick="checkSelectAll()">
                     </th>
                     <td>
                         <div class="title">&nbsp
@@ -42,7 +35,7 @@
                         </div>
                     </td>
                     <td style="width:15%">&nbsp<a class="text-decoration-none text-reset"
-                                                  href="/profile/<%= message.User.nickname %>"><%= message.User.nickname %></a>
+                                                  href='#' onclick="window.open('/message/profile/<%= message.User.nickname %>', '<%= message.User.nickname%>', 'status=no, toolbar=no, menubar=no, width=500, height=700');return false"> <%= message.User.nickname %></a>
                     </td>
                     <% const date = new Date(message.created_at) %>
                     <% const current_date = new Date() %>
@@ -59,7 +52,7 @@
             <% } else { %>
                 <tr>
                     <th class="text-center" style="width:7%" scope="row">
-                        <input type="checkbox" id="check" name="check" value="<%= message.id %>">
+                        <input type="checkbox" id="check" name="check" value="<%= message.id %>" onclick="checkSelectAll()">
                     </th>
                     <td>
                         <div class="title">&nbsp
@@ -68,7 +61,7 @@
                         </div>
                     </td>
                     <td style="width:15%">&nbsp<a class="text-decoration-none text-reset"
-                                                  href="/profile/<%= message.User.nickname %>"><%= message.User.nickname %></a>
+                                                  href='#' onclick="window.open('/message/profile/<%= message.User.nickname %>', '<%= message.User.nickname%>', 'status=no, toolbar=no, menubar=no, width=500, height=700');return false"> <%= message.User.nickname %></a>
                     </td>
                     <% const date = new Date(message.created_at) %>
                     <% const current_date = new Date() %>
@@ -117,6 +110,25 @@
 </div>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
+    function checkSelectAll() {
+        const checkboxes = document.querySelectorAll('input[name="check"]');
+        const checked = document.querySelectorAll('input[name="check"]:checked');
+        const selectAll = document.querySelector('input[name="select_all"]');
+
+        if(checkboxes.length === checked.length){
+            selectAll.checked = true;
+        } else{
+            selectAll.checked = false;
+        }
+    }
+
+    function selectAll(selectAll){
+        const checkboxes = document.getElementsByName('check');
+
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = selectAll.checked
+        })
+    }
     const delete_tag = document.querySelector("#delete");
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
@@ -139,5 +151,3 @@
             });
     });
 </script>
-</body>
-</html>
