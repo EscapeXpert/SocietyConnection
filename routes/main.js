@@ -27,16 +27,6 @@ router.get('/', async (req, res) => {
     const boards = await Board.findAll({
         attributes: ['id', 'name']
     });
-    /*const MyUser = await User.findOne({
-        where: {id: 'wodon'},
-        include: {
-            model: Post,
-            where:{creator_id: 'wodon'}
-        }
-    });
-    for(let MyUser_Post of MyUser.Posts){
-        console.log(MyUser_Post);
-    }*/
     if (req.cookies.auto_login) {
         if (!req.isAuthenticated()) {
             const exUser = await User.findOne({where: {session_id: req.cookies.auto_login}});

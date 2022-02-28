@@ -334,7 +334,7 @@ router.get('/profile/:user_nickname', isLoggedIn, async (req, res, next) => {
         });
         res.locals.user = req.user;
         res.render('profile', {
-            layout:false,
+            layout: 'window_layout',
             title: '프로필',
             boards: boards,
             User: Find_User,
