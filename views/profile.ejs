@@ -38,7 +38,8 @@
                                         </div>
                                         <div class="modal-body">
                                             <div class="mb-3">
-                                                <label for="password" class="form-label">회원 탈퇴시 개인정보는 삭제되며 게시물 및 댓글은 지워지지 않습니다.</label>
+                                                <label for="password" class="form-label">회원 탈퇴시 개인정보는 삭제되며 게시물 및 댓글은
+                                                    지워지지 않습니다.</label>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -172,7 +173,7 @@
                             <% if(User.nickname === locals.user.nickname){ %>
                                 내가 쓴글
                             <% }else{ %>
-                            <%= User.nickname %>의 글
+                                <%= User.nickname %>의 글
                             <% } %>
                         </button>
                     </h2>
@@ -199,10 +200,10 @@
                                             <td><%= Post.dataValues.id %></td>
                                         <% } %>
                                         <td>
-                                            <a href="/post/<%= Post.dataValues.id %>?board_id=<%= Post.dataValues.board_id %>"><%= Post.dataValues.title %></a>
+                                            <a class="text-decoration-none text-reset" href="/post/<%= Post.dataValues.id %>?board_id=<%= Post.dataValues.board_id %>"><%= Post.dataValues.title %></a>
                                         </td>
                                         <td>
-                                            <a href="/profile/<%= Post.User.dataValues.nickname %>"><%= Post.User.dataValues.nickname %></a>
+                                            <a class="text-decoration-none text-reset" href="/profile/<%= Post.User.dataValues.nickname %>"><%= Post.User.dataValues.nickname %></a>
                                         </td>
                                         <td><%= Post.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
                                         <td><%= Post.dataValues.view_count %></td>
@@ -222,7 +223,7 @@
                             <% if(User.nickname === locals.user.nickname){ %>
                                 내가 쓴 모집글
                             <% }else{ %>
-                            <%= User.nickname %>의 모집글
+                                <%= User.nickname %>의 모집글
                             <% } %>
                         </button>
                     </h2>
@@ -245,10 +246,10 @@
                                     <tr>
                                         <td><%= Recruitment.dataValues.id %></td>
                                         <td>
-                                            <a href="/post/<%= Recruitment.dataValues.id %>?board_id=<%= Recruitment.dataValues.board_id %>"><%= Recruitment.dataValues.title %></a>
+                                            <a class="text-decoration-none text-reset" href="/post/<%= Recruitment.dataValues.id %>?board_id=<%= Recruitment.dataValues.board_id %>"><%= Recruitment.dataValues.title %></a>
                                         </td>
                                         <td>
-                                            <a href="/profile/<%= Recruitment.User.dataValues.nickname %>"><%= Recruitment.User.dataValues.nickname %></a>
+                                            <a class="text-decoration-none text-reset" href="/profile/<%= Recruitment.User.dataValues.nickname %>"><%= Recruitment.User.dataValues.nickname %></a>
                                         </td>
                                         <td><%= Recruitment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
                                         <td><%= Recruitment.dataValues.view_count %></td>
@@ -262,46 +263,44 @@
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="panelsStayOpen-headingThree">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
-                                aria-controls="panelsStayOpen-collapseThree">
-                            <% if(User.nickname === locals.user.nickname){ %>
+                <% if(User.nickname === locals.user.nickname){ %>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
+                                    aria-controls="panelsStayOpen-collapseThree">
                                 나의 지원현황
-                            <% }else{ %>
-                            <%= User.nickname %>의 지원현황
-                            <% } %>
-                        </button>
-                    </h2>
-                    <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse"
-                         aria-labelledby="panelsStayOpen-headingThree">
-                        <div class="accordion-body">
-                            <table class="table table-striped table-bordered">
-                                <thead>
-                                <tr>
-                                    <th>모집글</th>
-                                    <th>모집글 작성자</th>
-                                    <th>지원 메세지</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <% for(let Applicant of MyApplicantList){ %>
+                            </button>
+                        </h2>
+                        <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse"
+                             aria-labelledby="panelsStayOpen-headingThree">
+                            <div class="accordion-body">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
                                     <tr>
-                                        <td>
-                                            <a href="/post/<%= Applicant.Recruitment.dataValues.id %>?board_id=<%= Applicant.Recruitment.dataValues.board_id %>"><%= Applicant.Recruitment.dataValues.title %></a>
-                                        </td>
-                                        <td>
-                                            <a href="/profile/<%= Applicant.Recruitment.User.dataValues.nickname %>"><%= Applicant.Recruitment.User.dataValues.nickname %></a>
-                                        </td>
-                                        <td><%= Applicant.dataValues.message %></td>
+                                        <th>모집글</th>
+                                        <th>모집글 작성자</th>
+                                        <th>지원 메세지</th>
                                     </tr>
-                                <% } %>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    <% for(let Applicant of MyApplicantList){ %>
+                                        <tr>
+                                            <td>
+                                                <a class="text-decoration-none text-reset" href="/post/<%= Applicant.Recruitment.dataValues.id %>?board_id=<%= Applicant.Recruitment.dataValues.board_id %>"><%= Applicant.Recruitment.dataValues.title %></a>
+                                            </td>
+                                            <td>
+                                                <a class="text-decoration-none text-reset" href="/profile/<%= Applicant.Recruitment.User.dataValues.nickname %>"><%= Applicant.Recruitment.User.dataValues.nickname %></a>
+                                            </td>
+                                            <td><%= Applicant.dataValues.message %></td>
+                                        </tr>
+                                    <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
+                <% } %>
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingFour">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -310,7 +309,7 @@
                             <% if(User.nickname === locals.user.nickname){ %>
                                 내가 쓴 댓글
                             <% }else{ %>
-                            <%= User.nickname %>의 댓글
+                                <%= User.nickname %>의 댓글
                             <% } %>
                         </button>
                     </h2>
@@ -329,10 +328,10 @@
                                 <% for(let Comment of MyCommentList){ %>
                                     <tr>
                                         <td>
-                                            <a href="/post/<%= Comment.Post.dataValues.id %>?board_id=<%= Comment.Post.dataValues.board_id %>"><%= Comment.Post.dataValues.title %></a>
+                                            <a class="text-decoration-none text-reset" href="/post/<%= Comment.Post.dataValues.id %>?board_id=<%= Comment.Post.dataValues.board_id %>"><%= Comment.Post.dataValues.title %></a>
                                         </td>
                                         <td>
-                                            <a href="/profile/<%= Comment.Post.User.dataValues.nickname %>"><%= Comment.Post.User.dataValues.nickname %></a>
+                                            <a class="text-decoration-none text-reset" href="/profile/<%= Comment.Post.User.dataValues.nickname %>"><%= Comment.Post.User.dataValues.nickname %></a>
                                         </td>
                                         <td><%= Comment.dataValues.content %></td>
                                     </tr>
@@ -350,7 +349,7 @@
                             <% if(User.nickname === locals.user.nickname){ %>
                                 내가 쓴 답글
                             <% }else{ %>
-                            <%= User.nickname %>의 답글
+                                <%= User.nickname %>의 답글
                             <% } %>
                         </button>
                     </h2>
@@ -371,10 +370,10 @@
                                 <% for(let ReplyComment of MyReplyCommentList) { %>
                                     <tr>
                                         <td>
-                                            <a href="/post/<%= ReplyComment.Comment.Post.dataValues.id %>?board_id=<%= ReplyComment.Comment.Post.dataValues.board_id %>"><%= ReplyComment.Comment.Post.dataValues.title %></a>
+                                            <a class="text-decoration-none text-reset" href="/post/<%= ReplyComment.Comment.Post.dataValues.id %>?board_id=<%= ReplyComment.Comment.Post.dataValues.board_id %>"><%= ReplyComment.Comment.Post.dataValues.title %></a>
                                         </td>
                                         <td>
-                                            <a href="/profile/<%= ReplyComment.Comment.Post.User.dataValues.nickname %>"><%= ReplyComment.Comment.Post.User.dataValues.nickname %></a>
+                                            <a class="text-decoration-none text-reset" href="/profile/<%= ReplyComment.Comment.Post.User.dataValues.nickname %>"><%= ReplyComment.Comment.Post.User.dataValues.nickname %></a>
                                         </td>
                                         <td><%= ReplyComment.Comment.dataValues.content %></td>
                                         <td><%= ReplyComment.Comment.dataValues.creator_id %></td>
