@@ -60,44 +60,27 @@
         </div>
         <div class="d-flex justify-content-start mb-3">
             <% if(post.creator_id === user.id) { %>
-                <a class="btn btn-outline-primary me-2" href="/post/<%= post.id %>/modify?board_id=<%= board.id %>"
-                   id="modify">수정</a>
-                <a class="btn btn-outline-danger me-2" href="#" id="delete">삭제</a>
-            <% } %>
-        </div>
-    </div>
-</div>
-<% if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime() ) { %>
-    <div class="apply">
-        <% if(already === null) { %>
-            <a href='#'
-               onclick="window.open('/post/<%= post.id %>/apply', 'apply', 'status=no, toolbar=no, menubar=no, width=400, height=400'); return false">신청</a>
-        <% } else { %>
-            <a href="#" id="cancel">취소</a>
-        <% } %>
-    </div>
-<% } %>
-
-<div>
-    <% if(post.creator_id === user.id && post.is_complete === false) { %>
-        <% if(post.deadline.getTime() > new Date().getTime()) { %>
-            <a href="/post/<%= post.id %>/modify?board_id=<%= board.id %>" id="modify">수정</a>
-            <% if(applicant_count == 0) { %>
-                <a href="#" id="delete">삭제</a>
-            <% } %>
-        <% } else if(post.deadline.getTime() < new Date().getTime()) { %>
-            <div>
-                <ul>
-                    <li>
-                        <span>체크</span>
-                        <span>닉네임</span>
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <ol>
-                    <% for(var applicant of applicants) { %>
-                        <li>
+                <% if(post.is_complete === false) { %>
+                    <% if(post.deadline.getTime() > new Date().getTime()) { %>
+                        <a class="btn btn-outline-primary me-2"
+                           href="/post/<%= post.id %>/modify?board_id=<%= board.id %>"
+                           id="modify">수정</a>
+                        <% if(applicant_count === 0) { %>
+                            <a class="btn btn-outline-danger me-2" href="#" id="delete">삭제</a>
+                        <% } %>
+                    <% } else if(post.deadline.getTime() < new Date().getTime()) { %>
+                        <div>
+                            <ul>
+                                <li>
+                                    <span>체크</span>
+                                    <span>닉네임</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ol>
+                                <% for(var applicant of applicants) { %>
+                                    <li>
                 <span>
                     <label for="check"></label><input type="checkbox" id="check" name="check"
                                                       value="<%= applicant.id %>"
@@ -105,19 +88,32 @@
                             <% } %>
                     >
                 </span>
-                            <span><a href="/profile/<%= applicant.User.nickname %>"><%= applicant.User.nickname %></a></span>
-                            <details>
-                                <summary>지원 내용</summary>
-                                <span><%= applicant.message %></span>
-                            </details>
-                        </li>
+                                        <span><a href="/profile/<%= applicant.User.nickname %>"><%= applicant.User.nickname %></a></span>
+                                        <details>
+                                            <summary>지원 내용</summary>
+                                            <span><%= applicant.message %></span>
+                                        </details>
+                                    </li>
+                                <% } %>
+                            </ol>
+                        </div>
+                            <a class="btn btn-outline-primary me-2"
+                               href='#' id="complete">선발</a>
                     <% } %>
-                </ol>
-            </div>
-            <a href="#" id="complete">선발</a>
-        <% } %>
-    <% } %>
+                <% } %>
+            <% } else if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime()) { %>
+                <% if(already === null) { %>
+                    <a class="btn btn-outline-primary me-2" href='#'
+                       onclick="window.open('/post/<%= post.id %>/apply', 'apply', 'status=no, toolbar=no, menubar=no, width=400, height=400'); return false">신청</a>
+                <% } else { %>
+                    <a class="btn btn-outline-danger me-2" href="#" id="cancel">취소</a>
+                <% } %>
+            <% } %>
+        </div>
+    </div>
 </div>
+
+
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     <% if(post.creator_id === user.id) { %>

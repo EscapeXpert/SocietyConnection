@@ -308,7 +308,10 @@ router.get('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
                 }]
             });
 
+            res.locals.user = req.user;
             res.render('apply_complete', {
+                title: 'title',
+                layout: false,
                 applicants: applicants,
                 post: post,
                 user_id: user_id
@@ -401,10 +404,13 @@ router.get('/:post_id/apply', isLoggedIn, async (req, res, next) => {
             }
         });
 
+        res.locals.user = req.user;
         if (already !== null) {
             res.send('<script> alert("신청 완료된 상태입니다.");window.location.replace("/post/' + post_id + '?board_id=' + post.board_id + '");</script>');
         } else {
             res.render('apply', {
+                title: 'title',
+                layout: false,
                 post: post
             });
         }
@@ -463,7 +469,6 @@ router.post('/:post_id/apply_cancel', isLoggedIn, async (req, res, next) => {
                 recruitment_id: post_id
             }
         });
-        console.log(already);
         if (already !== null) {
             await Applicant.destroy({
                 where: {
