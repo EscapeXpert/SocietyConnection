@@ -2,146 +2,171 @@
     p {
         word-break: break-all
     }
+
     a {
         word-break: keep-all;
     }
 </style>
 <div class="d-flex">
-
-</div>
-<div class="d-flex flex-column align-items-center mx-3">
-    <div class="d-flex flex-column">
-        <div class="d-flex my-3">
-            <a class="text-decoration-none text-primary" href="/board/<%= board.id %>"><%= board.name %></a>
+    <div class="d-flex flex-column ms-3 me-5 d-none d-sm-block">
+        <div class="my-3 bg-primary bg-opacity-10 rounded-3">
+            <% for(let board of boards) { %>
+                <div class="mx-5 my-3">
+                    <a class="text-decoration-none text-reset fw-bold "
+                       href="/board/<%= board.id %>"><%= board.name %></a>
+                </div>
+            <% } %>
         </div>
-        <p class="h3 mb-3"><%= post.title %></p>
-        <div class="d-flex mb-3">
-            <div>
-                <% if(post.User.profile_image != null) { %>
-                    <img class="me-2" src="<%= post.User.profile_image %>" alt="" width="32" height="32">
-                <% } else { %>
-                    <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32" height="32">
-                <% } %>
-            </div>
+        <div>
+        </div>
+    </div>
+    <div class="d-flex flex-column align-items-center mx-3">
+        <div>
             <div class="d-flex flex-column">
-                <div class="my-1">
-                    <a class="text-decoration-none text-reset fw-bold"
-                       href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
-                    <span><%= post.toJSON().grade %></span>
-                    <% if(post.creator_id !== user.id) { %>
-                        <a href='#' class="text-decoration-none badge bg-light text-dark"
-                           onclick="window.open('/message/write?target_nickname=<%= post.User.nickname %>','<%= post.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
-                    <% } %>
+                <div class="d-flex my-3">
+                    <a class="text-decoration-none text-primary" href="/board/<%= board.id %>"><%= board.name %></a>
                 </div>
-                <div class="my-1">
-                    <% const offset = new Date().getTimezoneOffset() * 60000 %>
-                    <% const date = new Date(post.created_at - offset) %>
-                    <span class="text-secondary"><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
-                    <span class="text-secondary">조회&nbsp<%= post.view_count %></span>
-                </div>
-            </div>
-        </div>
-        <div class="d-flex flex-column">
-            <div class="mb-3">
-                <p class="h5">마감기한</p>
-                <% const offset1 = new Date().getTimezoneOffset() * 60000 %>
-                <% const date_string = new Date(post.deadline - offset1).toISOString() %>
-                <span><%= date_string.slice(0, 16).replace('T', ' ') %></span>
-            </div>
-            <div class="mb-3">
-                <% if(files.length > 0) { %>
-                    <p class="h5">첨부파일</p>
-                <% } %>
-                <% for(file of files) { %>
-                    <p>
-                        <a class="btn btn-primary" href="<%= file.file_path %>" download="<%= file.file_name %>">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 class="bi bi-download" viewBox="0 0 16 16">
-                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-                            </svg>
-                            &nbsp<%= file.file_name %>
-                        </a>
-                    </p>
-                <% } %>
-            </div>
-            <div class="content mb-3">
-                <%- post.content %>
-            </div>
-        </div>
-        <div class="d-flex justify-content-start mb-3">
-            <% if(post.creator_id === user.id) { %>
-                <% if(post.is_complete === false) { %>
-                    <% if(post.deadline.getTime() > new Date().getTime()) { %>
-                        <a class="btn btn-outline-primary me-2"
-                           href="/post/<%= post.id %>/modify?board_id=<%= board.id %>"
-                           id="modify">수정</a>
-                        <% if(applicant_count === 0) { %>
-                            <a class="btn btn-outline-danger me-2" href="#" id="delete">삭제</a>
+                <p class="h3 mb-3"><%= post.title %></p>
+                <div class="d-flex mb-3">
+                    <div>
+                        <% if(post.User.profile_image != null) { %>
+                            <img class="me-2" src="<%= post.User.profile_image %>" alt="" width="32" height="32">
+                        <% } else { %>
+                            <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32"
+                                 height="32">
                         <% } %>
-                    <% } else if(post.deadline.getTime() < new Date().getTime()) { %>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <div class="my-1">
+                            <a class="text-decoration-none text-reset fw-bold"
+                               href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
+                            <span><%= post.toJSON().grade %></span>
+                            <% if(post.creator_id !== user.id) { %>
+                                <a href='#' class="text-decoration-none badge bg-light text-dark"
+                                   onclick="window.open('/message/write?target_nickname=<%= post.User.nickname %>','<%= post.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
+                            <% } %>
+                        </div>
+                        <div class="my-1">
+                            <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                            <% const date = new Date(post.created_at - offset) %>
+                            <span class="text-secondary"><%= date.toISOString().slice(0, 16).replace('T', ' ') %></span>
+                            <span class="text-secondary">조회&nbsp<%= post.view_count %></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column">
+                    <div class="mb-3">
+                        <p class="h5">마감기한</p>
+                        <% const offset1 = new Date().getTimezoneOffset() * 60000 %>
+                        <% const date_string = new Date(post.deadline - offset1).toISOString() %>
+                        <span><%= date_string.slice(0, 16).replace('T', ' ') %></span>
+                    </div>
+                    <div class="mb-3">
+                        <% if(files.length > 0) { %>
+                            <p class="h5">첨부파일</p>
+                        <% } %>
+                        <% for(file of files) { %>
+                            <p>
+                                <a class="btn btn-primary" href="<%= file.file_path %>"
+                                   download="<%= file.file_name %>">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                         class="bi bi-download" viewBox="0 0 16 16">
+                                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                    </svg>
+                                    &nbsp<%= file.file_name %>
+                                </a>
+                            </p>
+                        <% } %>
+                    </div>
+                    <div class="content mb-3">
+                        <%- post.content %>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-start mb-3">
+                    <% if(post.creator_id === user.id) { %>
+                        <% if(post.is_complete === false) { %>
+                            <% if(post.deadline.getTime() > new Date().getTime()) { %>
+                                <a class="btn btn-outline-primary me-2"
+                                   href="/post/<%= post.id %>/modify?board_id=<%= board.id %>"
+                                   id="modify">수정</a>
+                                <% if(applicant_count === 0) { %>
+                                    <a class="btn btn-outline-danger me-2" href="#" id="delete">삭제</a>
+                                <% } %>
+                            <% } else if(post.deadline.getTime() < new Date().getTime()) { %>
 
-                        <div>
+                    <div>
 
-                            <table class="table table-striped table-bordered">
-                                <thead>
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                            <tr>
+                                <th>체크</th>
+                                <th>아이디</th>
+                                <th>지원 내용</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% var num = 1; %>
+                            <% for(var applicant of applicants) { %>
                                 <tr>
-                                    <th>체크</th>
-                                    <th>아이디</th>
-                                    <th>지원 내용</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <%var num = 1;%>
-                                <% for(var applicant of applicants) { %>
-                                    <tr>
-                                        <td><label for="check"></label><input type="checkbox" id="check" name="check"
-                                                                              value="<%= applicant.id %>"
-                                            <% if(applicant.is_accepted === true) { %> checked
-                                                    <% } %>
-                                            >
-                                        </td>
-                                        <td><a href="/profile/<%= applicant.User.nickname %>"><%= applicant.User.nickname %></a></td>
-                                        <%var target_accordion = "accordion"+num;%>
-                                        <%num++;%>
-                                        <td><div class="accordion" id="accordionExample">
-                                                <div class="accordion-item">
-                                                    <h2 class="accordion-header" id="headingOne">
-                                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#<%=target_accordion%>" aria-expanded="true" aria-controls="<%=target_accordion%>">
-                                                            지원 내용
-                                                        </button>
-                                                    </h2>
-                                                    <div id="<%=target_accordion%>" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                                                        <div class="accordion-body">
-                                                            <%= applicant.message %>
-                                                        </div>
+                                    <td><label for="check"></label><input type="checkbox" id="check" name="check"
+                                                                          value="<%= applicant.id %>"
+                                        <% if(applicant.is_accepted === true) { %> checked
+                                                <% } %>
+                                        >
+                                    </td>
+                                    <td>
+                                        <a href="/profile/<%= applicant.User.nickname %>"><%= applicant.User.nickname %></a>
+                                    </td>
+                                    <% var target_accordion = "accordion" + num; %>
+                                    <% num++; %>
+                                    <td>
+                                        <div class="accordion" id="accordionExample">
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="headingOne">
+                                                    <button class="accordion-button" type="button"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#<%= target_accordion %>"
+                                                            aria-expanded="true"
+                                                            aria-controls="<%= target_accordion %>">
+                                                        지원 내용
+                                                    </button>
+                                                </h2>
+                                                <div id="<%= target_accordion %>"
+                                                     class="accordion-collapse collapse show"
+                                                     aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                                    <div class="accordion-body">
+                                                        <%= applicant.message %>
                                                     </div>
                                                 </div>
-                                            </div></td>
-                                    </tr>
-                                <% } %>
-                                </tbody>
-                            </table>
-                            <div>
-                                <a class="btn btn-outline-primary me-2"
-                                   href='#' id="complete">선발</a>
-                            </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+                        <div>
+                            <a class="btn btn-outline-primary me-2"
+                               href='#' id="complete">선발</a>
+                        </div>
 
-                    <% } %>
-                <% } %>
-            <% } else if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime()) { %>
-                <% if(already === null) { %>
-                    <a class="btn btn-outline-primary me-2" href='#'
-                       onclick="window.open('/post/<%= post.id %>/apply', 'apply', 'status=no, toolbar=no, menubar=no, width=400, height=400'); return false">신청</a>
-                <% } else { %>
-                    <a class="btn btn-outline-danger me-2" href="#" id="cancel">취소</a>
-                <% } %>
-            <% } %>
+                        <% } %>
+                        <% } %>
+                        <% } else if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime()) { %>
+                            <% if(already === null) { %>
+                                <a class="btn btn-outline-primary me-2" href='#'
+                                   onclick="window.open('/post/<%= post.id %>/apply', 'apply', 'status=no, toolbar=no, menubar=no, width=400, height=400'); return false">신청</a>
+                            <% } else { %>
+                                <a class="btn btn-outline-danger me-2" href="#" id="cancel">취소</a>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     <% if(post.creator_id === user.id) { %>

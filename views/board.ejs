@@ -6,27 +6,112 @@
     .btn-outline-info:hover {
         background-color: rgba(207, 226, 255, 1.0);
     }
+    a {
+        word-break: keep-all;
+    }
 </style>
-<div class="d-none d-sm-block">
-    <div class="d-flex justify-content-between mx-3 my-3">
-        <form class="d-flex">
-            <% if(board.board_type === 'general') { %>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_created_at">최신순</a>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_like">추천순</a>
-            <% } else if(board.board_type === 'recruitment') { %>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_created_at">최신순</a>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_deadline">마감기한순</a>
-                <a class="btn btn-outline-primary me-2" href="#" id="sort_by_after_deadline">마감기한 종료</a>
+<div class="d-flex">
+    <div class="d-flex flex-column ms-3 me-5 d-none d-md-block">
+        <div class="my-3 bg-primary bg-opacity-10 rounded-3">
+            <% for(let board of boards) { %>
+                <div class="mx-5 my-3">
+                    <a class="text-decoration-none text-reset fw-bold "
+                       href="/board/<%= board.id %>"><%= board.name %></a>
+                </div>
             <% } %>
-        </form>
-        <form class="d-flex">
-            <input class="form-control me-2" type="search" name="keyword" id="keyword" placeholder="검색어를 입력해주세요"
-                   aria-label="Search" value="<%= keyword %>" required>
-            <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
+        </div>
+        <div>
+        </div>
+    </div>
+    <div class="d-flex flex-fill flex-column">
+        <div class="d-flex d-none d-md-block">
+            <div class="d-flex justify-content-between mx-3 my-3">
+                <form class="d-flex">
+                    <% if(board.board_type === 'general') { %>
+                        <a class="btn btn-outline-primary me-2" href="#" id="sort_by_created_at">최신순</a>
+                        <a class="btn btn-outline-primary me-2" href="#" id="sort_by_like">추천순</a>
+                    <% } else if(board.board_type === 'recruitment') { %>
+                        <a class="btn btn-outline-primary me-2" href="#" id="sort_by_created_at">최신순</a>
+                        <a class="btn btn-outline-primary me-2" href="#" id="sort_by_deadline">마감기한순</a>
+                        <a class="btn btn-outline-primary me-2" href="#" id="sort_by_after_deadline">마감기한 종료</a>
+                    <% } %>
+                </form>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" name="keyword" id="keyword" placeholder="검색어를 입력해주세요"
+                           aria-label="Search" value="<%= keyword %>" required>
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+        <div class="d-flex d-none d-md-block justify-content-center mx-3 mb-3">
+            <table class="table table-borderless table-hover table-responsive" style="table-layout: fixed;">
+                <thead>
+                <tr class="table-primary">
+                    <th class="text-center" style="width:7%" scope="col">번호</th>
+                    <th class="text-center" scope="col">제목</th>
+                    <th class="text-center" style="width:15%" scope="col">작성자</th>
+                    <th class="text-center" style="width:10%" scope="col">작성일</th>
+                    <th class="text-center" style="width:7%" scope="col">조회수</th>
+                    <% if(board.board_type === 'general') { %>
+                        <th class="text-center" style="width:7%" scope="col">추천수</th>
+                    <% } else if(board.board_type === 'recruitment') { %>
+                        <th class="text-center" style="width:17%" scope="col">마감기한</th>
+                    <% } %>
+                </tr>
+                </thead>
+                <tbody>
+                <% for(let post of posts) { %>
+                    <tr>
+                        <% if(board.board_type === 'general' && post.is_notice) { %>
+                            <th class="text-center text-primary" style="width:7%" scope="row"><span
+                                        class="notice_prefix">공지</span></th>
+                        <% } else { %>
+                            <th class="text-center" style="width:7%" scope="row"><%= post.id %></th>
+                        <% } %>
+                        <td style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                            <div class="title">&nbsp
+                                <a class="text-decoration-none text-reset"
+                                   href="/post/<%= post.id %>?board_id=<%= board.id %>"><%= post.title %></a>
+                                <% if(board.board_type === 'general') { %>
+                                    <% if(post.comment_count > 0) { %>
+                                        <a class="text-decoration-none text-danger"
+                                           href="/post/<%= post.id %>?board_id=<%= board.id %>#comment_list">
+                                            [<%= post.comment_count %>]
+                                        </a>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        </td>
+                        <td style="width:15%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">&nbsp<a class="text-decoration-none text-reset"
+                                                      href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
+                        </td>
+                        <% const date = new Date(post.created_at) %>
+                        <% const current_date = new Date() %>
+                        <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                        <% const date_string = new Date(post.created_at - offset).toISOString() %>
+                        <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                            <td class="text-center" style="width:10%"><%= date_string.slice(11, 16) %></td>
+                        <% } else if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth()){ %>
+                            <td class="text-center" style="width:10%"><%= date_string.slice(5, 10) %></td>
+                        <% } else { %>
+                            <td class="text-center" style="width:10%"><%= date_string.slice(0, 10) %></td>
+                        <% } %>
+                        <td class="text-center" style="width:7%"><%= post.view_count %></td>
+                        <% if(board.board_type === 'general') { %>
+                            <td class="text-center" style="width:7%"><%= post.toJSON().like %></td>
+                        <% } else if(board.board_type === 'recruitment') { %>
+                            <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                            <% const date_string = new Date(post.deadline - offset).toISOString() %>
+                            <td class="text-center" style="width:10%"><%= date_string.slice(0, 16).replace('T', ' ') %></td>
+                        <% } %>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-<div class="d-sm-none">
+<div class="d-md-none">
     <form class="d-flex mx-3 my-3">
         <% if(board.board_type === 'general') { %>
             <a class="btn btn-outline-primary me-2" href="#" id="sort_by_created_at_m">최신순</a>
@@ -43,74 +128,7 @@
         <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
 </div>
-
-<div class="d-flex d-none d-sm-block justify-content-center mx-3 mb-3">
-    <table class="table table-responsive table-borderless table-hover">
-        <thead>
-        <tr class="table-primary">
-            <th class="text-center" style="width:7%" scope="col">번호</th>
-            <th class="text-center" scope="col">제목</th>
-            <th class="text-center" style="width:15%" scope="col">작성자</th>
-            <th class="text-center" style="width:10%" scope="col">작성일</th>
-            <th class="text-center" style="width:7%" scope="col">조회수</th>
-            <% if(board.board_type === 'general') { %>
-                <th class="text-center" style="width:7%" scope="col">추천수</th>
-            <% } else if(board.board_type === 'recruitment') { %>
-                <th class="text-center" style="width:17%" scope="col">마감기한</th>
-            <% } %>
-        </tr>
-        </thead>
-        <tbody>
-        <% for(let post of posts) { %>
-            <tr>
-                <% if(board.board_type === 'general' && post.is_notice) { %>
-                    <th class="text-center text-primary" style="width:7%" scope="row"><span
-                                class="notice_prefix">공지</span></th>
-                <% } else { %>
-                    <th class="text-center" style="width:7%" scope="row"><%= post.id %></th>
-                <% } %>
-                <td>
-                    <div class="title">&nbsp
-                        <a class="text-decoration-none text-reset"
-                           href="/post/<%= post.id %>?board_id=<%= board.id %>"><%= post.title %></a>
-                        <% if(board.board_type === 'general') { %>
-                            <% if(post.comment_count > 0) { %>
-                                <a class="text-decoration-none text-danger"
-                                   href="/post/<%= post.id %>?board_id=<%= board.id %>#comment_list">
-                                    [<%= post.comment_count %>]
-                                </a>
-                            <% } %>
-                        <% } %>
-                    </div>
-                </td>
-                <td style="width:15%">&nbsp<a class="text-decoration-none text-reset"
-                                              href="/profile/<%= post.User.nickname %>"><%= post.User.nickname %></a>
-                </td>
-                <% const date = new Date(post.created_at) %>
-                <% const current_date = new Date() %>
-                <% const offset = new Date().getTimezoneOffset() * 60000 %>
-                <% const date_string = new Date(post.created_at - offset).toISOString() %>
-                <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
-                    <td class="text-center" style="width:10%"><%= date_string.slice(11, 16) %></td>
-                <% } else if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth()){ %>
-                    <td class="text-center" style="width:10%"><%= date_string.slice(5, 10) %></td>
-                <% } else { %>
-                    <td class="text-center" style="width:10%"><%= date_string.slice(0, 10) %></td>
-                <% } %>
-                <td class="text-center" style="width:7%"><%= post.view_count %></td>
-                <% if(board.board_type === 'general') { %>
-                    <td class="text-center" style="width:7%"><%= post.toJSON().like %></td>
-                <% } else if(board.board_type === 'recruitment') { %>
-                    <% const offset = new Date().getTimezoneOffset() * 60000 %>
-                    <% const date_string = new Date(post.deadline - offset).toISOString() %>
-                    <td class="text-center" style="width:10%"><%= date_string.slice(0, 16).replace('T', ' ') %></td>
-                <% } %>
-            </tr>
-        <% } %>
-        </tbody>
-    </table>
-</div>
-<div class="d-flex d-sm-none flex-column justify-content-center mx-3 mb-3">
+<div class="d-flex d-md-none flex-column justify-content-center mx-3 mb-3">
     <table class="table table-responsive table-hover">
         <tbody>
         <% for(let post of posts) { %>
