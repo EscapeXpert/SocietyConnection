@@ -3,32 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <title>쪽지 보내기</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<form action="/message/write" method="post">
+
+<form id="message_write" action="/message/write" method="post">
     <% if(target_nickname != null) { %>
-        <div>
-            <label for="target_nickname">받는 사람 : <%= target_nickname %></label>
-            <input type="hidden" name="target_nickname" id="target_nickname" value="<%= target_nickname %>">
+        <div class="my-3 mx-3">
+            <label class="form-label" for="target_nickname">받는사람</label>
+            <input class="form-control" type="text" name="target_nickname" id="target_nickname" value="<%= target_nickname %>" readonly>
         </div>
     <% } else { %>
-        <div>
-            <label for="target_nickname"></label>
-            <input type="text" name="target_nickname" id="target_nickname" placeholder="받는사람" maxlength="100" required>
+        <div class="my-3 mx-3">
+            <label class="form-label" for="target_nickname">받는사람</label>
+            <input class="form-control" type="text" name="target_nickname" id="target_nickname" maxlength="100" required>
         </div>
     <% } %>
-    <div>
-        <label for="title"></label>
-        <input type="text" name="title" id="title" placeholder="제목" maxlength="50" required>
+    <div class="my-3 mx-3">
+        <label for="title" class="form-label">제목</label>
+        <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력해 주세요." maxlength="50"
+               required>
+    </div>
+    <div class="mb-3 mx-3">
+        <label for="message" class="form-label">내용</label>
+        <textarea class="form-control" name="message" id="message" rows="10" cols="70" placeholder="내용을 입력해 주세요." style="resize: none" required></textarea>
     </div>
 
-    <div>
-        <label for="message"></label>
-        <textarea rows="10" cols="50" name="message" id="message" placeholder="내용을 입력하세요." maxlength="1000"
-                  required></textarea>
-    </div>
-    <div>
-        <input type="submit" value="보내기">
+    <div class="my-2 mx-2">
+        <button class="btn btn-outline-primary btn-sm me-2" type="submit">보내기</button>
     </div>
 </form>
 </body>
