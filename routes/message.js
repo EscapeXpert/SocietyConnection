@@ -270,16 +270,6 @@ router.get('/profile/:user_nickname', isLoggedIn, async (req, res, next) => {
     const user_id = req.user.id;
 
     try {
-        const boards = await Board.findAll({
-            attributes: ['id', 'name']
-        });
-
-        const not_read_message = await Message.count({
-            where:{
-                receiver_id: user_id,
-                is_read: false
-            }
-        });
         const MyPostList = await Post.findAll({
             attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'creator_id','board_id',[
                 sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
@@ -334,13 +324,11 @@ router.get('/profile/:user_nickname', isLoggedIn, async (req, res, next) => {
             }
         });
         res.locals.user = req.user;
-        res.render('profile', {
-            layout: 'window_layout',
+        res.render('message_profile', {
+            layout: false,
             title: '프로필',
-            boards: boards,
             User: Find_User,
             birth : birth,
-            not_read_message: not_read_message,
             MyPostList : MyPostList,
             MyRecruitmentList : MyRecruitmentList,
             MyApplicantList : MyApplicantList,
