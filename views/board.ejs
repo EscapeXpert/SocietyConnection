@@ -68,8 +68,8 @@
                         <% } else { %>
                             <th class="text-center" style="width:7%" scope="row"><%= post.id %></th>
                         <% } %>
-                        <td style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
-                            <div class="title">&nbsp
+                        <td>
+                            <div class="title" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">&nbsp
                                 <a class="text-decoration-none text-reset"
                                    href="/post/<%= post.id %>?board_id=<%= board.id %>"><%= post.title %></a>
                                 <% if(board.board_type === 'general') { %>
