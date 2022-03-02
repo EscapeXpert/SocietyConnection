@@ -79,11 +79,11 @@
            href="/message/send?page=<%= start_page + 10 %>">></a>
     <% } %>
 </div>
-<div>
+<div class="d-flex my-2 mx-2">
     <a href='#'
-       onclick="window.open('/message/write','message','status=no, toolbar=no, menubar=no, width=400, height=300');return false" class="btn btn-outline-primary btn-sm">쪽지
+       onclick="window.open('/message/write','message','status=no, toolbar=no, menubar=no, width=600, height=600');return false" class="btn btn-outline-primary btn-sm me-2">쪽지
         보내기</a>
-    <a href="#" id="delete" class="btn btn-outline-primary btn-sm">삭제</a>
+    <a href="#" id="delete" class="btn btn-outline-danger btn-sm">삭제</a>
 </div>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
