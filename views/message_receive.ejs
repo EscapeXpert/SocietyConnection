@@ -1,13 +1,14 @@
 <style>
     .btn-info, .btn-info:hover, .btn-info:active, .btn-info:visited {
-        background-color:rgba(207, 226, 255, 1.0);
+        background-color: rgba(207, 226, 255, 1.0);
     }
+
     .btn-outline-info:hover {
-        background-color:rgba(207, 226, 255, 1.0);
+        background-color: rgba(207, 226, 255, 1.0);
     }
 </style>
-<div class="d-flex justify-content-center mx-2">
-    <table class="table table-responsive table-borderless table-hover">
+<div class="d-flex justify-content-center mx-2 d-none d-md-block">
+    <table class="table table-responsive table-borderless table-hover" style="table-layout: fixed;">
         <thead>
         <tr class="table-primary">
             <th class="text-center" style="width:7%" scope="col">
@@ -26,16 +27,19 @@
             <% if(message.is_read === false) { %>
                 <tr class="text-primary">
                     <th class="text-center" style="width:7%" scope="row">
-                        <input type="checkbox" id="check" name="check" value="<%= message.id %>" onclick="checkSelectAll()">
+                        <input type="checkbox" id="check" name="check" value="<%= message.id %>"
+                               onclick="checkSelectAll()">
                     </th>
                     <td>
-                        <div class="title">&nbsp
+                        <div class="title" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">&nbsp
                             <a class="text-decoration-none text-reset"
                                href="/message/<%= message.id %>?type=receive"><%= message.title %></a>
                         </div>
                     </td>
-                    <td style="width:15%">&nbsp<a class="text-decoration-none text-reset"
-                                                  href='#' onclick="window.open('/message/profile/<%= message.User.nickname %>', '<%= message.User.nickname%>', 'status=no, toolbar=no, menubar=no, width=500, height=700');return false"> <%= message.User.nickname %></a>
+                    <td style="width:15%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">&nbsp<a
+                                class="text-decoration-none text-reset"
+                                href='#'
+                                onclick="window.open('/message/profile/<%= message.User.nickname %>', '<%= message.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=500, height=700');return false"> <%= message.User.nickname %></a>
                     </td>
                     <% const date = new Date(message.created_at) %>
                     <% const current_date = new Date() %>
@@ -52,16 +56,18 @@
             <% } else { %>
                 <tr>
                     <th class="text-center" style="width:7%" scope="row">
-                        <input type="checkbox" id="check" name="check" value="<%= message.id %>" onclick="checkSelectAll()">
+                        <input type="checkbox" id="check" name="check" value="<%= message.id %>"
+                               onclick="checkSelectAll()">
                     </th>
                     <td>
-                        <div class="title">&nbsp
+                        <div class="title" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">&nbsp
                             <a class="text-decoration-none text-reset"
                                href="/message/<%= message.id %>?type=receive"><%= message.title %></a>
                         </div>
                     </td>
-                    <td style="width:15%">&nbsp<a class="text-decoration-none text-reset"
-                                                  href='#' onclick="window.open('/message/profile/<%= message.User.nickname %>', '<%= message.User.nickname%>', 'status=no, toolbar=no, menubar=no, width=500, height=700');return false"> <%= message.User.nickname %></a>
+                    <td style="width:15%" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">&nbsp<a class="text-decoration-none text-reset"
+                                                  href='#'
+                                                  onclick="window.open('/message/profile/<%= message.User.nickname %>', '<%= message.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=500, height=700');return false"> <%= message.User.nickname %></a>
                     </td>
                     <% const date = new Date(message.created_at) %>
                     <% const current_date = new Date() %>
@@ -80,6 +86,68 @@
         </tbody>
     </table>
 </div>
+
+<div class="d-flex d-md-none flex-column justify-content-center mx-3 mb-3">
+    <table class="table table-responsive table-hover">
+        <tbody>
+        <% for(var message of messages) { %>
+            <% if (filter === "is_not_read" && message.is_read == true) {
+                continue
+            } %>
+            <tr>
+                <td>
+                    <% if(message.is_read === false) { %>
+                        <div onclick="location.href = `/message/<%= message.id %>?type=receive`" class="d-flex my-1 text-primary">
+                            <div class="d-flex flex-column me-2">
+                                <div class="my-1">
+                                    <span class="text-decoration-none text-reset fw-bold"><%= message.title %></span>
+                                </div>
+                                <div class="my-1">
+                                    <span><%= message.User.nickname %></span>
+                                    <% const date = new Date(message.created_at) %>
+                                    <% const current_date = new Date() %>
+                                    <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                                    <% const date_string = new Date(message.created_at - offset).toISOString() %>
+                                    <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                                        <span><%= date_string.slice(11, 16) %></span>
+                                    <% } else if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth()){ %>
+                                        <span><%= date_string.slice(5, 10) %></span>
+                                    <% } else { %>
+                                        <span><%= date_string.slice(0, 10) %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div onclick="location.href = `/message/<%= message.id %>?type=receive`" class="d-flex my-1">
+                            <div class="d-flex flex-column me-2">
+                                <div class="my-1">
+                                    <span class="text-decoration-none text-reset fw-bold"><%= message.title %></span>
+                                </div>
+                                <div class="my-1">
+                                    <span><%= message.User.nickname %></span>
+                                    <% const date = new Date(message.created_at) %>
+                                    <% const current_date = new Date() %>
+                                    <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                                    <% const date_string = new Date(message.created_at - offset).toISOString() %>
+                                    <% if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth() && date.getDate() === current_date.getDate()) { %>
+                                        <span><%= date_string.slice(11, 16) %></span>
+                                    <% } else if(date.getFullYear() === current_date.getFullYear() && date.getMonth() === current_date.getMonth()){ %>
+                                        <span><%= date_string.slice(5, 10) %></span>
+                                    <% } else { %>
+                                        <span><%= date_string.slice(0, 10) %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </td>
+            </tr>
+        <% } %>
+        </tbody>
+    </table>
+</div>
+
 
 <div class="d-flex justify-content-center mb-3">
     <% const max_page = parseInt(parseInt(message_count / 10) + Math.ceil((message_count % 10) / 10)) %>
@@ -104,7 +172,8 @@
 </div>
 <div class="d-flex my-2 mx-2">
     <a href='#'
-       onclick="window.open('/message/write','message','status=no, toolbar=no, menubar=no, width=600, height=600');return false" class="btn btn-outline-primary btn-sm me-2">쪽지
+       onclick="window.open('/message/write','message','status=no, toolbar=no, menubar=no, width=600, height=600');return false"
+       class="btn btn-outline-primary btn-sm me-2">쪽지
         보내기</a>
     <a href="#" id="delete" class="btn btn-outline-danger btn-sm">삭제</a>
 </div>
@@ -115,20 +184,21 @@
         const checked = document.querySelectorAll('input[name="check"]:checked');
         const selectAll = document.querySelector('input[name="select_all"]');
 
-        if(checkboxes.length === checked.length){
+        if (checkboxes.length === checked.length) {
             selectAll.checked = true;
-        } else{
+        } else {
             selectAll.checked = false;
         }
     }
 
-    function selectAll(selectAll){
+    function selectAll(selectAll) {
         const checkboxes = document.getElementsByName('check');
 
         checkboxes.forEach((checkbox) => {
             checkbox.checked = selectAll.checked
         })
     }
+
     const delete_tag = document.querySelector("#delete");
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();

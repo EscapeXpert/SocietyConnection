@@ -4,7 +4,7 @@ module.exports = class Message extends Sequelize.Model {
     static init(sequelize) {
         return super.init({
             title:{
-                type: Sequelize.STRING(50),
+                type: Sequelize.STRING(30),
                 allowNull: false,
             },
             message: {
