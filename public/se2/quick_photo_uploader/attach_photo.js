@@ -348,7 +348,7 @@ function html5Upload() {
             try {
                 if (!!tempFile) {
                     //Ajax통신하는 부분. 파일과 업로더할 url을 전달한다.
-                    callAjaxForHTML5(tempFile, sUploadURL);
+                    callAjaxForHTML5(tempFile, sUploadURL, true);
                     k += 1;
                 }
             } catch (e) {
@@ -368,7 +368,7 @@ function sleep(num) {
     }
 }
 
-function callAjaxForHTML5(tempFile, sUploadURL) {
+function callAjaxForHTML5(tempFile, sUploadURL, dragDrop) {
     var request = new XMLHttpRequest();
     request.open('POST', sUploadURL, false);
 
@@ -385,11 +385,11 @@ function callAjaxForHTML5(tempFile, sUploadURL) {
         alert("이미지 파일(jpg,gif,png,bmp)만 업로드 하실 수 있습니다. (" + sFileName + ")");
     } else {
         //성공 시에  responseText를 가지고 array로 만드는 부분.
-        makeArrayFromString(sResString);
+        makeArrayFromString(sResString, dragDrop);
     }
 }
 
-function makeArrayFromString(sResString) {
+function makeArrayFromString(sResString, dragDrop) {
     var aTemp = [],
         aSubTemp = [],
         htTemp = {}
@@ -411,7 +411,7 @@ function makeArrayFromString(sResString) {
     aResultleng = aResult.length;
     aResult[aResultleng] = htTemp;
 
-    if (aResult.length == nImageFileCount) {
+    if (dragDrop && aResult.length == nImageFileCount || !dragDrop) {
         setPhotoToEditor(aResult);
         aResult = null;
         window.close();
@@ -491,7 +491,7 @@ function uploadImage(e) {
  */
 function callFileUploader() {
     oFileUploader = new jindo.FileUploader(jindo.$("uploadInputBox"), {
-        sUrl: location.href.replace(/\/[^\/]*$/, '') + '/file_uploader.php',	//샘플 URL입니다.
+        sUrl: '/board/upload_img',	//샘플 URL입니다.
         sCallback: location.href.replace(/\/[^\/]*$/, '') + '/callback.html',	//업로드 이후에 iframe이 redirect될 콜백페이지의 주소
         sFiletype: "*.jpg;*.png;*.bmp;*.gif",						//허용할 파일의 형식. ex) "*", "*.*", "*.jpg", 구분자(;)
         sMsgNotAllowedExt: 'JPG, GIF, PNG, BMP 확장자만 가능합니다',	//허용할 파일의 형식이 아닌경우에 띄워주는 경고창의 문구
@@ -505,17 +505,18 @@ function callFileUploader() {
 // 	    			bAllowed (Boolean) 선택된 파일의 형식이 허용되는 형식인지 여부
 // 	    			sMsgNotAllowedExt (String) 허용되지 않는 파일 형식인 경우 띄워줄 경고메세지
 // 	    		}
-//  				선택된 파일의 형식이 허용되는 경우만 처리 
+//  				선택된 파일의 형식이 허용되는 경우만 처리
             if (oCustomEvent.bAllowed === true) {
                 goStartMode();
             } else {
                 goReadyMode();
                 oFileUploader.reset();
             }
-// 	    		bAllowed 값이 false인 경우 경고문구와 함께 alert 수행 
+// 	    		bAllowed 값이 false인 경우 경고문구와 함께 alert 수행
 // 	    		oCustomEvent.stop(); 수행시 bAllowed 가 false이더라도 alert이 수행되지 않음
         },
         success: function (oCustomEvent) {
+            console.log(oCustomEvent);
             // alert("success");
             // 업로드가 성공적으로 완료되었을 때 발생
             // oCustomEvent(이벤트 객체) = {
@@ -567,7 +568,7 @@ window.onload = function () {
     } else {
         $Element("pop_container").hide();
         $Element("pop_container2").show();
-        callFileUploader();
+        //callFileUploader();
     }
     fnUploadImage = $Fn(uploadImage, this);
     $Fn(closeWindow, this).attach(welBtnCancel.$value(), "click");

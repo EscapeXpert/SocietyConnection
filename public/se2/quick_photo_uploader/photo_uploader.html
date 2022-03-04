@@ -86,7 +86,7 @@ h1{color:#333;font-size:14px;letter-spacing:-1px}
     <!-- footer -->
     <div id="pop_footer">
 	    <div class="btn_area">
-            <a href="#"><img src="./img/btn_confirm.png" width="49" height="28" alt="확인" id="btn_confirm"></a>
+            <a href="#" id="go_confirm"><img src="./img/btn_confirm.png" width="49" height="28" alt="확인" id="btn_confirm"></a>
             <a href="#"><img src="./img/btn_cancel.png" width="48" height="28" alt="취소" id="btn_cancel"></a>
         </div>
     </div>
@@ -95,6 +95,16 @@ h1{color:#333;font-size:14px;letter-spacing:-1px}
 <script type="text/javascript" src="./jindo.min.js" charset="utf-8"></script>
 <script type="text/javascript" src="./jindo.fileuploader.js" charset="utf-8"></script>
 <script type="text/javascript" src="./attach_photo.js" charset="utf-8"></script>
-
+<script type="text/javascript">
+    document.querySelector('#go_confirm').addEventListener('click', (event) => {
+        event.preventDefault();
+        if(document.querySelector('#pop_container2').style.display !== 'none')
+        {
+            console.log("Yeah");
+            const file = document.querySelector('#uploadInputBox').files[0];
+            callAjaxForHTML5(file, '/board/upload_img', false);
+        }
+    });
+</script>
 </body>
 </html>
