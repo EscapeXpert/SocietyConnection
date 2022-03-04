@@ -6,11 +6,26 @@
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        #wrap {
+            position: relative;
+            min-height: 100%;
+        }
+        #footer {
+            position: relative;
+            bottom: 0;
+        }
+    </style>
     <title><%= title %></title>
 </head>
 <body>
+<div id="wrap">
 <%- include('header') %>
 <%- body %>
+</div>
 <%- include('footer') %>
 <%- script %>
 </body>
