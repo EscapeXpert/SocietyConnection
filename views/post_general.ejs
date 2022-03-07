@@ -8,7 +8,7 @@
     }
 </style>
 <div class="d-flex">
-    <div class="d-flex flex-column ms-3 me-5 d-none d-sm-block">
+    <div class="d-flex flex-column ms-3 me-5 d-none d-md-block">
         <div class="my-3 bg-primary bg-opacity-10 rounded-3">
             <% for(let board of boards) { %>
                 <div class="mx-5 my-3">
@@ -75,7 +75,7 @@
                     <%- post.content %>
                 </div>
             </div>
-            <div class="d-flex justify-content-start mb-3 d-sm-none">
+            <div class="d-flex justify-content-start mb-3 d-md-none">
                 <% if(post.creator_id === user.id) { %>
                     <a class="btn btn-outline-primary me-2" href="/post/<%= post.id %>/modify?board_id=<%= board.id %>"
                        id="modify">수정</a>
@@ -114,7 +114,7 @@
                     <a href="#" class="text-decoration-none text-reset" id="go_comment_list">댓글 <span
                                 class="fw-bold"><%= comment_list.length %></span></a>
                 </div>
-                <div class="d-flex d-none d-sm-block">
+                <div class="d-flex d-none d-md-block">
                     <% if(post.creator_id === user.id) { %>
                         <a class="btn btn-outline-primary ms-2"
                            href="/post/<%= post.id %>/modify?board_id=<%= board.id %>"
