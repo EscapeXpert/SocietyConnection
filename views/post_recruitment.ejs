@@ -2,6 +2,7 @@
     p {
         word-break: break-all
     }
+
     pre {
         white-space: pre-wrap;
         word-break: break-all;
@@ -35,7 +36,7 @@
                     <% if(post.User.profile_image != null) { %>
                         <img class="me-2" src="<%= post.User.profile_image %>" alt="" width="32" height="32">
                     <% } else { %>
-                        <img class="me-2" src="./public/icon/default-user-profile-image.svg" alt="" width="32"
+                        <img class="me-2" src="/public/icon/default-user-profile-image.svg" alt="" width="32"
                              height="32">
                     <% } %>
                 </div>
@@ -101,49 +102,89 @@
             <div class="d-flex mb-3">
                 <% if(post.creator_id === user.id && post.is_complete === false) { %>
                     <% if(post.deadline.getTime() < new Date().getTime()) { %>
-                <div class="d-flex flex-fill">
-                    <table class="table table-striped table-bordered table-responsive" style="table-layout: fixed">
-                        <thead>
-                        <tr>
-                            <th scope="col" class="text-center" style="width: 7%">체크</th>
-                            <th scope="col" class="text-center" style="width: 15%">닉네임</th>
-                            <th scope="col" class="text-center">지원 내용</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <% var num = 1; %>
-                        <% for(var applicant of applicants) { %>
-                            <tr>
-                                <th scope="row" class="align-middle text-center" style="width: 7%"><label
-                                            for="check"></label>
-                                    <input type="checkbox" id="check" name="check"
-                                           value="<%= applicant.id %>"
-                                    <% if(applicant.is_accepted === true) { %> checked
-                                            <% } %>
-                                    >
-                                </th>
-                                <td class="align-middle" style="width: 15%">
-                                    <a class="text-decoration-none text-reset fw-bold" href="/profile/<%= applicant.User.nickname %>">&nbsp<%= applicant.User.nickname %></a>
-                                </td>
-                                <% var target_accordion = "accordion" + num; %>
-                                <% num++; %>
-                                <td class="align-middle">
-                                    <pre><%= applicant.message %></pre>
-                                </td>
-                            </tr>
-                        <% } %>
-                        </tbody>
-                    </table>
+                        <div class="d-flex d-md-block d-none flex-fill">
+                            <table class="table table-striped table-bordered table-responsive"
+                                   style="table-layout: fixed">
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="text-center" style="width: 7%">체크</th>
+                                    <th scope="col" class="text-center" style="width: 17%">닉네임</th>
+                                    <th scope="col" class="text-center">지원 내용</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <% for(var applicant of applicants) { %>
+                                    <tr>
+                                        <th scope="row" class="align-middle text-center">
+                                            <label
+                                                    for="check"></label>
+                                            <input type="checkbox" id="check" name="check"
+                                                   value="<%= applicant.id %>"
+                                            <% if(applicant.is_accepted === true) { %> checked
+                                                    <% } %>
+                                            >
+                                        </th>
+                                        <td class="align-middle"
+                                            style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                            <a class="text-decoration-none text-reset fw-bold"
+                                               href="/profile/<%= applicant.User.nickname %>">&nbsp<%= applicant.User.nickname %></a>
+                                        </td>
+                                        <td class="align-middle">
+                                            <pre><%= applicant.message %></pre>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex d-md-none flex-fill">
+                            <table class="table table-striped table-bordered table-responsive"
+                                   style="table-layout: fixed">
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="text-center" style="width: 15%">체크</th>
+                                    <th scope="col" class="text-center">닉네임</th>
+                                    <th scope="col" class="text-center" style="width: 25%">지원 내용</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <% for(var applicant of applicants) { %>
+                                    <tr>
+                                        <th scope="row" class="align-middle text-center">
+                                            <label
+                                                    for="check"></label>
+                                            <input type="checkbox" id="mobile_check" name="mobile_check"
+                                                   value="<%= applicant.id %>"
+                                            <% if(applicant.is_accepted === true) { %> checked
+                                                    <% } %>
+                                            >
+                                        </th>
+                                        <td class="align-middle"
+                                            style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                            <a class="text-decoration-none text-reset fw-bold"
+                                               href="/profile/<%= applicant.User.nickname %>">&nbsp<%= applicant.User.nickname %></a>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <a class="btn btn-outline-primary" href="">보기</a>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                                </tbody>
+                            </table>
+                        </div>
                     <% } %>
-                    <% } %>
-                </div>
+                <% } %>
             </div>
             <div class="d-flex mb-3">
                 <% if(post.creator_id === user.id && post.is_complete === false) { %>
                     <% if(post.deadline.getTime() < new Date().getTime()) { %>
-                        <div>
+                        <div class="d-md-block d-none">
                             <a class="btn btn-outline-primary me-2"
                                href='#' id="complete">선발</a>
+                        </div>
+                        <div class="d-md-none">
+                            <a class="btn btn-outline-primary me-2"
+                               href='#' id="mobile_complete">선발</a>
                         </div>
                     <% } %>
                 <% } %>
@@ -170,6 +211,17 @@
     complete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
         const checked = document.querySelectorAll("input#check:checked");
+        const applicant_ids = [];
+        for (let i of checked) {
+            applicant_ids.push(i.getAttribute("value"))
+        }
+        window.open(`/post/<%= post.id %>/apply/complete?applicant_id=` + applicant_ids, '<%= post.id %>', 'status=no, toolbar=no, menubar=no, width=600, height=500');
+
+    });
+    const mobile_complete_tag = document.querySelector('#mobile_complete');
+    mobile_complete_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        const checked = document.querySelectorAll("input#mobile_check:checked");
         const applicant_ids = [];
         for (let i of checked) {
             applicant_ids.push(i.getAttribute("value"))
