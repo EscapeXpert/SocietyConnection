@@ -1,6 +1,7 @@
-<div class="d-none d-md-block d-lg-node">
-    <div class="d-flex justify-content-center" style="margin:5%">
-        <div id="carouselIndicators" class="carousel slide flex-fill p-3" data-bs-ride="carousel">
+<div class="d-flex justify-content-center" style="margin:5%">
+    <div class="container" style="height: 30rem; width: 50rem;">
+        <div id="carouselIndicators" class="carousel slide flex-fill p-3" data-bs-ride="carousel"
+             style="background: #bcbbbb;">
             <div class="carousel-indicators">
                 <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="0" class="active"
                         aria-current="true"
@@ -12,15 +13,15 @@
                     </button>
                 <% } %>
             </div>
-            <div class="carousel-inner">
+            <div class="carousel-inner" style="width: auto; height: 30rem;">
                 <div class="carousel-item active" data-bs-interval="5000">
-                    <img src="\public\main_image\<%= image_files[0] %>" class="d-block w-auto" alt=""
-                         style="height:40vh; width:auto; margin-left: auto;margin-right: auto;">
+                    <img src="\public\main_image\<%= image_files[0] %>" class="d-block" alt=""
+                         style="width: auto; height: 30rem; margin-left: auto;margin-right: auto;">
                 </div>
                 <% for(var i = 1; i < image_files.length; ++i) { %>
                     <div class="carousel-item" data-bs-interval="5000">
-                        <img src="\public\main_image\<%= image_files[i] %>" class="d-block w-auto" alt=""
-                             style="height:40vh;  width:auto;margin-left: auto;margin-right: auto;">
+                        <img src="\public\main_image\<%= image_files[i] %>" class="d-block" alt=""
+                             style="width: auto; height: 30rem; margin-left: auto; margin-right: auto;">
                     </div>
                 <% } %>
             </div>
@@ -37,43 +38,29 @@
         </div>
     </div>
 </div>
-
-<div class="d-none d-md-none d-sm-block">
-    <div class="d-flex justify-content-center" style="margin:5%">
-        <div id="carouselIndicators_sm" class="carousel slide flex-fill p-1" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-                <button type="button" data-bs-target="#carouselIndicators_sm" data-bs-slide-to="0" class="active"
-                        aria-current="true"
-                        aria-label="Slide 1">
-                </button>
-                <% for(var i = 1; i < image_files.length; ++i) { %>
-                    <button type="button" data-bs-target="#carouselIndicators_sm" data-bs-slide-to="<%= i %>"
-                            aria-label="Slide <%= i + 1 %>">
-                    </button>
-                <% } %>
-            </div>
-            <div class="carousel-inner">
-                <div class="carousel-item active" data-bs-interval="5000">
-                    <img src="\public\main_image\<%= image_files[0] %>" class="d-block w-auto" alt=""
-                         style="height:30vh; width:auto; margin-left: auto;margin-right: auto;">
-                </div>
-                <% for(var i = 1; i < image_files.length; ++i) { %>
-                    <div class="carousel-item" data-bs-interval="5000">
-                        <img src="\public\main_image\<%= image_files[i] %>" class="d-block w-auto " alt=""
-                             style="height:30vh;  width:auto;margin-left: auto;margin-right: auto;">
-                    </div>
-                <% } %>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselIndicators_sm"
-                    data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselIndicators_sm"
-                    data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
+<div class="d-flex justify-content-center" style="margin:5%">
+    <div class="card border-light" style="width: 18rem;">
+        <img src="/public/main_card_image/img.png" class="card-img-top" alt="..." style="border-radius: 70%;">
+        <div class="card-body">
+            <h5 class="card-title" style="text-align:center;">C언어 교육</h5>
+        </div>
+    </div>
+    <div class="card border-light" style="width: 18rem;">
+        <img src="/public/main_card_image/img.png" class="card-img-top" alt="..." style="border-radius: 70%;">
+        <div class="card-body">
+            <h5 class="card-title" style="text-align:center;">멘토링 활동</h5>
+        </div>
+    </div>
+    <div class="card border-light" style="width: 18rem;">
+        <img src="/public/main_card_image/img.png" class="card-img-top" alt="..." style="border-radius: 70%;">
+        <div class="card-body">
+            <h5 class="card-title" style="text-align:center;">여름방학 교육</h5>
+        </div>
+    </div>
+    <div class="card border-light" style="width: 18rem;">
+        <img src="/public/main_card_image/img.png" class="card-img-top" alt="..." style="border-radius: 70%;">
+        <div class="card-body">
+            <h5 class="card-title" style="text-align:center;">프로젝트 및 공부</h5>
         </div>
     </div>
 </div>

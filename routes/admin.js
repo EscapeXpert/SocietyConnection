@@ -7,6 +7,9 @@ const bcrypt = require("bcrypt");
 const {Op} = require("sequelize");
 const Board = require("../models/board");
 const {sequelize} = require("../models");
+const fs = require("fs");
+const multer = require("multer");
+const path = require("path");
 const router = express.Router();
 
 router.get('/', isLoggedIn, async (req, res) => {
@@ -29,15 +32,15 @@ router.get('/', isLoggedIn, async (req, res) => {
     });
     res.locals.user = req.user;
     const BoardList = await Board.findAll();
-
-    console.log(GradeList);
+    const image_files = fs.readdirSync('./public/main_image');
 
     res.render('admin', {
         title: 'admin',
         boards:boards,
         UserList : UserList,
         BoardList : BoardList,
-        GradeList : GradeList
+        GradeList : GradeList,
+        image_files : image_files
     });
 });
 router.post('/:User_nickname/edit', isLoggedIn, async (req, res, next) => {
@@ -118,6 +121,35 @@ router.get('/:Board_id/board_delete', isLoggedIn, async (req, res) => {
     } catch (error) {
         console.error(error);
     }
+});
+
+router.get('/image_delete/:image', isLoggedIn, async (req, res) => {
+    if(req.user.grade!==5){
+        return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
+    }
+    const image = req.params.image;
+    fs.unlink('./public/main_image/'+image,(err)=>{ console.log(err);});
+    res.redirect(`/admin`);
+});
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'public/main_image/');
+        },
+        filename(req, file, cb) {
+            const ext = path.extname(file.originalname);
+            cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
+        },
+    }),
+    limits: {fileSize: 5 * 1024 * 1024},
+});
+
+router.post('/main_img', isLoggedIn, upload.single('img'), async (req, res) => {
+    if(req.user.grade!==5){
+        return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
+    }
+    res.json({url: `/public/main_image/${req.file.filename}`});
 });
 
 
