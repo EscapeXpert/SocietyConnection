@@ -48,7 +48,7 @@
                         <span><%= post.toJSON().grade %></span>
                         <% if(post.creator_id !== user.id) { %>
                             <a href='#' class="text-decoration-none badge bg-light text-dark"
-                               onclick="window.open('/message/write?target_nickname=<%= post.User.nickname %>','<%= post.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=400, height=300');return false">쪽지</a>
+                               onclick="window.open('/message/write?target_nickname=<%= post.User.nickname %>','<%= post.User.nickname %>', 'status=no, toolbar=no, menubar=no, width=600, height=600');return false">쪽지</a>
                         <% } %>
                     </div>
                     <div class="my-1">
@@ -207,7 +207,7 @@
                 <% if(post.creator_id !== user.id && post.deadline.getTime() > new Date().getTime()) { %>
                     <% if(already === null) { %>
                         <a class="btn btn-outline-primary me-2" href='#'
-                           onclick="window.open('/post/<%= post.id %>/apply', 'apply', 'status=no, toolbar=no, menubar=no, width=400, height=400'); return false">신청</a>
+                           onclick="window.open('/post/<%= post.id %>/apply', 'apply', 'status=no, toolbar=no, menubar=no, width=600, height=600'); return false">신청</a>
                     <% } else { %>
                         <a class="btn btn-outline-danger me-2" href="#" id="cancel">취소</a>
                     <% } %>

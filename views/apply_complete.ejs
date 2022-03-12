@@ -2,58 +2,64 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title><%= post.title %> 선택</title>
+    <title><%= post.title %> 선발</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<div>
-    <ul>
-        <li>
-            <span>닉네임</span>
-        </li>
-    </ul>
+
+<div class="d-flex">
+    <div class="d-flex flex-column flex-fill">
+        <table class="table table-bordered table-responsive"
+               style="table-layout: fixed">
+            <thead>
+            <tr>
+                <th class="text-left">닉네임</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% for(var applicant of applicants) { %>
+                <tr>
+                    <td class="align-middle"
+                        style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                        <a class="text-decoration-none text-reset fw-bold">&nbsp<%= applicant.User.nickname %></a>
+                    </td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-    <div>
-        <ol>
-            <% for(var applicant of applicants) { %>
-                <li>
-                    <span><%= applicant.User.nickname%></span>
-                    <details>
-                        <summary>지원 내용</summary>
-                        <span><%= applicant.message %></span>
-                    </details>
-                </li>
-            <% } %>
-        </ol>
-    </div>
-    <div>
-        <a href="#" id="confirm">확정</a>
-    </div>
+<div>
+    <a class="btn btn-outline-primary me-2" href="#" id="confirm">확정</a>
+</div>
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     const applicants = <%- JSON.stringify(applicants) %>
     const applicants_id = [];
     const confirm_tag = document.querySelector('#confirm');
-    confirm_tag.addEventListener('click', async function(event) {
-       event.preventDefault();
-       for(let applicant of applicants)
-       {
-           applicants_id.push(applicant.id);
-       }
-       await axios.post(`/post/<%= post.id%>/apply/complete`,{
-           applicant_id: applicants_id
-       })
-        .then((response) => {
-            if(response.data === 'success') {
-                alert("확정되었습니다.");
-                window.opener.location.reload();
-                window.close();
-            }
+    confirm_tag.addEventListener('click', async function (event) {
+        event.preventDefault();
+        for (let applicant of applicants) {
+            applicants_id.push(applicant.id);
+        }
+        await axios.post(`/post/<%= post.id %>/apply/complete`, {
+            applicant_id: applicants_id
         })
-       .catch((err) => {
-           console.error(err);
-       });
+            .then((response) => {
+                if (response.data === 'success') {
+                    alert("확정되었습니다.");
+                    window.opener.location.reload();
+                    window.close();
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     });
 </script>
 </html>
