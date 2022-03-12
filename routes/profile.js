@@ -133,6 +133,7 @@ router.get('/:user_nickname/edit', isLoggedIn, async (req, res) => {
         attributes: ['id', 'name']
     });
     res.locals.user = req.user;
+
     res.render('edit', {
         title: '프로필 수정',
         User: req.user,
@@ -159,9 +160,14 @@ router.post('/:user_nickname/edit', isLoggedIn, upload2.none(), async (req, res,
         if (!nickname) {
             return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
         }
-        exUser = await User.findOne({where: {nickname: nickname}});
+        const exUser = await User.findOne({where: {nickname: nickname}});
         if (exUser && exUser.nickname !== req.user.nickname) {
             return res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
+        }
+
+        //프로필 사진 수정후 기존 사진 삭제
+        if(req.user.profile_image){
+            fs.unlink('./'+req.user.profile_image,(err)=>{ console.log(err);});
         }
         await User.update({
             sns_id: sns_id,
