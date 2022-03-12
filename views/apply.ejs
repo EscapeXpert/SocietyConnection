@@ -1,23 +1,41 @@
+<style>
+    p {
+        word-break: break-all
+    }
+
+    pre {
+        white-space: pre-wrap;
+        word-break: break-all;
+        overflow: auto;
+    }
+
+    a {
+        word-break: keep-all;
+    }
+</style>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title><%= post.title %> 신청 </title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<div>
-    <p>프로젝트 내용</p>
-    <label rows="10" cols="50" name="content" id="content"><%- post.content%></label>
+<div class="my-3 mx-3">
+    <label class="form-label">프로젝트 내용</label>
+        <pre class="form-control"><%- post.content%></pre>
 </div>
-<form action="/post/<%= post.id %>/apply" method="post">
-    <div>
-        <p>신청 내용</p>
-        <label for="apply"></label>
-        <textarea rows="10" cols="50" name="message" id="message" placeholder="내용을 입력하세요." maxlength="100"
-                  required></textarea>
+<form id="apply_message" action="/post/<%= post.id %>/apply" method="post">
+    <div class="my-3 mx-3">
+        <label for="content" class="from-label">신청 내용</label>
+
+        <textarea class="form-control" rows="10" cols="70" name="message" id="message" placeholder="내용을 입력해 주세요." style="resize: none" maxlength="300" required></textarea>
     </div>
-    <div>
-        <input type="submit" value="신청하기">
+    <div class="my-3 mx-3">
+        <button class="btn btn-outline-primary btn-sm me-2" type="submit">신청</button>
     </div>
 </form>
 </body>
