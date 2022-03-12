@@ -166,7 +166,20 @@
                                                href="/profile/<%= applicant.User.nickname %>">&nbsp<%= applicant.User.nickname %></a>
                                         </td>
                                         <td class="align-middle text-center">
-                                            <a class="btn btn-outline-primary" href="">보기</a>
+                                            <button class="btn btn-outline-primary" type="button" id="liveToastBtn">보기</button>
+                                            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                                                <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                                                    <div class="toast-header">
+                                                        <img src="" class="rounded me-2" alt="">
+                                                        <strong class="me-auto"><%= applicant.User.nickname%></strong>
+                                                        <small></small>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="toast-body">
+                                                        <%= applicant.message %>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 <% } %>
@@ -272,4 +285,13 @@
             });
     });
     <% } %>
+    const toastTriggers = document.querySelectorAll('#liveToastBtn');
+    const toastLives = document.querySelectorAll('#liveToast');
+    for(let [index, toastTrigger] of toastTriggers.entries())
+    {
+        toastTrigger.addEventListener('click', function () {
+            const toast = new bootstrap.Toast(toastLives[index])
+            toast.show()
+        });
+    }
 </script>
