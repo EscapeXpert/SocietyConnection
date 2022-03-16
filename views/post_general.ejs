@@ -238,16 +238,19 @@
     </div>
 </div>
 <input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
+<input type="hidden" id="csrfToken" name="csrfToken" value="<%= csrfToken %>">
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     const board_id = document.querySelector('#board_id').value;
+    const csrfToken = document.querySelector('#csrfToken').value;
     <% if (post.creator_id === user.id || user.grade === 5) { %>
     const delete_tags = document.querySelectorAll('#delete');
     delete_tags.forEach(delete_tag => {
         delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
             await axios.post('/post/<%= post.id %>/delete', {
-                board_id: board_id
+                board_id: board_id,
+                _csrf: csrfToken
             })
                 .then((response) => {
                     if (response.data === 'success') {
@@ -265,7 +268,9 @@
     const like_tag = document.querySelector('#like');
     like_tag.addEventListener('click', async function (event) {
         event.preventDefault();
-        await axios.post('/post/<%= post.id %>/like')
+        await axios.post('/post/<%= post.id %>/like', {
+            _csrf: csrfToken
+        })
             .then((response) => {
                 if (response.data === 'success') {
                     location.reload();
@@ -300,7 +305,9 @@
         comment_delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
             const comment_id = comment_delete_tag.parentElement.parentElement.parentElement.id;
-            await axios.post(`/post/<%= post.id %>/comment/${comment_id}/delete`)
+            await axios.post(`/post/<%= post.id %>/comment/${comment_id}/delete`, {
+                _csrf: csrfToken
+            })
                 .then((response) => {
                     if (response.data === 'success') {
                         location.reload();
@@ -318,7 +325,8 @@
         event.preventDefault();
         const comment_content = document.querySelector('#comment_content').value;
         axios.post('/post/<%= post.id %>/comment/write', {
-            comment_content: comment_content
+            comment_content: comment_content,
+            _csrf: csrfToken
         })
             .then((response) => {
                 if (response.data === 'success') {
@@ -371,7 +379,8 @@
                 event.preventDefault();
                 const content = document.querySelector('#reply_comment_content').value;
                 axios.post(`/post/<%= post.id %>/comment/${comment_id}/reply_comment/write`, {
-                    reply_comment_content: content
+                    reply_comment_content: content,
+                    _csrf: csrfToken
                 })
                     .then((response) => {
                         if (response.data === 'success') {
@@ -391,7 +400,9 @@
         reply_comment_delete_tag.addEventListener('click', async function (event) {
             event.preventDefault();
             const reply_comment_id = reply_comment_delete_tag.parentElement.parentElement.parentElement.id;
-            await axios.post(`/post/<%= post.id %>/reply_comment/${reply_comment_id}/delete`)
+            await axios.post(`/post/<%= post.id %>/reply_comment/${reply_comment_id}/delete`, {
+                _csrf: csrfToken
+            })
                 .then((response) => {
                     if (response.data === 'success') {
                         location.reload();
@@ -410,7 +421,9 @@
     notice_tags.forEach(notice_tag => {
         notice_tag.addEventListener('click', async function (event) {
             event.preventDefault();
-            await axios.post('/post/<%= post.id %>/notice')
+            await axios.post('/post/<%= post.id %>/notice', {
+                _csrf: csrfToken
+            })
                 .then((response) => {
                     if (response.data === 'success') {
                         location.reload();

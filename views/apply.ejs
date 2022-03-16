@@ -26,17 +26,18 @@
 <body>
 <div class="my-3 mx-3">
     <label class="form-label">프로젝트 내용</label>
-        <pre class="form-control"><%- post.content%></pre>
+    <pre class="form-control"><%- post.content %></pre>
 </div>
 <form id="apply_message" action="/post/<%= post.id %>/apply" method="post">
     <div class="my-3 mx-3">
-        <label for="content" class="from-label">신청 내용</label>
-
-        <textarea class="form-control" rows="10" cols="70" name="message" id="message" placeholder="내용을 입력해 주세요." style="resize: none" maxlength="300" required></textarea>
+        <label for="message" class="from-label">신청 내용</label>
+        <textarea class="form-control" rows="10" cols="70" name="message" id="message" placeholder="내용을 입력해 주세요."
+                  style="resize: none" maxlength="300" required></textarea>
     </div>
     <div class="my-3 mx-3">
         <button class="btn btn-outline-primary btn-sm me-2" type="submit">신청</button>
     </div>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 </form>
 </body>
 </html>

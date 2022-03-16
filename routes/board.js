@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const sanitizeHtml = require('sanitize-html');
 const {isLoggedIn} = require('./middlewares');
 const {sequelize, Post, Board, Recruitment, User, Grade, PostFile} = require('../models');
 const {Op} = require('sequelize');
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
 
 const img_upload = multer({
     storage: multer.diskStorage({
@@ -42,7 +45,7 @@ router.post('/upload_img', img_upload.single('img'), async (req, res, next) => {
     res.send(fileInfo);
 });
 
-router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
+router.get('/:board_id/write', csrfProtection, isLoggedIn, async (req, res, next) => {
     const board_id = req.params.board_id;
     const user_id = req.user.id;
     try {
@@ -66,7 +69,8 @@ router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
             res.render('post_write', {
                 board: board,
                 boards: boards,
-                title: "게시글 쓰기"
+                title: "게시글 쓰기",
+                csrfToken: req.csrfToken()
             });
         } else {
             const grade = await Grade.findOne({
@@ -83,7 +87,7 @@ router.get('/:board_id/write', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
+router.post('/:board_id/write', csrfProtection, isLoggedIn, async (req, res, next) => {
     await file_upload(req, res, async function (err) {
         if (err) {
             res.send('<script>alert("파일당 최대 50MB까지 업로드하실 수 있습니다.");history.back();</script>');
@@ -91,17 +95,59 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
         }
         const board_id = req.params.board_id;
         const title = req.body.title;
-        const content = req.body.ir1;
+        const content = sanitizeHtml(req.body.ir1, {
+            allowedTags: [
+                "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
+                "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
+                "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
+                "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
+                "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
+                "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
+                "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "img"
+            ],
+            disallowedTagsMode: 'discard',
+            allowedAttributes: {
+                a: ['href', 'name', 'target'],
+                // We don't currently allow img itself by default, but
+                // these attributes would make sense if we did.
+                img: ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading'],
+                p: ['style'],
+                span: ['style']
+            },
+// Lots of these won't come up by default because we don't allow them
+            selfClosing: ['img', 'br', 'hr', 'area', 'base', 'basefont', 'input', 'link', 'meta'],
+// URL schemes we permit
+            allowedSchemes: ['http', 'https', 'ftp', 'mailto', 'tel'],
+            allowedSchemesByTag: {},
+            allowedSchemesAppliedToAttributes: ['href', 'src', 'cite'],
+            allowProtocolRelative: true,
+            enforceHtmlBoundary: false
+        });
         const deadline = req.body.deadline;
         const creator_id = req.user.id;
         const files = req.files;
         try {
             const board = await Board.findOne({
-                attributes: ['board_type'],
+                attributes: ['board_type', 'min_write_grade'],
                 where: {
                     id: board_id
                 }
             });
+            const user = await User.findOne({
+                attributes: ['grade'],
+                where: {
+                    id: creator_id
+                }
+            })
+            if (user.grade < board.min_write_grade) {
+                const grade = await Grade.findOne({
+                    attributes: ['name'],
+                    where: {
+                        id: board.min_write_grade
+                    }
+                });
+                return res.send('<script>alert("게시글을 작성할 수 있는 권한이 없습니다. 이 게시판은 ' + grade.name + '등급부터 쓸 수 있습니다.");history.back();</script>');
+            }
             let post;
             if (board.board_type === 'general') {
                 post = await Post.create({
@@ -149,7 +195,7 @@ router.post('/:board_id/write', isLoggedIn, async (req, res, next) => {
     });
 });
 
-router.get('/:board_id', async (req, res, next) => {
+router.get('/:board_id', csrfProtection, async (req, res, next) => {
     const board_id = req.params.board_id;
     const sort = req.query.sort || 'created_at';
     const page = req.query.page || 1;
@@ -207,7 +253,8 @@ router.get('/:board_id', async (req, res, next) => {
                     post_count: post_count,
                     page: page,
                     sort: sort,
-                    keyword: keyword
+                    keyword: keyword,
+                    csrfToken: req.csrfToken()
                 }
             );
         } else if (board.board_type === 'recruitment') {
@@ -319,7 +366,8 @@ router.get('/:board_id', async (req, res, next) => {
                 post_count: recruitment_count,
                 page: page,
                 sort: sort,
-                keyword: keyword
+                keyword: keyword,
+                csrfToken: req.csrfToken()
             });
         }
     } catch (err) {
