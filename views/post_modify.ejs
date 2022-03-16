@@ -1,9 +1,9 @@
-<form id="post_modify" action="/post/<%= post.id %>/modify" enctype="multipart/form-data" method="post">
+<form id="post_modify" action="/post/<%= post.id %>/modify?_csrf=<%= csrfToken%>" enctype="multipart/form-data" method="post">
     <input type="hidden" name="board_id" id="board_id" value="<%= board.id %>">
     <div class="my-3 mx-3">
         <label for="title" class="form-label">제목</label>
         <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력해 주세요." maxlength="100"
-               value="<%= post.title %>" required>
+               value="<%= post.title %>" required pattern=".*\S+.*">
     </div>
     <div class="mb-3 mx-3">
         <label class="mb-2 form-label" for="ir1">내용</label>
@@ -37,7 +37,12 @@
         oAppRef: oEditors,
         elPlaceHolder: "ir1",
         sSkinURI: "/public/se2/SmartEditor2Skin.html",
-        fCreator: "createSEditor2"
+        fCreator: "createSEditor2",
+        htParams : {
+            bUseToolbar : true,
+            bUseVerticalResizer : true,
+            bUseModeChanger : false,
+        }
     });
 
     function submitContents() {

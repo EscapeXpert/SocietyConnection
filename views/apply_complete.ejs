@@ -9,9 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-
-<div class="d-flex">
-    <div class="d-flex flex-column flex-fill">
+    <div class="d-flex flex-column mx-3 my-3">
         <table class="table table-bordered table-responsive"
                style="table-layout: fixed">
             <thead>
@@ -31,14 +29,12 @@
             </tbody>
         </table>
     </div>
-</div>
-
-<div>
-    <a class="btn btn-outline-primary me-2" href="#" id="confirm">확정</a>
-</div>
+    <a class="btn btn-outline-primary ms-3" href="#" id="confirm">확정</a>
 </body>
+<input type="hidden" id="csrfToken" name="csrfToken" value="<%=csrfToken%>">
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
+    const csrfToken = document.querySelector('#csrfToken').value;
     const applicants = <%- JSON.stringify(applicants) %>
     const applicants_id = [];
     const confirm_tag = document.querySelector('#confirm');
@@ -48,7 +44,8 @@
             applicants_id.push(applicant.id);
         }
         await axios.post(`/post/<%= post.id %>/apply/complete`, {
-            applicant_id: applicants_id
+            applicant_id: applicants_id,
+            _csrf: csrfToken
         })
             .then((response) => {
                 if (response.data === 'success') {

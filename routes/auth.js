@@ -5,17 +5,14 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
 const router = express.Router();
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(cookieParser());
 
-router.get('/join', isNotLoggedIn, async (req, res) => {
-    res.render('join', {title: '회원가입'});
-});
-router.post('/join', isNotLoggedIn, async (req, res, next) => {
-
+router.post('/join', csrfProtection, isNotLoggedIn, async (req, res, next) => {
     const {id, password, verify_password, nickname} = req.body;
-
     try {
         let exUser = await User.findOne({where: {id}});
         if (!id) {
@@ -56,7 +53,7 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/login', isNotLoggedIn, async (req, res, next)=>{
+router.post('/login', csrfProtection, isNotLoggedIn, async (req, res, next)=>{
     passport.authenticate('local', (authError, user, info) => {
         if (authError) {
             console.error(authError);

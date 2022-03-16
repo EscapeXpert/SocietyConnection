@@ -10,20 +10,23 @@ const cookieParser = require('cookie-parser');
 const {Applicant, Recruitment} = require("../models");
 const fs = require("fs");
 const LocalStrategy = require('passport-local').Strategy;
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
 const router = express.Router();
 
-router.get('/introduce', async (req, res, next) => {
+router.get('/introduce', csrfProtection, async (req, res, next) => {
     const boards = await Board.findAll({
         attributes: ['id', 'name']
     });
     res.locals.user = req.user;
     res.render('introduce', {
         title: '동아리 소개',
-        boards: boards
+        boards: boards,
+        csrfToken: req.csrfToken()
     });
 });
 
-router.get('/', async (req, res) => {
+router.get('/', csrfProtection, async (req, res) => {
     const boards = await Board.findAll({
         attributes: ['id', 'name']
     });
@@ -54,7 +57,8 @@ router.get('/', async (req, res) => {
         title: '메인',
         User: req.user,
         boards: boards,
-        image_files: image_files
+        image_files: image_files,
+        csrfToken: req.csrfToken()
     });
 });
 

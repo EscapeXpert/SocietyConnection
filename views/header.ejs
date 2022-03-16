@@ -76,6 +76,7 @@
                                 </div>
                             </div>
                         </div>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     </form>
                     <form id="join-form" action="/auth/join" method="post">
                         <div class="modal fade" id="join" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -125,6 +126,7 @@
                                 </div>
                             </div>
                         </div>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     </form>
                 <% } else { %>
                     <a class="btn btn-outline-primary me-2" href="/profile/<%= locals.user.nickname %>">프로필</a>

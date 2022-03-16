@@ -1,6 +1,9 @@
 const express = require('express');
 const multer = require("multer");
 const fs = require("fs");
+const sanitizeHtml = require('sanitize-html');
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
 const router = express.Router();
 const {
     sequelize,
@@ -33,7 +36,7 @@ const file_upload = multer({
     limits: {fileSize: 50 * 1024 * 1024},
 }).array('files');
 
-router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/delete', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.body.board_id;
     const user_id = req.user.id;
@@ -86,7 +89,7 @@ router.post('/:post_id/delete', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
+router.get('/:post_id/modify', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
     const user_id = req.user.id;
@@ -113,7 +116,8 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                     title: '게시글 수정',
                     board: board,
                     boards: boards,
-                    post: post
+                    post: post,
+                    csrfToken: req.csrfToken()
                 });
             } else {
                 res.send('<script> alert("자신의 게시글만 수정할 수 있습니다.");history.back()</script>');
@@ -132,7 +136,8 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                         title: '게시글 수정',
                         board: board,
                         boards: boards,
-                        post: post
+                        post: post,
+                        csrfToken: req.csrfToken()
                     });
                 } else {
                     res.send('<script> alert("수정 기간이 지났습니다.");window.location.replace("/post/' + post_id + '?board_id=' + board_id + '");</script>');
@@ -147,16 +152,43 @@ router.get('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
-    await file_upload(req, res, async function(err) {
-        if(err) {
+router.post('/:post_id/modify', csrfProtection, isLoggedIn, async (req, res, next) => {
+    await file_upload(req, res, async function (err) {
+        if (err) {
             res.send('<script>alert("파일당 최대 50MB까지 업로드하실 수 있습니다.");history.back();</script>');
             return;
         }
         const post_id = req.params.post_id;
         const board_id = req.body.board_id;
         const title = req.body.title;
-        const content = req.body.ir1;
+        const content = sanitizeHtml(req.body.ir1, {
+            allowedTags: [
+                "address", "article", "aside", "footer", "header", "h1", "h2", "h3", "h4",
+                "h5", "h6", "hgroup", "main", "nav", "section", "blockquote", "dd", "div",
+                "dl", "dt", "figcaption", "figure", "hr", "li", "main", "ol", "p", "pre",
+                "ul", "a", "abbr", "b", "bdi", "bdo", "br", "cite", "code", "data", "dfn",
+                "em", "i", "kbd", "mark", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
+                "small", "span", "strong", "sub", "sup", "time", "u", "var", "wbr", "caption",
+                "col", "colgroup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "img"
+            ],
+            disallowedTagsMode: 'discard',
+            allowedAttributes: {
+                a: ['href', 'name', 'target'],
+                // We don't currently allow img itself by default, but
+                // these attributes would make sense if we did.
+                img: ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading'],
+                p: ['style'],
+                span: ['style']
+            },
+// Lots of these won't come up by default because we don't allow them
+            selfClosing: ['img', 'br', 'hr', 'area', 'base', 'basefont', 'input', 'link', 'meta'],
+// URL schemes we permit
+            allowedSchemes: ['http', 'https', 'ftp', 'mailto', 'tel'],
+            allowedSchemesByTag: {},
+            allowedSchemesAppliedToAttributes: ['href', 'src', 'cite'],
+            allowProtocolRelative: true,
+            enforceHtmlBoundary: false
+        });
         const deadline = req.body.deadline;
         const user_id = req.user.id;
         const files = req.files;
@@ -173,8 +205,7 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
                     board_id: board_id
                 }
             });
-            for(file of files)
-            {
+            for (file of files) {
                 await PostFile.create({
                     post_id: post_id,
                     file_name: file.originalname,
@@ -243,7 +274,7 @@ router.post('/:post_id/modify', isLoggedIn, async (req, res, next) => {
     });
 });
 
-router.post('/:post_id/notice', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/notice', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
     try {
@@ -283,7 +314,7 @@ router.post('/:post_id/notice', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
+router.get('/:post_id/apply/complete', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
     const applicant_id = req.query.applicant_id.split(',');
@@ -314,7 +345,8 @@ router.get('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
                 layout: false,
                 applicants: applicants,
                 post: post,
-                user_id: user_id
+                user_id: user_id,
+                csrfToken: req.csrfToken()
             });
         } else {
             res.send('<script> alert("자신의 게시글만 선발할 수 있습니다.");</script>');
@@ -326,7 +358,7 @@ router.get('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/apply/complete', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
     const applicant_id = req.body.applicant_id;
@@ -385,7 +417,7 @@ router.post('/:post_id/apply/complete', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.get('/:post_id/apply', isLoggedIn, async (req, res, next) => {
+router.get('/:post_id/apply', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
     try {
@@ -411,7 +443,8 @@ router.get('/:post_id/apply', isLoggedIn, async (req, res, next) => {
             res.render('apply', {
                 title: 'title',
                 layout: false,
-                post: post
+                post: post,
+                csrfToken: req.csrfToken()
             });
         }
     } catch (err) {
@@ -421,7 +454,7 @@ router.get('/:post_id/apply', isLoggedIn, async (req, res, next) => {
 
 });
 
-router.post('/:post_id/apply', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/apply', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
     const message = req.body.message;
@@ -456,7 +489,7 @@ router.post('/:post_id/apply', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/apply_cancel', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/apply_cancel', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
     const message = req.body.message;
@@ -486,7 +519,7 @@ router.post('/:post_id/apply_cancel', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/like', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/like', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const user_id = req.user.id;
     try {
@@ -516,7 +549,7 @@ router.post('/:post_id/like', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/comment/:comment_id/reply_comment/write', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/comment/:comment_id/reply_comment/write', csrfProtection, isLoggedIn, async (req, res, next) => {
     const comment_id = req.params.comment_id;
     const reply_comment_content = req.body.reply_comment_content;
     const user_id = req.user.id;
@@ -545,7 +578,7 @@ router.post('/:post_id/comment/:comment_id/reply_comment/write', isLoggedIn, asy
     }
 });
 
-router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/comment/:comment_id/delete', csrfProtection, isLoggedIn, async (req, res, next) => {
         const post_id = req.params.post_id;
         const comment_id = req.params.comment_id;
         const user_id = req.user.id;
@@ -594,7 +627,7 @@ router.post('/:post_id/comment/:comment_id/delete', isLoggedIn, async (req, res,
 )
 ;
 
-router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/comment/write', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const content = req.body.comment_content;
     const user_id = req.user.id;
@@ -624,7 +657,7 @@ router.post('/:post_id/comment/write', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:post_id/reply_comment/:reply_comment_id/delete', isLoggedIn, async (req, res, next) => {
+router.post('/:post_id/reply_comment/:reply_comment_id/delete', csrfProtection, isLoggedIn, async (req, res, next) => {
     const reply_comment_id = req.params.reply_comment_id;
     const user_id = req.user.id;
     const post_id = req.params.post_id;
@@ -663,7 +696,7 @@ router.post('/:post_id/reply_comment/:reply_comment_id/delete', isLoggedIn, asyn
     }
 });
 
-router.get('/:post_id', isLoggedIn, async (req, res, next) => {
+router.get('/:post_id', csrfProtection, isLoggedIn, async (req, res, next) => {
     const post_id = req.params.post_id;
     const board_id = req.query.board_id;
     const user_id = req.user.id;
@@ -762,7 +795,8 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                     like_list: like_list,
                     comment_list: comment_list,
                     reply_comment_map: reply_comment_map,
-                    files: files
+                    files: files,
+                    csrfToken: req.csrfToken()
                 });
             } else {
                 const grade = await Grade.findOne({
@@ -827,7 +861,8 @@ router.get('/:post_id', isLoggedIn, async (req, res, next) => {
                     already: already,
                     applicants: applicants,
                     applicant_count: applicant_count,
-                    files: files
+                    files: files,
+                    csrfToken: req.csrfToken()
                 });
             } else {
                 const grade = await Grade.findOne({

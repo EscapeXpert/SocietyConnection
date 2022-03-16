@@ -166,14 +166,17 @@
                                                href="/profile/<%= applicant.User.nickname %>">&nbsp<%= applicant.User.nickname %></a>
                                         </td>
                                         <td class="align-middle text-center">
-                                            <button class="btn btn-outline-primary" type="button" id="liveToastBtn">보기</button>
+                                            <button class="btn btn-outline-primary" type="button" id="liveToastBtn">보기
+                                            </button>
                                             <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-                                                <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                                                <div id="liveToast" class="toast" role="alert" aria-live="assertive"
+                                                     aria-atomic="true">
                                                     <div class="toast-header">
                                                         <img src="" class="rounded me-2" alt="">
-                                                        <strong class="me-auto"><%= applicant.User.nickname%></strong>
+                                                        <strong class="me-auto"><%= applicant.User.nickname %></strong>
                                                         <small></small>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="toast"
+                                                                aria-label="Close"></button>
                                                     </div>
                                                     <div class="toast-body">
                                                         <%= applicant.message %>
@@ -217,9 +220,11 @@
     </div>
 </div>
 <input type="hidden" id="board_id" name="board_id" value="<%= board.id %>">
+<input type="hidden" id="csrfToken" name="csrfToken" value="<%= csrfToken %>">
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
     const board_id = document.querySelector('#board_id').value;
+    const csrfToken = document.querySelector('#csrfToken').value;
     <% if(post.creator_id === user.id && post.deadline.getTime() < new Date().getTime() ) { %>
     const complete_tag = document.querySelector('#complete');
     complete_tag.addEventListener('click', async function (event) {
@@ -230,7 +235,6 @@
             applicant_ids.push(i.getAttribute("value"))
         }
         window.open(`/post/<%= post.id %>/apply/complete?applicant_id=` + applicant_ids, '<%= post.id %>', 'status=no, toolbar=no, menubar=no, width=600, height=500');
-
     });
     const mobile_complete_tag = document.querySelector('#mobile_complete');
     mobile_complete_tag.addEventListener('click', async function (event) {
@@ -241,7 +245,6 @@
             applicant_ids.push(i.getAttribute("value"))
         }
         window.open(`/post/<%= post.id %>/apply/complete?applicant_id=` + applicant_ids, '<%= post.id %>', 'status=no, toolbar=no, menubar=no, width=600, height=500');
-
     });
     <% } %>
     <% if(post.creator_id === user.id && applicant_count === 0 || user.grade === 5) { %>
@@ -249,7 +252,8 @@
     delete_tag.addEventListener('click', async function (event) {
         event.preventDefault();
         await axios.post(`/post/<%= post.id %>/delete`, {
-            board_id: board_id
+            board_id: board_id,
+            _csrf: csrfToken
         })
             .then((response) => {
                 if (response.data === 'success') {
@@ -269,7 +273,8 @@
     cancel_tag.addEventListener('click', async function (event) {
         event.preventDefault();
         await axios.post(`/post/<%= post.id %>/apply_cancel`, {
-            board_id: board_id
+            board_id: board_id,
+            _csrf: csrfToken
         })
             .then((response) => {
                 if (response.data === 'success') {
@@ -287,8 +292,7 @@
     <% } %>
     const toastTriggers = document.querySelectorAll('#liveToastBtn');
     const toastLives = document.querySelectorAll('#liveToast');
-    for(let [index, toastTrigger] of toastTriggers.entries())
-    {
+    for (let [index, toastTrigger] of toastTriggers.entries()) {
         toastTrigger.addEventListener('click', function () {
             const toast = new bootstrap.Toast(toastLives[index])
             toast.show()
