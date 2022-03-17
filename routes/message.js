@@ -1,18 +1,21 @@
 const express = require('express');
 const router = express.Router();
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
 const {sequelize, Message, User, Post, Recruitment, Applicant, Comment, ReplyComment} = require('../models');
 const {Op} = require('sequelize');
 const {isLoggedIn} = require("./middlewares");
 const Board = require("../models/board");
 const moment = require("moment");
 
-router.get('/write', isLoggedIn, async (req, res, next) => {
+router.get('/write', csrfProtection, isLoggedIn, async (req, res, next) => {
     const target_nickname = req.query.target_nickname;
     try {
         res.locals.user = req.user;
         res.render("message_write", {
             layout: false,
-            target_nickname: target_nickname
+            target_nickname: target_nickname,
+            csrfToken: req.csrfToken()
         });
     } catch (err) {
         console.error(err);
@@ -20,7 +23,7 @@ router.get('/write', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/write', isLoggedIn, async (req, res, next) => {
+router.post('/write', csrfProtection, isLoggedIn, async (req, res, next) => {
     const target_nickname = req.body.target_nickname;
     console.log(target_nickname);
     const title = req.body.title;
@@ -172,7 +175,7 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/delete', isLoggedIn, async (req, res, next) => {
+router.post('/delete', csrfProtection, isLoggedIn, async (req, res, next) => {
     const message_ids = req.body.message_ids;
     const user_id = req.user.id;
     let flag = false;
@@ -208,7 +211,7 @@ router.post('/delete', isLoggedIn, async (req, res, next) => {
     }
 })
 
-router.get('/:message_id', isLoggedIn, async (req, res, next) => {
+router.get('/:message_id', csrfProtection, isLoggedIn, async (req, res, next) => {
     const message_id = req.params.message_id;
     const type = req.query.type;
     const user_id = req.user.id;
@@ -218,7 +221,6 @@ router.get('/:message_id', isLoggedIn, async (req, res, next) => {
             attributes: ['id', 'title', 'message', 'is_read', 'created_at', 'is_receiver_delete', 'is_sender_delete', 'sender_id', 'receiver_id'],
             where: {
                 id: message_id,
-
                 [Op.or]: [
                     {
                         sender_id:
@@ -235,26 +237,24 @@ router.get('/:message_id', isLoggedIn, async (req, res, next) => {
                 ]
             },
         });
-
         const sender_nickname = await User.findOne({
             attributes: ['id', 'nickname', 'profile_image', 'grade'],
             where: {id: message.sender_id}
         });
-
         await Message.update({is_read: true}, {
             where: {
                 receiver_id: user_id,
                 id: message_id
             }
         });
-
         res.locals.user = req.user;
         res.render("message", {
             layout: false,
             title: message.title,
             message: message,
             sender_nickname: sender_nickname,
-            type: type
+            type: type,
+            csrfToken: req.csrfToken()
         });
 
     } catch (err) {
@@ -262,7 +262,6 @@ router.get('/:message_id', isLoggedIn, async (req, res, next) => {
         next(err);
     }
 })
-
 
 router.get('/profile/:user_nickname', isLoggedIn, async (req, res, next) => {
     const req_params_user_nickname = req.params.user_nickname;
