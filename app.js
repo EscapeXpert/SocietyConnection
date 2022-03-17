@@ -38,6 +38,7 @@ app.use(expressLayouts);
 app.set("layout extractScripts", true);
 
 async function set_default_database() {
+    const grade_name = ['방문자', '준회원', '정회원', '운영진', '관리자']
     try {
         for (let i = 1; i <= 5; i++) {
             const grade = await Grade.findOne({
@@ -48,7 +49,7 @@ async function set_default_database() {
             if (!grade) {
                 await Grade.create({
                     id: i,
-                    name: String(i)
+                    name: grade_name[i]
                 });
             }
         }
@@ -78,7 +79,6 @@ async function make_admin() {
 
 sequelize.sync({force: false})
     .then(() => {
-
         console.log("데이터베이스 연결 성공");
         set_default_database();
         make_admin();
