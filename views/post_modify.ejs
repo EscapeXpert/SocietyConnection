@@ -14,10 +14,11 @@
             <label class="form-label" for="deadline">마감기한</label>
             <% const offset = new Date().getTimezoneOffset() * 60000 %>
             <% const date = new Date(Date.now() - offset) %>
+            <% const deadline_date = new Date(post.deadline - offset) %>
             <% const max_date = new Date(post.created_at - offset) %>
             <% max_date.setFullYear(max_date.getFullYear() + 1) %>
             <input class="form-control" type="datetime-local" name="deadline" id="deadline" min="<%= date.toISOString().slice(0, 16) %>"
-                   max="<%= max_date.toISOString().slice(0, 16) %>" value="<%= date.toISOString().slice(0, 16) %>"
+                   max="<%= max_date.toISOString().slice(0, 16) %>" value="<%= deadline_date.toISOString().slice(0, 16) %>"
                    required>
         </div>
     <% } %>
