@@ -12,6 +12,8 @@ const {sequelize} = require("../models");
 const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
 const router = express.Router();
 
 router.get('/', csrfProtection, isLoggedIn, async (req, res) => {
