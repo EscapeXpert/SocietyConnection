@@ -73,11 +73,10 @@
                 </div>
                 <button id="edit_button" type="submit" class="btn btn-primary">수정</button>
             </div>
-
         </div>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     </form>
 </div>
-
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>

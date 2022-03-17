@@ -10,6 +10,8 @@ const {sequelize} = require("../models");
 const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
 const router = express.Router();
 
 router.get('/', isLoggedIn, async (req, res) => {
@@ -43,7 +45,7 @@ router.get('/', isLoggedIn, async (req, res) => {
         image_files : image_files
     });
 });
-router.post('/:User_nickname/edit', isLoggedIn, async (req, res, next) => {
+router.post('/:User_nickname/edit', csrfProtection, isLoggedIn, async (req, res, next) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }

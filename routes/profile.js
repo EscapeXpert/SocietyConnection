@@ -8,12 +8,10 @@ const multer = require("multer");
 const {Op} = require("sequelize");
 const axios = require("axios");
 const {sequelize,Message, Post, Board, User, Comment, Recruitment, ReplyComment, Applicant} = require('../models');
-
-
 const router = express.Router();
-
-
-router.get('/:user_nickname', isLoggedIn, async (req, res, next) => {
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
+router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next) => {
     const req_params_user_nickname = req.params.user_nickname;
     const Find_User = await User.findOne({where: {nickname: req_params_user_nickname}});
     const birth =  moment(Find_User.birth_date).format('YYYY-MM-DD')
@@ -95,7 +93,8 @@ router.get('/:user_nickname', isLoggedIn, async (req, res, next) => {
             MyRecruitmentList : MyRecruitmentList,
             MyApplicantList : MyApplicantList,
             MyCommentList : MyCommentList,
-            MyReplyCommentList : MyReplyCommentList
+            MyReplyCommentList : MyReplyCommentList,
+            csrfToken: req.csrfToken()
         });
     } catch (err) {
         console.error(err);
@@ -124,7 +123,7 @@ router.post('/:user_nickname/edit/img', isLoggedIn, upload.single('img'), async 
     res.json({url: `/uploads/profile/${req.file.filename}`});
 });
 
-router.get('/:user_nickname/edit', isLoggedIn, async (req, res) => {
+router.get('/:user_nickname/edit', csrfProtection, isLoggedIn, async (req, res) => {
     const user_nickname = req.params.user_nickname;
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
@@ -134,16 +133,17 @@ router.get('/:user_nickname/edit', isLoggedIn, async (req, res) => {
     });
     res.locals.user = req.user;
 
-    res.render('edit', {
+    res.render('profile_edit', {
         title: '프로필 수정',
         User: req.user,
         boards:boards,
-        birth: moment(req.user.birth_date).format('YYYY-MM-DD')
+        birth: moment(req.user.birth_date).format('YYYY-MM-DD'),
+        csrfToken: req.csrfToken()
     });
 });
 
 const upload2 = multer();
-router.post('/:user_nickname/edit', isLoggedIn, upload2.none(), async (req, res, next) => {
+router.post('/:user_nickname/edit', csrfProtection, isLoggedIn, upload2.none(), async (req, res, next) => {
     const user_nickname = req.params.user_nickname;
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
@@ -187,7 +187,7 @@ router.post('/:user_nickname/edit', isLoggedIn, upload2.none(), async (req, res,
     }
 });
 
-router.post('/:user_nickname/change_password', isLoggedIn, async (req, res, next) => {
+router.post('/:user_nickname/change_password', csrfProtection, isLoggedIn, async (req, res, next) => {
     const user_nickname = req.params.user_nickname;
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
@@ -292,8 +292,4 @@ router.get('/:user_nickname/account_delete', isLoggedIn, async (req, res) => {
         console.error(error);
     }
 });
-
-
-
-
 module.exports = router;
