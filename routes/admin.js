@@ -4,6 +4,8 @@ const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const User = require("../models/user");
 const Grade = require("../models/grade");
 const bcrypt = require("bcrypt");
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
 const {Op} = require("sequelize");
 const Board = require("../models/board");
 const {sequelize} = require("../models");
@@ -12,7 +14,7 @@ const multer = require("multer");
 const path = require("path");
 const router = express.Router();
 
-router.get('/', isLoggedIn, async (req, res) => {
+router.get('/', csrfProtection, isLoggedIn, async (req, res) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
@@ -40,10 +42,11 @@ router.get('/', isLoggedIn, async (req, res) => {
         UserList : UserList,
         BoardList : BoardList,
         GradeList : GradeList,
-        image_files : image_files
+        image_files : image_files,
+        csrfToken: req.csrfToken()
     });
 });
-router.post('/:User_nickname/edit', isLoggedIn, async (req, res, next) => {
+router.post('/:User_nickname/edit', csrfProtection, isLoggedIn, async (req, res, next) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
@@ -70,7 +73,7 @@ router.post('/:User_nickname/edit', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/board_create', isLoggedIn, async (req, res, next) => {
+router.post('/board_create', csrfProtection, isLoggedIn, async (req, res, next) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
@@ -88,7 +91,7 @@ router.post('/board_create', isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.post('/:Board_id/board_edit', isLoggedIn, async (req, res, next) => {
+router.post('/:Board_id/board_edit', csrfProtection, isLoggedIn, async (req, res, next) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
@@ -108,6 +111,7 @@ router.post('/:Board_id/board_edit', isLoggedIn, async (req, res, next) => {
         return next(error);
     }
 });
+
 router.get('/:Board_id/board_delete', isLoggedIn, async (req, res) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
@@ -145,7 +149,7 @@ const upload = multer({
     limits: {fileSize: 5 * 1024 * 1024},
 });
 
-router.post('/main_img', isLoggedIn, upload.single('img'), async (req, res) => {
+router.post('/main_img', csrfProtection, isLoggedIn, upload.single('img'), async (req, res) => {
     if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }

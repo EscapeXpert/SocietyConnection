@@ -108,10 +108,12 @@
                     <hr>
                     <% if(User.nickname === locals.user.nickname){ %>
                         <div>
-                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#change_password" id="openJoinBtn">
-                                비밀번호 변경
-                            </button>
+                            <% if(login_type === 'local') { %>
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#change_password" id="openJoinBtn">
+                                    비밀번호 변경
+                                </button>
+                            <% } %>
                             <a href="/profile/<%= User.nickname %>/edit" class="btn btn-primary btn-sm">프로필 수정</a>
                             <form id="change_password-form" action="/profile/<%= User.nickname %>/change_password"
                                   method="post">
@@ -200,10 +202,12 @@
                                             <td><%= Post.dataValues.id %></td>
                                         <% } %>
                                         <td>
-                                            <a class="text-decoration-none text-reset" href="/post/<%= Post.dataValues.id %>?board_id=<%= Post.dataValues.board_id %>"><%= Post.dataValues.title %></a>
+                                            <a class="text-decoration-none text-reset"
+                                               href="/post/<%= Post.dataValues.id %>?board_id=<%= Post.dataValues.board_id %>"><%= Post.dataValues.title %></a>
                                         </td>
                                         <td>
-                                            <a class="text-decoration-none text-reset" href="/profile/<%= Post.User.dataValues.nickname %>"><%= Post.User.dataValues.nickname %></a>
+                                            <a class="text-decoration-none text-reset"
+                                               href="/profile/<%= Post.User.dataValues.nickname %>"><%= Post.User.dataValues.nickname %></a>
                                         </td>
                                         <td><%= Post.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
                                         <td><%= Post.dataValues.view_count %></td>
@@ -246,10 +250,12 @@
                                     <tr>
                                         <td><%= Recruitment.dataValues.id %></td>
                                         <td>
-                                            <a class="text-decoration-none text-reset" href="/post/<%= Recruitment.dataValues.id %>?board_id=<%= Recruitment.dataValues.board_id %>"><%= Recruitment.dataValues.title %></a>
+                                            <a class="text-decoration-none text-reset"
+                                               href="/post/<%= Recruitment.dataValues.id %>?board_id=<%= Recruitment.dataValues.board_id %>"><%= Recruitment.dataValues.title %></a>
                                         </td>
                                         <td>
-                                            <a class="text-decoration-none text-reset" href="/profile/<%= Recruitment.User.dataValues.nickname %>"><%= Recruitment.User.dataValues.nickname %></a>
+                                            <a class="text-decoration-none text-reset"
+                                               href="/profile/<%= Recruitment.User.dataValues.nickname %>"><%= Recruitment.User.dataValues.nickname %></a>
                                         </td>
                                         <td><%= Recruitment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
                                         <td><%= Recruitment.dataValues.view_count %></td>
@@ -287,10 +293,12 @@
                                     <% for(let Applicant of MyApplicantList){ %>
                                         <tr>
                                             <td>
-                                                <a class="text-decoration-none text-reset" href="/post/<%= Applicant.Recruitment.dataValues.id %>?board_id=<%= Applicant.Recruitment.dataValues.board_id %>"><%= Applicant.Recruitment.dataValues.title %></a>
+                                                <a class="text-decoration-none text-reset"
+                                                   href="/post/<%= Applicant.Recruitment.dataValues.id %>?board_id=<%= Applicant.Recruitment.dataValues.board_id %>"><%= Applicant.Recruitment.dataValues.title %></a>
                                             </td>
                                             <td>
-                                                <a class="text-decoration-none text-reset" href="/profile/<%= Applicant.Recruitment.User.dataValues.nickname %>"><%= Applicant.Recruitment.User.dataValues.nickname %></a>
+                                                <a class="text-decoration-none text-reset"
+                                                   href="/profile/<%= Applicant.Recruitment.User.dataValues.nickname %>"><%= Applicant.Recruitment.User.dataValues.nickname %></a>
                                             </td>
                                             <td><%= Applicant.dataValues.message %></td>
                                         </tr>
@@ -328,10 +336,12 @@
                                 <% for(let Comment of MyCommentList){ %>
                                     <tr>
                                         <td>
-                                            <a class="text-decoration-none text-reset" href="/post/<%= Comment.Post.dataValues.id %>?board_id=<%= Comment.Post.dataValues.board_id %>"><%= Comment.Post.dataValues.title %></a>
+                                            <a class="text-decoration-none text-reset"
+                                               href="/post/<%= Comment.Post.dataValues.id %>?board_id=<%= Comment.Post.dataValues.board_id %>"><%= Comment.Post.dataValues.title %></a>
                                         </td>
                                         <td>
-                                            <a class="text-decoration-none text-reset" href="/profile/<%= Comment.Post.User.dataValues.nickname %>"><%= Comment.Post.User.dataValues.nickname %></a>
+                                            <a class="text-decoration-none text-reset"
+                                               href="/profile/<%= Comment.Post.User.dataValues.nickname %>"><%= Comment.Post.User.dataValues.nickname %></a>
                                         </td>
                                         <td><%= Comment.dataValues.content %></td>
                                     </tr>
@@ -370,10 +380,12 @@
                                 <% for(let ReplyComment of MyReplyCommentList) { %>
                                     <tr>
                                         <td>
-                                            <a class="text-decoration-none text-reset" href="/post/<%= ReplyComment.Comment.Post.dataValues.id %>?board_id=<%= ReplyComment.Comment.Post.dataValues.board_id %>"><%= ReplyComment.Comment.Post.dataValues.title %></a>
+                                            <a class="text-decoration-none text-reset"
+                                               href="/post/<%= ReplyComment.Comment.Post.dataValues.id %>?board_id=<%= ReplyComment.Comment.Post.dataValues.board_id %>"><%= ReplyComment.Comment.Post.dataValues.title %></a>
                                         </td>
                                         <td>
-                                            <a class="text-decoration-none text-reset" href="/profile/<%= ReplyComment.Comment.Post.User.dataValues.nickname %>"><%= ReplyComment.Comment.Post.User.dataValues.nickname %></a>
+                                            <a class="text-decoration-none text-reset"
+                                               href="/profile/<%= ReplyComment.Comment.Post.User.dataValues.nickname %>"><%= ReplyComment.Comment.Post.User.dataValues.nickname %></a>
                                         </td>
                                         <td><%= ReplyComment.Comment.dataValues.content %></td>
                                         <td><%= ReplyComment.Comment.dataValues.creator_id %></td>

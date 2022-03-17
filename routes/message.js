@@ -25,7 +25,6 @@ router.get('/write', csrfProtection, isLoggedIn, async (req, res, next) => {
 
 router.post('/write', csrfProtection, isLoggedIn, async (req, res, next) => {
     const target_nickname = req.body.target_nickname;
-    console.log(target_nickname);
     const title = req.body.title;
     const message = req.body.message;
     const sender_id = req.user.id;
