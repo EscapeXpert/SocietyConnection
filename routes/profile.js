@@ -20,6 +20,10 @@ router.get('/:user_nickname', isLoggedIn, async (req, res, next) => {
     const user_id = req.user.id;
 
     try {
+        const login_type = await User.findOne({
+            where: {id: user_id}
+        });
+
         const boards = await Board.findAll({
             attributes: ['id', 'name']
         });
@@ -89,6 +93,7 @@ router.get('/:user_nickname', isLoggedIn, async (req, res, next) => {
             title: '프로필',
             boards: boards,
             User: Find_User,
+            login_type: login_type.login_type,
             birth : birth,
             not_read_message: not_read_message,
             MyPostList : MyPostList,
