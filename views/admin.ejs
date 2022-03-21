@@ -81,10 +81,12 @@
                                         <% } %>
                                     <% } %>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#<%= User.nickname %>" id="openJoinBtn">
-                                            수정
-                                        </button>
+                                        <% if(User.grade !== 5 || user.id === 'admin') { %>
+                                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#<%= User.nickname %>" id="openJoinBtn">
+                                                수정
+                                            </button>
+                                        <% } %>
                                     </td>
                                     <form id="edit-form" action="/admin/<%= User.nickname %>/edit" method="post">
                                         <div class="modal fade" id="<%= User.nickname %>" tabindex="-1"
@@ -107,12 +109,15 @@
                                                         <div class="mb-3">
                                                             <label for="grade" class="form-label">grade</label>
                                                             <select name="grade" class="form-select">
-                                                                <% for(let list_of_grade of GradeList) { %>
-                                                                    <% if(User.grade == list_of_grade.dataValues.id){ %>
-                                                                        <option value=<%= list_of_grade.dataValues.id %> selected="selected"><%= list_of_grade.dataValues.name %></option>
+                                                                <% for(let i = 0; i < 4; i++) { %>
+                                                                    <% if(User.grade == GradeList[i].dataValues.id){ %>
+                                                                        <option value=<%= GradeList[i].dataValues.id %> selected="selected"><%= GradeList[i].dataValues.name %></option>
                                                                     <% }else{ %>
-                                                                        <option value=<%= list_of_grade.dataValues.id %>><%= list_of_grade.dataValues.name %></option>
+                                                                        <option value=<%= GradeList[i].dataValues.id %>><%= GradeList[i].dataValues.name %></option>
                                                                     <% } %>
+                                                                <% } %>
+                                                                <% if(user.id === 'admin') { %>
+                                                                    <option value=<%= GradeList[4].dataValues.id %>><%= GradeList[4].dataValues.name %></option>
                                                                 <% } %>
                                                             </select>
                                                         </div>
@@ -130,7 +135,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     </form>
                                 </tr>
                             <% } %>
@@ -218,7 +223,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 </form>
                             </tr>
                             </thead>
@@ -268,7 +273,8 @@
                                                                    value="<%= list_of_board.dataValues.name %>">
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="min_read_grade" class="form-label">최소 읽기 권한</label>
+                                                            <label for="min_read_grade" class="form-label">최소 읽기
+                                                                권한</label>
                                                             <select name="min_read_grade" class="form-select">
                                                                 <% for(let list_of_grade of GradeList) { %>
                                                                     <% if(list_of_board.dataValues.min_read_grade === list_of_grade.dataValues.id){ %>
@@ -278,7 +284,8 @@
                                                                     <% } %>
                                                                 <% } %>
                                                             </select>
-                                                            <label for="min_write_grade" class="form-label">최소 쓰기 권한</label>
+                                                            <label for="min_write_grade" class="form-label">최소 쓰기
+                                                                권한</label>
                                                             <select name="min_write_grade" class="form-select">
                                                                 <% for(let list_of_grade of GradeList) { %>
                                                                     <% if(list_of_board.dataValues.min_write_grade === list_of_grade.dataValues.id){ %>
@@ -303,7 +310,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <input type="hidden" name="_csrf" value="<%= csrfToken%>">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     </form>
                                 </tr>
                             <% } %>
@@ -333,7 +340,8 @@
                             <tbody>
                             <% for(let list_of_image_files of image_files) { %>
                                 <tr>
-                                    <td><img src="\public\main_image\<%= list_of_image_files %>" alt="" width="300"></td>
+                                    <td><img src="\public\main_image\<%= list_of_image_files %>" alt="" width="300">
+                                    </td>
 
                                     <td>
                                         <a href="/admin/image_delete/<%= list_of_image_files %>"
