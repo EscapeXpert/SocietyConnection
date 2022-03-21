@@ -120,8 +120,9 @@ router.post('/:Board_id/board_edit', csrfProtection, isLoggedIn, async (req, res
     }
 });
 
-router.get('/:Board_id/board_delete', isLoggedIn, async (req, res) => {
-    if (req.user.grade !== 5) {
+
+router.post('/:Board_id/board_delete',csrfProtection, isLoggedIn, async (req, res) => {
+    if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
     const Board_id = req.params.Board_id;
@@ -129,21 +130,20 @@ router.get('/:Board_id/board_delete', isLoggedIn, async (req, res) => {
         await Board.destroy({
             where: {id: Board_id}
         });
-        res.redirect(`/admin`);
+        res.send('success');
     } catch (error) {
         console.error(error);
     }
 });
 
-router.get('/image_delete/:image', isLoggedIn, async (req, res) => {
-    if (req.user.grade !== 5) {
+
+router.post('/image_delete/:image',csrfProtection, isLoggedIn, async (req, res) => {
+    if(req.user.grade!==5){
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
     const image = req.params.image;
-    fs.unlink('./public/main_image/' + image, (err) => {
-        console.log(err);
-    });
-    res.redirect(`/admin`);
+    fs.unlink('./public/main_image/'+image,(err)=>{ console.log(err);});
+    res.send(`success`);
 });
 
 const upload = multer({
@@ -163,6 +163,7 @@ router.post('/main_img', csrfProtection, isLoggedIn, upload.single('img'), async
     if (req.user.grade !== 5) {
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
+    console.log(req.file);
     res.json({url: `/public/main_image/${req.file.filename}`});
 });
 

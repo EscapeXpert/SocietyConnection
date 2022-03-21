@@ -43,7 +43,8 @@
                                 <tr>
                                     <% } %>
                                     <td><%= User.id %></td>
-                                    <td><%= User.nickname %></td>
+                                    <td><a class="text-decoration-none text-reset"
+                                           href="/profile/<%= User.nickname %>"><%= User.nickname %></a></td>
                                     <% if(User.name){ %>
                                         <td><%= User.name %></td>
                                     <% }else{ %>
@@ -229,7 +230,7 @@
                             </thead>
                             <tbody>
                             <% for(let list_of_board of BoardList) { %>
-                                <tr>
+                                <tr id="<%=list_of_board.dataValues.id%>">
                                     <td><%= list_of_board.dataValues.name %></td>
 
                                     <% for(let Grade of GradeList) { %>
@@ -250,7 +251,7 @@
                                             수정
                                         </button>
                                     </td>
-                                    <td><a href="/admin/<%= list_of_board.dataValues.id %>/board_delete"
+                                    <td><a href="#" id="board_delete"
                                            class="btn btn-primary btn-sm">삭제</a></td>
 
                                     <form id="edit-form" action="/admin/<%= list_of_board.dataValues.id %>/board_edit"
@@ -339,12 +340,11 @@
                             </thead>
                             <tbody>
                             <% for(let list_of_image_files of image_files) { %>
-                                <tr>
-                                    <td><img src="\public\main_image\<%= list_of_image_files %>" alt="" width="300">
-                                    </td>
+                                <tr id="<%=list_of_image_files%>">
+                                    <td><img src="\public\main_image\<%= list_of_image_files %>" alt="" width="300"></td>
 
                                     <td>
-                                        <a href="/admin/image_delete/<%= list_of_image_files %>"
+                                        <a href="#" id="image_delete"
                                            class="btn btn-primary btn-sm">삭제</a>
                                     </td>
                                 </tr>
@@ -358,30 +358,68 @@
                             <label id="img-label" for="img" class="form-label">사진 업로드</label>
                             <input id="img" name="img" type="file" accept="image/*" class="form-control">
                         </div>
-                        <a href="/admin" class="btn btn-primary btn-sm">이미지 추가</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<input type="hidden" id="csrfToken" name="csrfToken" value="<%= csrfToken %>">
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
+    const csrfToken = document.querySelector('#csrfToken').value;
     if (document.getElementById('img')) {
         document.getElementById('img').addEventListener('change', function (e) {
             const formData = new FormData();
             formData.append('img', this.files[0]);
-            axios.post('/admin/main_img', formData)
+            axios.post('/admin/main_img?_csrf=' + csrfToken, formData)
                 .then((res) => {
                     document.getElementById('img-url').value = res.data.url;
                     document.getElementById('img-preview').src = res.data.url;
                     document.getElementById('img-preview').style.display = 'inline';
+                    location.href='/admin';
                 })
                 .catch((err) => {
                     console.log(err);
                 });
         });
     }
+    const board_delete_tags = document.querySelectorAll('#board_delete');
+    board_delete_tags.forEach((board_delete_tag) => {
+        board_delete_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            const board_delete_id = board_delete_tag.parentElement.parentElement.id;
+            await axios.post(`/admin/${board_delete_id}/board_delete`, {
+                _csrf: csrfToken
+            })
+                .then((response) => {
+                    if (response.data === 'success') {
+                        location.href='/admin';
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        })
+    });
+    const image_delete_tags = document.querySelectorAll('#image_delete');
+    image_delete_tags.forEach((image_delete_tag) => {
+        image_delete_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            const image_delete_id = image_delete_tag.parentElement.parentElement.id;
+            await axios.post(`/admin/image_delete/${image_delete_id}`, {
+                _csrf: csrfToken
+            })
+                .then((response) => {
+                    if (response.data === 'success') {
+                        location.href='/admin';
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        })
+    });
 </script>
 </html>
