@@ -47,8 +47,7 @@
                                                     id="closeJoinBtn">
                                                 Close
                                             </button>
-                                            <a href="/profile/<%= User.nickname %>/account_delete"
-                                               class="btn btn-primary">회원탈퇴</a>
+                                            <a href="#" id="account_delete_btn" class="btn btn-primary">회원탈퇴</a>
                                         </div>
                                     </div>
                                 </div>
@@ -402,3 +401,26 @@
         </div>
     </div>
 </div>
+<input type="hidden" id="csrfToken" name="csrfToken" value="<%= csrfToken %>">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    const csrfToken = document.querySelector('#csrfToken').value;
+    <% if(User.nickname === locals.user.nickname){ %>
+    const account_delete_btn_tag = document.querySelector('#account_delete_btn');
+    account_delete_btn_tag.addEventListener('click', async function (event) {
+            event.preventDefault();
+            await axios.post(`/profile/<%= User.nickname %>/account_delete`, {
+                _csrf: csrfToken
+            })
+                .then((response) => {
+                    if (response.data === 'success') {
+                        location.href='/';
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+    });
+    <% } %>
+
+</script>

@@ -232,7 +232,7 @@ router.post('/:user_nickname/change_password', csrfProtection, isLoggedIn, async
     }
 });
 
-router.get('/:user_nickname/account_delete', isLoggedIn, async (req, res) => {
+router.post('/:user_nickname/account_delete',csrfProtection,  isLoggedIn, async (req, res) => {
     const user_nickname = req.params.user_nickname;
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
@@ -292,7 +292,7 @@ router.get('/:user_nickname/account_delete', isLoggedIn, async (req, res) => {
         if (req.session) {
             req.session.destroy();
         }
-        res.redirect(`/`);
+        res.send(`success`);
     } catch (error) {
         console.error(error);
     }
