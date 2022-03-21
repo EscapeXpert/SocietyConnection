@@ -4,8 +4,6 @@ const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const User = require("../models/user");
 const Grade = require("../models/grade");
 const bcrypt = require("bcrypt");
-const csrf = require('csurf');
-const csrfProtection = csrf({cookie: true});
 const {Op} = require("sequelize");
 const Board = require("../models/board");
 const {sequelize} = require("../models");
@@ -17,8 +15,8 @@ const csrfProtection = csrf({cookie: true});
 const router = express.Router();
 
 router.get('/', csrfProtection, isLoggedIn, async (req, res) => {
-    if(req.user.grade!==5){
-        return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
+    if (req.user.grade !== 5) {
+        return res.send('<script> alert("관리자가 아닙니다.");window.location.replace("/");</script>');
     }
     const boards = await Board.findAll({
         attributes: ['id', 'name']
@@ -26,47 +24,55 @@ router.get('/', csrfProtection, isLoggedIn, async (req, res) => {
     const UserList = await User.findAll({
         where: {
             id: {
-                [Op.not]: req.user.id
+                [Op.and]: {
+                    [Op.not]: req.user.id,
+                    [Op.not]: 'admin'
+                }
             }
         },
         order: [['is_delete', 'ASC'], ['grade', 'ASC']]
     });
     const GradeList = await Grade.findAll({
-        order: [['id']]
+        order: [['id']],
     });
     res.locals.user = req.user;
     const BoardList = await Board.findAll();
     const image_files = fs.readdirSync('./public/main_image');
-
     res.render('admin', {
         title: 'admin',
-        boards:boards,
-        UserList : UserList,
-        BoardList : BoardList,
-        GradeList : GradeList,
-        image_files : image_files,
+        boards: boards,
+        UserList: UserList,
+        BoardList: BoardList,
+        GradeList: GradeList,
+        image_files: image_files,
         csrfToken: req.csrfToken()
     });
 });
 router.post('/:User_nickname/edit', csrfProtection, isLoggedIn, async (req, res, next) => {
-    if(req.user.grade!==5){
-        return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
+    if (req.user.grade !== 5) {
+        return res.send('<script> alert("관리자가 아닙니다.");window.location.replace("/");</script>');
     }
     const User_nickname = req.params.User_nickname;
-    const {nickname,grade}= req.body;
+    const {nickname, grade} = req.body;
+    if (req.user.id !== 'admin' && grade === 5) {
+        return res.send('<script> alert("관리자 권한은 admin만 부여할 수 있습니다.");history.back();</script>')
+    }
     try {
         if (!nickname) {
-            return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
+            return res.send('<script> alert("닉네임을 입력해주세요.");history.back();</script>');
         }
-        exUser = await User.findOne({where: {nickname : nickname}});
-        if (exUser&&exUser.nickname!==User_nickname) {
-            return res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
+        exUser = await User.findOne({where: {nickname: nickname}});
+        if (exUser.id === 'admin') {
+            return res.send('<script> alert("admin의 정보는 수정할 수 업없습니다.");history.back();</script>');
+        }
+        if (exUser && exUser.nickname !== User_nickname) {
+            return res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back();</script>');
         }
         await User.update({
-            nickname : nickname,
+            nickname: nickname,
             grade: grade
         }, {
-            where: {nickname : User_nickname},
+            where: {nickname: User_nickname},
         });
         res.redirect(`/admin`);
     } catch (error) {
@@ -76,16 +82,16 @@ router.post('/:User_nickname/edit', csrfProtection, isLoggedIn, async (req, res,
 });
 
 router.post('/board_create', csrfProtection, isLoggedIn, async (req, res, next) => {
-    if(req.user.grade!==5){
+    if (req.user.grade !== 5) {
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
-    const {name,min_read_grade,min_write_grade,board_type}= req.body;
+    const {name, min_read_grade, min_write_grade, board_type} = req.body;
     try {
         await Board.create({
-            name : name,
+            name: name,
             min_read_grade: min_read_grade,
-            min_write_grade : min_write_grade,
-            board_type : board_type
+            min_write_grade: min_write_grade,
+            board_type: board_type
         });
         res.redirect(`/admin`);
     } catch (error) {
@@ -94,18 +100,18 @@ router.post('/board_create', csrfProtection, isLoggedIn, async (req, res, next) 
 });
 
 router.post('/:Board_id/board_edit', csrfProtection, isLoggedIn, async (req, res, next) => {
-    if(req.user.grade!==5){
+    if (req.user.grade !== 5) {
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
     const Board_id = req.params.Board_id;
-    const {name,min_read_grade,min_write_grade}= req.body;
+    const {name, min_read_grade, min_write_grade} = req.body;
     try {
         await Board.update({
-            name : name,
+            name: name,
             min_read_grade: min_read_grade,
-            min_write_grade : min_write_grade
+            min_write_grade: min_write_grade
         }, {
-            where: {id : Board_id},
+            where: {id: Board_id},
         });
         res.redirect(`/admin`);
     } catch (error) {
@@ -115,7 +121,7 @@ router.post('/:Board_id/board_edit', csrfProtection, isLoggedIn, async (req, res
 });
 
 router.get('/:Board_id/board_delete', isLoggedIn, async (req, res) => {
-    if(req.user.grade!==5){
+    if (req.user.grade !== 5) {
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
     const Board_id = req.params.Board_id;
@@ -130,11 +136,13 @@ router.get('/:Board_id/board_delete', isLoggedIn, async (req, res) => {
 });
 
 router.get('/image_delete/:image', isLoggedIn, async (req, res) => {
-    if(req.user.grade!==5){
+    if (req.user.grade !== 5) {
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
     const image = req.params.image;
-    fs.unlink('./public/main_image/'+image,(err)=>{ console.log(err);});
+    fs.unlink('./public/main_image/' + image, (err) => {
+        console.log(err);
+    });
     res.redirect(`/admin`);
 });
 
@@ -152,12 +160,11 @@ const upload = multer({
 });
 
 router.post('/main_img', csrfProtection, isLoggedIn, upload.single('img'), async (req, res) => {
-    if(req.user.grade!==5){
+    if (req.user.grade !== 5) {
         return res.send('<script> alert("admin이 아닙니다.");window.location.replace("/");</script>');
     }
     res.json({url: `/public/main_image/${req.file.filename}`});
 });
-
 
 
 module.exports = router;
