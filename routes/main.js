@@ -26,6 +26,18 @@ router.get('/introduce', csrfProtection, async (req, res, next) => {
     });
 });
 
+router.get('/policy', csrfProtection, async (req, res, next) => {
+    const boards = await Board.findAll({
+        attributes: ['id', 'name']
+    });
+    res.locals.user = req.user;
+    res.render('privacy_policy', {
+        title: '개인정보 처리방침',
+        boards: boards,
+        csrfToken: req.csrfToken()
+    });
+});
+
 router.get('/', csrfProtection, async (req, res) => {
     const boards = await Board.findAll({
         attributes: ['id', 'name']
