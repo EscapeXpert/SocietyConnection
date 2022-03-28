@@ -16,6 +16,7 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
     const Find_User = await User.findOne({where: {nickname: req_params_user_nickname}});
     const birth =  moment(Find_User.birth_date).format('YYYY-MM-DD')
     const user_id = req.user.id;
+    const Find_User_Id = Find_User.id;
 
     try {
         const login_type = await User.findOne({
@@ -37,21 +38,21 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
             attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'creator_id','board_id',[
                 sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
             ]],
-            where: {creator_id: req_params_user_nickname},
+            where: {creator_id: Find_User_Id},
             include: {
                 model: User,
                 attributes: ['nickname']
             }
         });
         const MyRecruitmentList = await Recruitment.findAll({
-            where: {creator_id: req_params_user_nickname},
+            where: {creator_id: Find_User_Id},
             include: {
                 model: User,
                 attributes: ['nickname']
             }
         });
         const MyApplicantList = await Applicant.findAll({
-            where: {user_id: req_params_user_nickname},
+            where: {user_id: Find_User_Id},
             include: {
                 model: Recruitment,
                 attributes: ['id','title','creator_id','board_id'],
@@ -62,7 +63,7 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
             }
         });
         const MyCommentList = await Comment.findAll({
-            where: {creator_id: req_params_user_nickname},
+            where: {creator_id: Find_User_Id},
             include: {
                 model: Post,
                 attributes: ['id','title','creator_id','board_id'],
@@ -73,7 +74,7 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
             }
         });
         const MyReplyCommentList = await ReplyComment.findAll({
-            where: {creator_id: req_params_user_nickname},
+            where: {creator_id: Find_User_Id},
             include: {
                 model: Comment,
                 include:{
