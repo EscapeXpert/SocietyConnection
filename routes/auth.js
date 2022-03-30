@@ -39,7 +39,6 @@ router.post('/join', csrfProtection, isNotLoggedIn, async (req, res, next) => {
         if(!PwRules.test(password)) {
             return res.send('<script> alert("비밀번호는 8자리 이상 문자, 숫자, 특수문자로 구성하여야 합니다.");history.back()</script>');
         }
-
         const hash = await bcrypt.hash(password, 12);
         await User.create({
             id,
