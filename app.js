@@ -48,7 +48,7 @@ async function set_default_database() {
             if (!grade) {
                 await Grade.create({
                     id: i,
-                    name: grade_name[i]
+                    name: grade_name[i - 1]
                 });
             }
         }
@@ -77,10 +77,10 @@ async function make_admin() {
 }
 
 sequelize.sync({force: false})
-    .then(() => {
+    .then(async () => {
         console.log("데이터베이스 연결 성공");
-        set_default_database();
-        make_admin();
+        await set_default_database();
+        await make_admin();
     })
     .catch(() => {
         console.error("데이터베이스 연결 실패");
@@ -125,10 +125,6 @@ app.use((err, req, res, next) => {
     res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
     res.status(err.status || 500);
     res.render('error', {layout: false});
-});
-
-app.listen(app.get('port'), () => {
-    console.log(app.get('port'), '번 포트에서 대기 중');
 });
 
 cron.schedule('0 0 * * *', async () => {
@@ -210,4 +206,6 @@ try {
     console.error('uploads/post/file 폴더가 없어 생성합니다.');
     fs.mkdirSync('./uploads/post/file');
 }
+
+module.exports = app;
 

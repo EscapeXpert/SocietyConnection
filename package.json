@@ -4,7 +4,7 @@
   "description": "동아리 홈페이지입니다.",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app",
+    "start": "nodemon server",
     "test": "jest"
   },
   "repository": {
@@ -43,10 +43,13 @@
     "sequelize-cli": "^6.4.1"
   },
   "devDependencies": {
+    "artillery": "^2.0.0-12",
     "babel-preset-env": "^1.7.0",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.0",
     "jest": "^27.5.1",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "supertest": "^6.2.2",
+    "supertest-session": "^4.1.0"
   }
 }
