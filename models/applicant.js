@@ -12,6 +12,11 @@ module.exports = class Applicant extends Sequelize.Model {
                 type: Sequelize.TEXT,
                 allowNull: false,
                 defaultValue: "신청합니다."
+            },
+            created_at: {
+                type: Sequelize.DATE,
+                allowNull: false,
+                defaultValue: Sequelize.NOW,
             }
         }, {
             sequelize,

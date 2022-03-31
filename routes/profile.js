@@ -7,14 +7,14 @@ const path = require("path");
 const multer = require("multer");
 const {Op} = require("sequelize");
 const axios = require("axios");
-const {sequelize,Message, Post, Board, User, Comment, Recruitment, ReplyComment, Applicant} = require('../models');
+const {sequelize, Message, Post, Board, User, Comment, Recruitment, ReplyComment, Applicant} = require('../models');
 const router = express.Router();
 const csrf = require('csurf');
 const csrfProtection = csrf({cookie: true});
 router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next) => {
     const req_params_user_nickname = req.params.user_nickname;
     const Find_User = await User.findOne({where: {nickname: req_params_user_nickname}});
-    const birth =  moment(Find_User.birth_date).format('YYYY-MM-DD')
+    const birth = moment(Find_User.birth_date).format('YYYY-MM-DD')
     const user_id = req.user.id;
     const Find_User_Id = Find_User.id;
 
@@ -28,14 +28,14 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
         });
 
         const not_read_message = await Message.count({
-            where:{
+            where: {
                 receiver_id: user_id,
                 is_read: false,
                 is_receiver_delete: false
             }
         });
         const MyPostList = await Post.findAll({
-            attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'creator_id','board_id',[
+            attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'board_id', 'comment_count', [
                 sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
             ]],
             where: {creator_id: Find_User_Id},
@@ -55,7 +55,7 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
             where: {user_id: Find_User_Id},
             include: {
                 model: Recruitment,
-                attributes: ['id','title','creator_id','board_id'],
+                attributes: ['id', 'title', 'board_id'],
                 include: {
                     model: User,
                     attributes: ['nickname']
@@ -66,7 +66,7 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
             where: {creator_id: Find_User_Id},
             include: {
                 model: Post,
-                attributes: ['id','title','creator_id','board_id'],
+                attributes: ['id', 'title', 'board_id'],
                 include: {
                     model: User,
                     attributes: ['nickname']
@@ -77,9 +77,9 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
             where: {creator_id: Find_User_Id},
             include: {
                 model: Comment,
-                include:{
+                include: {
                     model: Post,
-                    attributes: ['id','title','creator_id','board_id'],
+                    attributes: ['id', 'title', 'board_id'],
                     include: {
                         model: User,
                         attributes: ['nickname']
@@ -93,13 +93,13 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
             boards: boards,
             User: Find_User,
             login_type: login_type.login_type,
-            birth : birth,
+            birth: birth,
             not_read_message: not_read_message,
-            MyPostList : MyPostList,
-            MyRecruitmentList : MyRecruitmentList,
-            MyApplicantList : MyApplicantList,
-            MyCommentList : MyCommentList,
-            MyReplyCommentList : MyReplyCommentList,
+            MyPostList: MyPostList,
+            MyRecruitmentList: MyRecruitmentList,
+            MyApplicantList: MyApplicantList,
+            MyCommentList: MyCommentList,
+            MyReplyCommentList: MyReplyCommentList,
             csrfToken: req.csrfToken()
         });
     } catch (err) {
@@ -142,7 +142,7 @@ router.get('/:user_nickname/edit', csrfProtection, isLoggedIn, async (req, res) 
     res.render('profile_edit', {
         title: '프로필 수정',
         User: req.user,
-        boards:boards,
+        boards: boards,
         birth: moment(req.user.birth_date).format('YYYY-MM-DD'),
         csrfToken: req.csrfToken()
     });
@@ -154,12 +154,12 @@ router.post('/:user_nickname/edit', csrfProtection, isLoggedIn, upload2.none(), 
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
     }
-    const {sns_id, nickname, name, birth_date, gender, introduce, profile_image,default_profile_image} = req.body;
+    const {sns_id, nickname, name, birth_date, gender, introduce, profile_image, default_profile_image} = req.body;
     let input_profile_image = null;
     let input_birth_date = null;
-    if(birth_date)
+    if (birth_date)
         input_birth_date = birth_date;
-    if(!default_profile_image){
+    if (!default_profile_image) {
         input_profile_image = profile_image;
     }
     try {
@@ -172,8 +172,10 @@ router.post('/:user_nickname/edit', csrfProtection, isLoggedIn, upload2.none(), 
         }
 
         //프로필 사진 수정후 기존 사진 삭제
-        if(req.user.profile_image){
-            fs.unlink('./'+req.user.profile_image,(err)=>{ console.log(err);});
+        if (req.user.profile_image) {
+            fs.unlink('./' + req.user.profile_image, (err) => {
+                console.log(err);
+            });
         }
         await User.update({
             sns_id: sns_id,
@@ -212,11 +214,11 @@ router.post('/:user_nickname/change_password', csrfProtection, isLoggedIn, async
             return res.send('<script> alert("새 비밀번호를 기존 비밀번호와 일치하게 설정할 수 없습니다.");history.back()</script>');
         }
 
-        if(new_password.search(/\s/) !== -1) {
+        if (new_password.search(/\s/) !== -1) {
             return res.send('<script> alert("비밀번호에 공백이 입력되었습니다.");history.back()</script>');
         }
         const PwRules = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,}$/;
-        if(!PwRules.test(new_password)) {
+        if (!PwRules.test(new_password)) {
             return res.send('<script> alert("비밀번호는 8자리 이상 문자, 숫자, 특수문자로 구성하여야 합니다.");history.back()</script>');
         }
 
@@ -233,21 +235,21 @@ router.post('/:user_nickname/change_password', csrfProtection, isLoggedIn, async
     }
 });
 
-router.post('/:user_nickname/account_delete',csrfProtection,  isLoggedIn, async (req, res) => {
+router.post('/:user_nickname/account_delete', csrfProtection, isLoggedIn, async (req, res) => {
     const user_nickname = req.params.user_nickname;
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
     }
     try {
         await Message.update({
-            is_sender_delete : true
+            is_sender_delete: true
         }, {
             where: {sender_id: req.user.id},
         });
         await Message.destroy({
             where: {
-                is_receiver_delete : true,
-                is_sender_delete : true
+                is_receiver_delete: true,
+                is_sender_delete: true
             }
         });
         const user_delete_count = User.findAndCountAll({
@@ -256,13 +258,13 @@ router.post('/:user_nickname/account_delete',csrfProtection,  isLoggedIn, async 
             }
         });
         let delete_count = (await user_delete_count).count;
-        let nickname_delete = req.user.nickname+'_delete'+ delete_count;
-        while(true){
-            nickname_delete = req.user.nickname+'_delete'+ delete_count;
+        let nickname_delete = req.user.nickname + '_delete' + delete_count;
+        while (true) {
+            nickname_delete = req.user.nickname + '_delete' + delete_count;
             const exUser = await User.findOne({
-                where: {nickname : nickname_delete}
+                where: {nickname: nickname_delete}
             });
-            if(!exUser)
+            if (!exUser)
                 break;
             delete_count++;
         }
@@ -274,7 +276,7 @@ router.post('/:user_nickname/account_delete',csrfProtection,  isLoggedIn, async 
             gender: null,
             introduce: null,
             profile_image: null,
-            nickname : nickname_delete,
+            nickname: nickname_delete,
             is_delete: true
         }, {
             where: {id: req.user.id},
