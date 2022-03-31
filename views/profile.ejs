@@ -1,6 +1,6 @@
-<div class="container">
-    <div class="row" style="float: none; margin:10% auto;">
-        <div class="col">
+<div class="d-md-block d-none">
+    <div class="d-flex">
+        <div class="d-flex flex-column mx-3 my-3">
             <div class="card" style="width: 18rem;">
                 <% if(User.profile_image){ %>
                     <img src="<%= User.profile_image %>" class="card-img-top" width="250" height="250" alt="미리보기">
@@ -158,15 +158,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                <input type="hidden" name="csrfToken" value="<%= csrfToken%>">
+                                <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
                             </form>
                         </div>
                     <% } %>
                 </div>
             </div>
         </div>
-        <div class="col-8">
-            <div class="accordion" id="accordionPanelsStayOpenExample">
+        <div class="d-flex flex-fill me-3 my-3">
+            <div class="accordion flex-fill" id="accordionPanelsStayOpenExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="panelsStayOpen-headingOne">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -182,36 +182,36 @@
                     <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show"
                          aria-labelledby="panelsStayOpen-headingOne">
                         <div class="accordion-body">
-                            <table class="table table-striped table-bordered">
+                            <table class="table table-striped table-bordered" style="table-layout: fixed;">
                                 <thead>
                                 <tr>
-                                    <th>번호</th>
-                                    <th>제목</th>
-                                    <th>작성자</th>
-                                    <th>작성일</th>
-                                    <th>조회수</th>
-                                    <th>추천수</th>
+                                    <th class="text-center" style="width: 7%" scope="col">번호</th>
+                                    <th class="text-center" scope="col">제목</th>
+                                    <th class="text-center" style="width: 15%" scope="col">작성일</th>
+                                    <th class="text-center" style="width: 7%" scope="col">조회</th>
+                                    <th class="text-center" style="width: 7%" scope="col">추천</th>
+                                    <th class="text-center" style="width: 7%" scope="col">댓글</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <% for(let Post of MyPostList) { %>
                                     <tr>
                                         <% if(Post.is_notice) { %>
-                                            <td>공지</td>
+                                            <th class="text-center text-primary" style="width: 7%" scope="row">공지</th>
                                         <% } else { %>
-                                            <td><%= Post.dataValues.id %></td>
+                                            <th class="text-center" style="width: 7%"
+                                                scope="row"><%= Post.dataValues.id %></th>
                                         <% } %>
-                                        <td>
-                                            <a class="text-decoration-none text-reset"
-                                               href="/post/<%= Post.dataValues.id %>?board_id=<%= Post.dataValues.board_id %>"><%= Post.dataValues.title %></a>
+                                        <td style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                            &nbsp<a class="text-decoration-none text-reset"
+                                                    href="/post/<%= Post.dataValues.id %>?board_id=<%= Post.dataValues.board_id %>"><%= Post.dataValues.title %></a>
                                         </td>
-                                        <td>
-                                            <a class="text-decoration-none text-reset"
-                                               href="/profile/<%= Post.User.dataValues.nickname %>"><%= Post.User.dataValues.nickname %></a>
-                                        </td>
-                                        <td><%= Post.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
-                                        <td><%= Post.dataValues.view_count %></td>
-                                        <td><%= Post.dataValues.like %></td>
+                                        <td class="text-center"
+                                            style="width: 15%"><%= Post.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
+                                        <td class="text-center" style="width: 7%"><%= Post.dataValues.view_count %></td>
+                                        <td class="text-center" style="width: 7%"><%= Post.dataValues.like %></td>
+                                        <td class="text-center"
+                                            style="width: 7%"><%= Post.dataValues.comment_count %></td>
                                     </tr>
                                 <% } %>
                                 </tbody>
@@ -234,34 +234,33 @@
                     <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse"
                          aria-labelledby="panelsStayOpen-headingTwo">
                         <div class="accordion-body">
-                            <table class="table table-striped table-bordered">
+                            <table class="table table-striped table-bordered" style="table-layout: fixed;">
                                 <thead>
                                 <tr>
-                                    <th>번호</th>
-                                    <th>제목</th>
-                                    <th>작성자</th>
-                                    <th>작성일</th>
-                                    <th>조회수</th>
-                                    <th>마감기한</th>
+                                    <th class="text-center" style="width: 7%;" scope="col">번호</th>
+                                    <th class="text-center" scope="col">제목</th>
+                                    <th class="text-center" style="width: 15%;" scope="col">작성일</th>
+                                    <th class="text-center" style="width: 15%;" scope="col">마감기한</th>
+                                    <th class="text-center" style="width: 7%;" scope="col">조회</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <% for(let Recruitment of MyRecruitmentList) { %>
                                     <tr>
-                                        <td><%= Recruitment.dataValues.id %></td>
-                                        <td>
-                                            <a class="text-decoration-none text-reset"
-                                               href="/post/<%= Recruitment.dataValues.id %>?board_id=<%= Recruitment.dataValues.board_id %>"><%= Recruitment.dataValues.title %></a>
+                                        <th class="text-center" style="width: 7%"
+                                            scope="row"><%= Recruitment.dataValues.id %></th>
+                                        <td style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                            &nbsp<a class="text-decoration-none text-reset"
+                                                    href="/post/<%= Recruitment.dataValues.id %>?board_id=<%= Recruitment.dataValues.board_id %>"><%= Recruitment.dataValues.title %></a>
                                         </td>
-                                        <td>
-                                            <a class="text-decoration-none text-reset"
-                                               href="/profile/<%= Recruitment.User.dataValues.nickname %>"><%= Recruitment.User.dataValues.nickname %></a>
-                                        </td>
-                                        <td><%= Recruitment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
-                                        <td><%= Recruitment.dataValues.view_count %></td>
+                                        <td class="text-center"
+                                            style="width: 15%"><%= Recruitment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
                                         <% const offset = new Date().getTimezoneOffset() * 60000 %>
                                         <% const date_string = new Date(Recruitment.dataValues.deadline - offset).toISOString() %>
-                                        <td><%= date_string.slice(0, 16).replace('T', ' ') %></td>
+                                        <td class="text-center"
+                                            style="width: 15%"><%= date_string.slice(0, 16).replace('T', ' ') %></td>
+                                        <td class="text-center"
+                                            style="width: 7%"><%= Recruitment.dataValues.view_count %></td>
                                     </tr>
                                 <% } %>
                                 </tbody>
@@ -281,26 +280,33 @@
                         <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse"
                              aria-labelledby="panelsStayOpen-headingThree">
                             <div class="accordion-body">
-                                <table class="table table-striped table-bordered">
+                                <table class="table table-striped table-bordered" style="table-layout: fixed;">
                                     <thead>
                                     <tr>
-                                        <th>모집글</th>
-                                        <th>모집글 작성자</th>
-                                        <th>지원 메세지</th>
+                                        <th class="text-center" style="width: 7%" scope="col">선발</th>
+                                        <th class="text-center" style="width: 41%" scope="col">지원 메세지</th>
+                                        <th class="text-center" style="width: 37%" scope="col">게시글 제목</th>
+                                        <th class="text-center" style="width: 15%" scope="col">신청일</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <% for(let Applicant of MyApplicantList){ %>
                                         <tr>
-                                            <td>
-                                                <a class="text-decoration-none text-reset"
-                                                   href="/post/<%= Applicant.Recruitment.dataValues.id %>?board_id=<%= Applicant.Recruitment.dataValues.board_id %>"><%= Applicant.Recruitment.dataValues.title %></a>
+                                            <% if(Applicant.dataValues.is_accepted) { %>
+                                                <th class="text-center text-success" style="width: 7%" scope="row">선발
+                                                </th>
+                                            <% } else { %>
+                                                <th class="text-center text-danger" style="width: 7%" scope="row">미선발
+                                                </th>
+                                            <% } %>
+                                            <td style="width: 41%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                                &nbsp<%= Applicant.dataValues.message %></td>
+                                            <td style="width: 37%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                                &nbsp<a class="text-decoration-none text-reset"
+                                                        href="/post/<%= Applicant.Recruitment.dataValues.id %>?board_id=<%= Applicant.Recruitment.dataValues.board_id %>"><%= Applicant.Recruitment.dataValues.title %></a>
                                             </td>
-                                            <td>
-                                                <a class="text-decoration-none text-reset"
-                                                   href="/profile/<%= Applicant.Recruitment.User.dataValues.nickname %>"><%= Applicant.Recruitment.User.dataValues.nickname %></a>
-                                            </td>
-                                            <td><%= Applicant.dataValues.message %></td>
+                                            <td class="text-center"
+                                                style="width: 15%"><%= Applicant.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
                                         </tr>
                                     <% } %>
                                     </tbody>
@@ -324,26 +330,25 @@
                     <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse"
                          aria-labelledby="panelsStayOpen-headingFour">
                         <div class="accordion-body">
-                            <table class="table table-striped table-bordered">
+                            <table class="table table-striped table-bordered" style="table-layout: fixed;">
                                 <thead>
                                 <tr>
-                                    <th>댓글을 쓴 글</th>
-                                    <th>글 작성자</th>
-                                    <th>댓글 내용</th>
+                                    <th class="text-center" style="width: 45%" scope="col">댓글</th>
+                                    <th class="text-center" style="width: 40%" scope="col">게시글 제목</th>
+                                    <th class="text-center" style="width: 15%" scope="col">작성일</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <% for(let Comment of MyCommentList){ %>
                                     <tr>
-                                        <td>
-                                            <a class="text-decoration-none text-reset"
-                                               href="/post/<%= Comment.Post.dataValues.id %>?board_id=<%= Comment.Post.dataValues.board_id %>"><%= Comment.Post.dataValues.title %></a>
+                                        <td style="width: 45%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                            &nbsp<%= Comment.dataValues.content %></td>
+                                        <td style="width: 40%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                            &nbsp<a class="text-decoration-none text-reset"
+                                                    href="/post/<%= Comment.Post.dataValues.id %>?board_id=<%= Comment.Post.dataValues.board_id %>"><%= Comment.Post.dataValues.title %></a>
                                         </td>
-                                        <td>
-                                            <a class="text-decoration-none text-reset"
-                                               href="/profile/<%= Comment.Post.User.dataValues.nickname %>"><%= Comment.Post.User.dataValues.nickname %></a>
-                                        </td>
-                                        <td><%= Comment.dataValues.content %></td>
+                                        <td class="text-center"
+                                            style="width: 15%"><%= Comment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
                                     </tr>
                                 <% } %>
                                 </tbody>
@@ -366,30 +371,25 @@
                     <div id="panelsStayOpen-collapseFive" class="accordion-collapse collapse"
                          aria-labelledby="panelsStayOpen-headingFive">
                         <div class="accordion-body">
-                            <table class="table table-striped table-bordered">
+                            <table class="table table-striped table-bordered" style="table-layout: fixed;">
                                 <thead>
                                 <tr>
-                                    <th>답글의 글</th>
-                                    <th>글 작성자</th>
-                                    <th>답글을 쓴 댓글</th>
-                                    <th>댓글 작성자</th>
-                                    <th>답글 내용</th>
+                                    <th class="text-center" style="width: 45%" scope="col">답글</th>
+                                    <th class="text-center" style="width: 40%" scope="col">게시글 제목</th>
+                                    <th class="text-center" style="width: 15%" scope="col">작성일</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <% for(let ReplyComment of MyReplyCommentList) { %>
                                     <tr>
-                                        <td>
-                                            <a class="text-decoration-none text-reset"
-                                               href="/post/<%= ReplyComment.Comment.Post.dataValues.id %>?board_id=<%= ReplyComment.Comment.Post.dataValues.board_id %>"><%= ReplyComment.Comment.Post.dataValues.title %></a>
+                                        <td style="width: 45%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                            &nbsp<%= ReplyComment.dataValues.content %></td>
+                                        <td style="width: 40%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden">
+                                            &nbsp<a class="text-decoration-none text-reset"
+                                                    href="/post/<%= ReplyComment.Comment.Post.dataValues.id %>?board_id=<%= ReplyComment.Comment.Post.dataValues.board_id %>"><%= ReplyComment.Comment.Post.dataValues.title %></a>
                                         </td>
-                                        <td>
-                                            <a class="text-decoration-none text-reset"
-                                               href="/profile/<%= ReplyComment.Comment.Post.User.dataValues.nickname %>"><%= ReplyComment.Comment.Post.User.dataValues.nickname %></a>
-                                        </td>
-                                        <td><%= ReplyComment.Comment.dataValues.content %></td>
-                                        <td><%= ReplyComment.Comment.dataValues.creator_id %></td>
-                                        <td><%= ReplyComment.dataValues.content %></td>
+                                        <td class="text-center"
+                                            style="width: 15%"><%= ReplyComment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
                                     </tr>
                                 <% } %>
                                 </tbody>
@@ -401,6 +401,173 @@
         </div>
     </div>
 </div>
+<div class="d-md-none">
+    <div class="d-flex flex-column align-items-center mx-3 my-3">
+        <div class="card" style="width: 18rem;">
+            <% if(User.profile_image){ %>
+                <img src="<%= User.profile_image %>" class="card-img-top" width="250" height="250" alt="미리보기">
+            <% }else{ %>
+                <img src="/public/icon/default-user-profile-image.svg" class="card-img-top" width="250" height="250"
+                     alt="미리보기">
+            <% } %>
+            <div class="card-body">
+                <h5 class="card-title"><%= User.nickname %></h5>
+                <p class="card-text"><%= User.introduce %></p>
+                <hr>
+                <% if(User.nickname === locals.user.nickname){ %>
+                    <a href="/message/receive" class="btn btn-primary btn-sm position-relative"
+                       onclick="window.open(this.href, '_blank', 'width=600, height=600' ); return false;">쪽지함
+                        <% if(not_read_message !== 0) { %>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><%= not_read_message %></span>
+                        <% } %>
+                    </a>
+                    <% if(User.grade === 5){ %>
+                        <a href="/admin" class="btn btn-primary btn-sm">Admin</a>
+                    <% }else{ %>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#account_delete" id="openJoinBtn">
+                            회원탈퇴
+                        </button>
+                        <div class="modal fade" id="account_delete" tabindex="-1"
+                             aria-labelledby="exampleModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">회원탈퇴</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label">회원 탈퇴시 개인정보는 삭제되며 게시물 및 댓글은
+                                                지워지지 않습니다.</label>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                id="closeJoinBtn">
+                                            Close
+                                        </button>
+                                        <a href="#" id="account_delete_btn" class="btn btn-primary">회원탈퇴</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }else{ %>
+                    <a href='#'
+                       onclick="window.open('/message/write?target_nickname=<%= User.nickname %>','<%= User.nickname %>', 'status=no, toolbar=no, menubar=no, width=600, height=600');return false"
+                       class="btn btn-primary btn-sm">쪽지 보내기</a>
+                <% } %>
+            </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">이름</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                        <% if(User.name === null){ %>
+                            설정안함
+                        <% }else{ %>
+                            <%= User.name %>
+                        <% } %>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">성별</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                        <% if(User.gender === null){ %>
+                            설정안함
+                        <% }else{ %>
+                            <% if(User.gender === true){ %>
+                                남성
+                            <% }else{ %>
+                                여성
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <h6 class="mb-0">생년월일</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                        <% if(User.birth_date === null){ %>
+                            설정안함
+                        <% }else{ %>
+                            <%= birth %>
+                        <% } %>
+                    </div>
+                </div>
+                <hr>
+                <% if(User.nickname === locals.user.nickname){ %>
+                    <div>
+                        <% if(login_type === 'local') { %>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#change_password" id="openJoinBtn">
+                                비밀번호 변경
+                            </button>
+                        <% } %>
+                        <a href="/profile/<%= User.nickname %>/edit" class="btn btn-primary btn-sm">프로필 수정</a>
+                        <form id="change_password-form" action="/profile/<%= User.nickname %>/change_password"
+                              method="post">
+                            <div class="modal fade" id="change_password" tabindex="-1"
+                                 aria-labelledby="exampleModalLabel"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">비밀번호 변경</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="password" class="form-label">기존 비밀번호</label>
+                                                <input class="form-control" id="password" name="password"
+                                                       type="password" maxlength="255" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="new_password" class="form-label">새로운 비밀번호</label>
+                                                <input class="form-control" id="new_password" name="new_password"
+                                                       type="password" maxlength="255"
+                                                       required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="verify_new_password" class="form-label">새로운 비밀번호
+                                                    확인</label>
+                                                <input class="form-control" id="verify_new_password"
+                                                       name="verify_new_password" type="password"
+                                                       max="255" required>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                    id="closeJoinBtn">
+                                                Close
+                                            </button>
+                                            <button id="register_button" type="submit" class="btn btn-primary">비밀번호
+                                                변경
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="csrfToken" value="<%= csrfToken %>">
+                        </form>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
 <input type="hidden" id="csrfToken" name="csrfToken" value="<%= csrfToken %>">
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
@@ -408,18 +575,18 @@
     <% if(User.nickname === locals.user.nickname){ %>
     const account_delete_btn_tag = document.querySelector('#account_delete_btn');
     account_delete_btn_tag.addEventListener('click', async function (event) {
-            event.preventDefault();
-            await axios.post(`/profile/<%= User.nickname %>/account_delete`, {
-                _csrf: csrfToken
+        event.preventDefault();
+        await axios.post(`/profile/<%= User.nickname %>/account_delete`, {
+            _csrf: csrfToken
+        })
+            .then((response) => {
+                if (response.data === 'success') {
+                    location.href = '/';
+                }
             })
-                .then((response) => {
-                    if (response.data === 'success') {
-                        location.href='/';
-                    }
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
+            .catch((err) => {
+                console.error(err);
+            });
     });
     <% } %>
 
