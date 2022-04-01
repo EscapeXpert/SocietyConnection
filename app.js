@@ -9,6 +9,7 @@ const cron = require('node-cron');
 
 dotenv.config();
 const passportConfig = require('./passport');
+const logger = require('./logger');
 const boardRouter = require('./routes/board');
 const adminRouter = require('./routes/admin');
 const messageRouter = require('./routes/message');
@@ -86,7 +87,12 @@ sequelize.sync({force: false})
         console.error("데이터베이스 연결 실패");
     });
 
-app.use(morgan('dev'))
+if(process.env.NODE_ENV === 'production') {
+    app.use(morgan('combined'));
+} else {
+    app.use(morgan('dev'));
+}
+
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
@@ -95,7 +101,7 @@ app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 app.use(express.json({limit: "100mb"}));
 app.use(express.urlencoded({limit: "100mb", extended: false}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(session({
+const sessionOption = {
     resave: false,
     saveUninitialized: false,
     secret: process.env.COOKIE_SECRET,
@@ -103,8 +109,12 @@ app.use(session({
         httpOnly: true,
         secure: false
     }
-}));
-
+};
+if(process.env.NODE_ENV === 'production') {
+    sessionOption.proxy = false;
+    sessionOption.cookie.secure = false;
+}
+app.use(session(sessionOption));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/board', boardRouter);
@@ -117,6 +127,8 @@ app.use('/profile', profileRouter);
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
     error.status = 404;
+    logger.info('hello');
+    logger.error(error.message);
     next(error);
 });
 

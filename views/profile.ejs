@@ -173,7 +173,7 @@
                                 data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
                                 aria-controls="panelsStayOpen-collapseOne">
                             <% if(User.nickname === locals.user.nickname){ %>
-                                내가 쓴글
+                                내가 쓴 글
                             <% }else{ %>
                                 <%= User.nickname %>의 글
                             <% } %>
@@ -207,7 +207,7 @@
                                                     href="/post/<%= Post.dataValues.id %>?board_id=<%= Post.dataValues.board_id %>"><%= Post.dataValues.title %></a>
                                         </td>
                                         <td class="text-center"
-                                            style="width: 15%"><%= Post.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
+                                            style="width: 15%"><%= Post.dataValues.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></td>
                                         <td class="text-center" style="width: 7%"><%= Post.dataValues.view_count %></td>
                                         <td class="text-center" style="width: 7%"><%= Post.dataValues.like %></td>
                                         <td class="text-center"
@@ -254,7 +254,7 @@
                                                     href="/post/<%= Recruitment.dataValues.id %>?board_id=<%= Recruitment.dataValues.board_id %>"><%= Recruitment.dataValues.title %></a>
                                         </td>
                                         <td class="text-center"
-                                            style="width: 15%"><%= Recruitment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
+                                            style="width: 15%"><%= Recruitment.dataValues.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></td>
                                         <% const offset = new Date().getTimezoneOffset() * 60000 %>
                                         <% const date_string = new Date(Recruitment.dataValues.deadline - offset).toISOString() %>
                                         <td class="text-center"
@@ -306,7 +306,7 @@
                                                         href="/post/<%= Applicant.Recruitment.dataValues.id %>?board_id=<%= Applicant.Recruitment.dataValues.board_id %>"><%= Applicant.Recruitment.dataValues.title %></a>
                                             </td>
                                             <td class="text-center"
-                                                style="width: 15%"><%= Applicant.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
+                                                style="width: 15%"><%= Applicant.dataValues.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></td>
                                         </tr>
                                     <% } %>
                                     </tbody>
@@ -348,7 +348,7 @@
                                                     href="/post/<%= Comment.Post.dataValues.id %>?board_id=<%= Comment.Post.dataValues.board_id %>"><%= Comment.Post.dataValues.title %></a>
                                         </td>
                                         <td class="text-center"
-                                            style="width: 15%"><%= Comment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
+                                            style="width: 15%"><%= Comment.dataValues.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></td>
                                     </tr>
                                 <% } %>
                                 </tbody>
@@ -389,7 +389,7 @@
                                                     href="/post/<%= ReplyComment.Comment.Post.dataValues.id %>?board_id=<%= ReplyComment.Comment.Post.dataValues.board_id %>"><%= ReplyComment.Comment.Post.dataValues.title %></a>
                                         </td>
                                         <td class="text-center"
-                                            style="width: 15%"><%= ReplyComment.dataValues.created_at.toISOString().replace(/T/, ' ').replace(/\..+/, '') %></td>
+                                            style="width: 15%"><%= ReplyComment.dataValues.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></td>
                                     </tr>
                                 <% } %>
                                 </tbody>
@@ -401,7 +401,7 @@
         </div>
     </div>
 </div>
-<div class="d-md-none">
+<div class="d-flex flex-column d-md-none">
     <div class="d-flex flex-column align-items-center mx-3 my-3">
         <div class="card" style="width: 18rem;">
             <% if(User.profile_image){ %>
@@ -564,6 +564,182 @@
                         </form>
                     </div>
                 <% } %>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex flex-column flex-fill mx-3 mb-3">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="post_general-tab" data-bs-toggle="tab"
+                        data-bs-target="#post_general" type="button" role="tab" aria-controls="post_general"
+                        aria-selected="true">게시글
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="post_recruitment-tab" data-bs-toggle="tab"
+                        data-bs-target="#post_recruitment" type="button" role="tab" aria-controls="post_recruitment"
+                        aria-selected="false">모집글
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="apply-tab" data-bs-toggle="tab" data-bs-target="#apply" type="button"
+                        role="tab" aria-controls="apply" aria-selected="false">지원현황
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="comment-tab" data-bs-toggle="tab" data-bs-target="#comment" type="button"
+                        role="tab" aria-controls="comment" aria-selected="false">댓글
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reply_comment-tab" data-bs-toggle="tab" data-bs-target="#reply_comment"
+                        type="button" role="tab" aria-controls="reply_comment" aria-selected="false">답글
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="post_general" role="tabpanel" aria-labelledby="post_general-tab">
+                <table class="table table-responsive table-hover">
+                    <tbody>
+                    <% for(let post of MyPostList) { %>
+                        <tr>
+                            <td>
+                                <div onclick="location.href = `/post/<%= post.id %>?board_id=<%= post.board_id %>`"
+                                     class="d-flex my-1">
+                                    <div class="d-flex flex-column me-2">
+                                        <div class="my-1">
+                                            <% if(post.is_notice) { %>
+                                                <span class="badge bg-primary">공지</span>
+                                            <% } %>
+                                            <span class="text-decoration-none text-reset fw-bold"><%= post.title %></span>
+                                        </div>
+                                        <div class="my-1">
+                                            <span><%= post.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></span>
+                                            <span>조회</span>
+                                            <sapn><%= post.view_count %></sapn>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="post_recruitment" role="tabpanel" aria-labelledby="post_recruitment-tab">
+                <table class="table table-responsive table-hover">
+                    <tbody>
+                    <% for(let post of MyRecruitmentList) { %>
+                        <tr>
+                            <td>
+                                <div onclick="location.href = `/post/<%= post.id %>?board_id=<%= post.board_id %>`"
+                                     class="d-flex my-1">
+                                    <div class="d-flex flex-column me-2">
+                                        <div class="my-1">
+                                            <span class="text-decoration-none text-reset fw-bold"><%= post.title %></span>
+                                        </div>
+                                        <div class="my-1">
+                                            <span><%= post.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></span>
+                                            <span>조회</span>
+                                            <span><%= post.view_count %></span>
+                                        </div>
+                                        <div class="mb-1">
+                                            <span>마감기한</span>
+                                            <% const offset = new Date().getTimezoneOffset() * 60000 %>
+                                            <% const date_string = new Date(post.dataValues.deadline - offset).toISOString() %>
+                                            <span><%= date_string.slice(0, 16).replace('T', ' ') %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="apply" role="tabpanel" aria-labelledby="apply-tab">
+                <table class="table table-responsive table-hover">
+                    <tbody>
+                    <% for(let applicant of MyApplicantList) { %>
+                        <tr>
+                            <td>
+                                <div onclick="location.href = `/post/<%= applicant.Recruitment.id %>?board_id=<%= applicant.Recruitment.board_id %>`"
+                                     class="d-flex my-1">
+                                    <div class="d-flex flex-column me-2">
+                                        <div class="my-1">
+                                            <span class="text-decoration-none text-reset fw-bold"><%= applicant.message %></span>
+                                        </div>
+                                        <div class="my-1">
+                                            <% if(applicant.is_accepted) { %>
+                                                <span class="text-success fw-bold">선벌</span>
+                                            <% } else { %>
+                                                <span class="text-danger fw-bold">미선발</span>
+                                            <% } %>
+                                            <span>신청일</span>
+                                            <span><%= applicant.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></span>
+                                        </div>
+                                        <div class="mb-1">
+                                            <span><%= applicant.Recruitment.title %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="comment" role="tabpanel" aria-labelledby="comment-tab">
+                <table class="table table-responsive table-hover">
+                    <tbody>
+                    <% for(let comment of MyCommentList) { %>
+                        <tr>
+                            <td>
+                                <div onclick="location.href = `/post/<%= comment.Post.id %>?board_id=<%= comment.Post.board_id %>#comment_list`"
+                                     class="d-flex my-1">
+                                    <div class="d-flex flex-column me-2">
+                                        <div class="my-1">
+                                            <span class="text-decoration-none text-reset fw-bold"><%= comment.content %></span>
+                                        </div>
+                                        <div class="my-1">
+                                            <span><%= comment.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></span>
+                                        </div>
+                                        <div class="mb-1">
+                                            <span><%= comment.Post.title %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="reply_comment" role="tabpanel" aria-labelledby="reply_comment-tab">
+                <table class="table table-responsive table-hover">
+                    <tbody>
+                    <% for(let reply_comment of MyReplyCommentList) { %>
+                        <tr>
+                            <td>
+                                <div onclick="location.href = `/post/<%= reply_comment.Comment.Post.id %>?board_id=<%= reply_comment.Comment.Post.board_id %>#comment_list`"
+                                     class="d-flex my-1">
+                                    <div class="d-flex flex-column me-2">
+                                        <div class="my-1">
+                                            <span class="text-decoration-none text-reset fw-bold"><%= reply_comment.content %></span>
+                                        </div>
+                                        <div class="my-1">
+                                            <span><%= reply_comment.created_at.toISOString().slice(0, 16).replace(/T/, ' ').replace(/\..+/, '') %></span>
+                                        </div>
+                                        <div class="mb-1">
+                                            <span><%= reply_comment.Comment.Post.title %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
