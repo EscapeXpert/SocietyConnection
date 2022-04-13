@@ -20,7 +20,7 @@ module.exports = {
     production: {
         username: process.env.SEQUELIZE_PRODUCTION_USERNAME,
         password: process.env.SEQUELIZE_PRODUCTION_PASSWORD,
-        database: 'societyconnection_production',
+        database: 'societyconnection',
         host: process.env.SEQUELIZE_PRODUCTION_HOST,
         dialect: 'mysql',
         timezone: 'Asia/Seoul',
