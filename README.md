@@ -87,6 +87,7 @@ npx sequelize db:create --env production
 + 네이버 Smart Editor 2.0을 사용하여 글쓰기 폼 구현
 + PM2를 사용하여 무중단 배포
 + Redis에 세션 정보를 저장하여 서버 재시작 후 로그인 유지
++ Bootstrap을 사용하여 반응형 웹 디자인
 
 ## License / 라이센스
 
