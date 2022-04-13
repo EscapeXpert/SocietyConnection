@@ -36,7 +36,7 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
         });
         const MyPostList = await Post.findAll({
             attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'board_id', 'comment_count', [
-                sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
+                sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `Post`.`id`)'), 'like'
             ]],
             where: {creator_id: Find_User_Id},
             include: {

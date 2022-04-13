@@ -220,7 +220,7 @@ router.get('/:board_id', csrfProtection, async (req, res, next) => {
             }
             const posts = await Post.findAll({
                 attributes: ['id', 'title', 'created_at', 'is_notice', 'view_count', 'comment_count', [
-                    sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `post`.`id`)'), 'like'
+                    sequelize.literal('(SELECT count(*) FROM `like` WHERE `post_id` = `Post`.`id`)'), 'like'
                 ]],
                 where: {
                     board_id: board_id,

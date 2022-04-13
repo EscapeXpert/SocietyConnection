@@ -728,7 +728,7 @@ router.get('/:post_id', csrfProtection, isLoggedIn, async (req, res, next) => {
         if (board.board_type === 'general') {
             const post = await Post.findOne({
                 attributes: ['id', 'title', 'content', 'is_notice', 'created_at', 'creator_id', 'view_count', 'board_id', [
-                    sequelize.literal('(SELECT name FROM grade WHERE id = user.grade)'), 'grade'
+                    sequelize.literal('(SELECT name FROM grade WHERE id = User.grade)'), 'grade'
                 ]],
                 where: {
                     id: post_id
@@ -810,7 +810,7 @@ router.get('/:post_id', csrfProtection, isLoggedIn, async (req, res, next) => {
         } else if (board.board_type === 'recruitment') {
             const post = await Recruitment.findOne({
                 attributes: ['id', 'title', 'content', 'created_at', 'creator_id', 'view_count', 'deadline', 'board_id', 'is_complete', [
-                    sequelize.literal('(SELECT name FROM grade WHERE id = user.grade)'), 'grade'
+                    sequelize.literal('(SELECT name FROM grade WHERE id = User.grade)'), 'grade'
                 ]],
                 where: {
                     id: post_id

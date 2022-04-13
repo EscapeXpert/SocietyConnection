@@ -59,6 +59,11 @@ SEQUELIZE_PRODUCTION_HOST=MySQL 서버 주소
 
 3. KAKAO_LOGOUT_REDIRECT_URI에 도메인 입력
 
+4. 아래의 명령어로 데이터베이스 생성
+```
+npx sequelize db:create --env production
+```
+
 ## Built With / 누구랑 만들었나요?
 
 * [박세훈](https://github.com/psh3253) - 프로젝트 및 DB 설계, 게시판 기능 구현 및 디자인 등
