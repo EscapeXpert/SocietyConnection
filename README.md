@@ -16,7 +16,7 @@ npm start
 아래 사항들이 설치 및 세팅이 되어있어야 하며 카카오 로그인을 사용하기 위해서 카카오 REST API 키를 발급하셔야 합니다.
 
 ```
-MySQL Server 8.0 이상, Node.js 16.13.0 이상, npm 8.1.0 이상
+MySQL Server 8.0 이상의 서버, Redis 서버, Node.js 16.13.0 이상, npm 8.1.0 이상
 ```
 
 ### 모듈 설치
@@ -53,13 +53,18 @@ KAKAO_LOGOUT_REDIRECT_URI=http://도메인/auth/logout
 SEQUELIZE_PRODUCTION_USERNAME=MySQL 아이디
 SEQUELIZE_PRODUCTION_PASSWORD=MySQL 비밀번호
 SEQUELIZE_PRODUCTION_HOST=MySQL 서버 주소
+REDIS_HOST=Redis 서버 주소
+REDIS_PORT=Redis 서버 포트
+REDIS_PASSWORD=Redis 서버 비밀번호
 ```
 
 2. .env 파일의 KAKAO_ID에 위에서 발급 받은 키와 SEQUELIZE_*에 MySQL 서버 관련 정보를 입력
 
-3. KAKAO_LOGOUT_REDIRECT_URI에 도메인 입력
+3. REDIS_*에 Redis 서버 관련 정보를 입력
 
-4. 아래의 명령어로 데이터베이스 생성
+4. KAKAO_LOGOUT_REDIRECT_URI에 도메인 입력
+
+5. 아래의 명령어로 데이터베이스 생성
 ```
 npx sequelize db:create --env production
 ```

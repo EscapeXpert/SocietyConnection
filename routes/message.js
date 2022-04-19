@@ -82,7 +82,7 @@ router.get('/send', isLoggedIn, async (req, res, next) => {
                 attributes: ['nickname'],
                 on: {
                     id: {
-                        [Op.eq]: sequelize.col('message.receiver_id')
+                        [Op.eq]: sequelize.col('Message.receiver_id')
                     }
                 }
             }],
@@ -140,7 +140,7 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
                 attributes: ['nickname'],
                 on: {
                     id: {
-                        [Op.eq]: sequelize.col('message.sender_id')
+                        [Op.eq]: sequelize.col('Message.sender_id')
                     }
                 }
             }],
