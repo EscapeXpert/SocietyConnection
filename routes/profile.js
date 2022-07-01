@@ -23,10 +23,6 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
             where: {id: user_id}
         });
 
-        const boards = await Board.findAll({
-            attributes: ['id', 'name']
-        });
-
         const not_read_message = await Message.count({
             where: {
                 receiver_id: user_id,
@@ -90,7 +86,6 @@ router.get('/:user_nickname', csrfProtection, isLoggedIn, async (req, res, next)
         res.locals.user = req.user;
         res.render('profile', {
             title: '프로필',
-            boards: boards,
             User: Find_User,
             login_type: login_type.login_type,
             birth: birth,
@@ -134,15 +129,11 @@ router.get('/:user_nickname/edit', csrfProtection, isLoggedIn, async (req, res) 
     if (user_nickname !== req.user.nickname) {
         return res.send('<script> alert("잘못된 접근입니다.");history.back()</script>');
     }
-    const boards = await Board.findAll({
-        attributes: ['id', 'name']
-    });
     res.locals.user = req.user;
 
     res.render('profile_edit', {
         title: '프로필 수정',
         User: req.user,
-        boards: boards,
         birth: moment(req.user.birth_date).format('YYYY-MM-DD'),
         csrfToken: req.csrfToken()
     });

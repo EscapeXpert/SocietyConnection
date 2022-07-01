@@ -208,9 +208,6 @@ router.get('/:board_id', csrfProtection, async (req, res, next) => {
                 id: board_id
             }
         });
-        const boards = await Board.findAll({
-            attributes: ['id', 'name']
-        });
         if (board.board_type === 'general') {
             let order;
             if (sort === 'like') {
@@ -247,7 +244,6 @@ router.get('/:board_id', csrfProtection, async (req, res, next) => {
             res.locals.user = req.user;
             res.render('board', {
                     title: board.name,
-                    boards: boards,
                     board: board,
                     posts: posts,
                     post_count: post_count,
@@ -360,7 +356,6 @@ router.get('/:board_id', csrfProtection, async (req, res, next) => {
             res.locals.user = req.user;
             res.render('board', {
                 title: board.name,
-                boards: boards,
                 board: board,
                 posts: recruitments,
                 post_count: recruitment_count,

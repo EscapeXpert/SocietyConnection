@@ -91,10 +91,6 @@ router.get('/send', isLoggedIn, async (req, res, next) => {
             limit: 10,
         });
 
-        const boards = await Board.findAll({
-            attributes: ['id', 'name']
-        });
-
         res.locals.link = 'send';
         res.locals.user = req.user;
         res.render("message_send", {
@@ -102,7 +98,6 @@ router.get('/send', isLoggedIn, async (req, res, next) => {
             title: user.nickname + '의 발신함',
             messages: messages,
             page: page,
-            boards: boards,
             message_count: message_count
         });
     } catch (err) {
@@ -148,9 +143,6 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
             offset: start_message_number,
             limit: 10,
         });
-        const boards = await Board.findAll({
-            attributes: ['id', 'name']
-        });
         if(filter === "is_not_read"){
             res.locals.link = 'receive_is_not_read';
         }
@@ -164,7 +156,6 @@ router.get('/receive', isLoggedIn, async (req, res, next) => {
             title: user.nickname + '의 수신함',
             messages: messages,
             filter: filter,
-            boards: boards,
             page: page,
             message_count: message_count
         });

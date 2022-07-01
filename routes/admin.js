@@ -10,15 +10,14 @@ const {sequelize} = require("../models");
 const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
+const csrf = require('csurf');
+const csrfProtection = csrf({cookie: true});
 const router = express.Router();
 
 router.get('/', csrfProtection, isLoggedIn, async (req, res) => {
     if (req.user.grade !== 5) {
         return res.send('<script> alert("관리자가 아닙니다.");window.location.replace("/");</script>');
     }
-    const boards = await Board.findAll({
-        attributes: ['id', 'name']
-    });
     const UserList = await User.findAll({
         where: {
             id: {
@@ -38,7 +37,6 @@ router.get('/', csrfProtection, isLoggedIn, async (req, res) => {
     const image_files = fs.readdirSync('./public/main_image');
     res.render('admin', {
         title: 'admin',
-        boards: boards,
         UserList: UserList,
         BoardList: BoardList,
         GradeList: GradeList,
