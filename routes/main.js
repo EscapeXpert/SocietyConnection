@@ -15,33 +15,22 @@ const csrfProtection = csrf({cookie: true});
 const router = express.Router();
 
 router.get('/introduce', csrfProtection, async (req, res, next) => {
-    const boards = await Board.findAll({
-        attributes: ['id', 'name']
-    });
     res.locals.user = req.user;
     res.render('introduce', {
         title: '동아리 소개',
-        boards: boards,
         csrfToken: req.csrfToken()
     });
 });
 
 router.get('/policy', csrfProtection, async (req, res, next) => {
-    const boards = await Board.findAll({
-        attributes: ['id', 'name']
-    });
     res.locals.user = req.user;
     res.render('privacy_policy', {
         title: '개인정보 처리방침',
-        boards: boards,
         csrfToken: req.csrfToken()
     });
 });
 
 router.get('/', csrfProtection, async (req, res) => {
-    const boards = await Board.findAll({
-        attributes: ['id', 'name']
-    });
     if (req.cookies.auto_login) {
         if (!req.isAuthenticated()) {
             const exUser = await User.findOne({where: {session_id: req.cookies.auto_login}});
@@ -63,12 +52,10 @@ router.get('/', csrfProtection, async (req, res) => {
         }
     }
     res.locals.user = req.user;
-    res.locals.boards = boards;
     const image_files = fs.readdirSync('./public/main_image');
     res.render('main', {
         title: '메인',
         User: req.user,
-        boards: boards,
         image_files: image_files,
         csrfToken: req.csrfToken()
     });

@@ -94,9 +94,6 @@ router.get('/:post_id/modify', csrfProtection, isLoggedIn, async (req, res, next
     const board_id = req.query.board_id;
     const user_id = req.user.id;
     try {
-        const boards = await Board.findAll({
-            attributes: ['id', 'name']
-        });
         const board = await Board.findOne({
             attributes: ['id', 'board_type'],
             where: {
@@ -115,7 +112,6 @@ router.get('/:post_id/modify', csrfProtection, isLoggedIn, async (req, res, next
                 res.render('post_modify', {
                     title: '게시글 수정',
                     board: board,
-                    boards: boards,
                     post: post,
                     csrfToken: req.csrfToken()
                 });
@@ -135,7 +131,6 @@ router.get('/:post_id/modify', csrfProtection, isLoggedIn, async (req, res, next
                     res.render('post_modify', {
                         title: '게시글 수정',
                         board: board,
-                        boards: boards,
                         post: post,
                         csrfToken: req.csrfToken()
                     });
@@ -174,15 +169,11 @@ router.post('/:post_id/modify', csrfProtection, isLoggedIn, async (req, res, nex
             disallowedTagsMode: 'discard',
             allowedAttributes: {
                 a: ['href', 'name', 'target'],
-                // We don't currently allow img itself by default, but
-                // these attributes would make sense if we did.
                 img: ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading'],
                 p: ['style'],
                 span: ['style']
             },
-// Lots of these won't come up by default because we don't allow them
             selfClosing: ['img', 'br', 'hr', 'area', 'base', 'basefont', 'input', 'link', 'meta'],
-// URL schemes we permit
             allowedSchemes: ['http', 'https', 'ftp', 'mailto', 'tel'],
             allowedSchemesByTag: {},
             allowedSchemesAppliedToAttributes: ['href', 'src', 'cite'],
@@ -701,9 +692,6 @@ router.get('/:post_id', csrfProtection, isLoggedIn, async (req, res, next) => {
     const board_id = req.query.board_id;
     const user_id = req.user.id;
     try {
-        const boards = await Board.findAll({
-            attributes: ['id', 'name']
-        });
         const board = await Board.findOne({
             attributes: ['id', 'name', 'board_type', 'min_read_grade'],
             where: {
@@ -789,7 +777,6 @@ router.get('/:post_id', csrfProtection, isLoggedIn, async (req, res, next) => {
                     title: post.title,
                     post: post,
                     board: board,
-                    boards: boards,
                     user: user,
                     is_like: is_like,
                     like_list: like_list,
@@ -856,7 +843,6 @@ router.get('/:post_id', csrfProtection, isLoggedIn, async (req, res, next) => {
                     title: post.title,
                     post: post,
                     board: board,
-                    boards: boards,
                     user: user,
                     already: already,
                     applicants: applicants,

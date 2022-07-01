@@ -35,6 +35,7 @@ const mainRouter = require('./routes/main');
 const profileRouter = require('./routes/profile');
 const {sequelize} = require('./models');
 const {Op} = require('sequelize');
+const Board = require('./models/board');
 const User = require('./models/user');
 const Grade = require('./models/grade');
 const PostFile = require('./models/post_file');
@@ -131,6 +132,7 @@ const sessionOption = {
         client: redisClient
     })
 };
+
 if(process.env.NODE_ENV === 'production') {
     sessionOption.proxy = false;
     sessionOption.cookie.secure = false;
@@ -138,6 +140,14 @@ if(process.env.NODE_ENV === 'production') {
 app.use(session(sessionOption));
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(async (req, res, next) => {
+    const boards = await Board.findAll({
+        attributes: ['id', 'name']
+    });
+    res.locals.boards = boards;
+    next();
+});
 app.use('/board', boardRouter);
 app.use('/admin', adminRouter);
 app.use('/message', messageRouter);
