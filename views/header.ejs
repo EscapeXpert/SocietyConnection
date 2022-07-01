@@ -31,7 +31,7 @@
                             data-bs-target="#login" id="openJoinBtn">
                         로그인
                     </button>
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#join"
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#terms"
                             id="openJoinBtn">
                         회원가입
                     </button>
@@ -90,7 +90,27 @@
                                     </div>
                                     <div class="modal-body">
                                         <div class="mb-3">
-                                            <label for="id" class="form-label">암튼 동의 ㅇㅈ?</label>
+                                            <table class="table">
+                                                <thead>
+                                                <tr>
+                                                    <th>항목</th>
+                                                    <th>수집 이용 목적</th>
+                                                    <th>보유 이용기간</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>이름, 아이디, 비밀번호</td>
+                                                    <td>홈페이지 운영</td>
+                                                    <td>회원 탈퇴 시까지</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="mb-3">
+                                            <p class="fs-6">※ 위의 개인정보 수집·이용에 대한 동의를 거부할 권리가 있습니다.</p>
+                                            <p class="fs-6">그러나 동의를 거부할 경우 원활한 홈페이지 사용에 제한을 받을 수 있습니다.</p>
+                                            <p class="fs-6">위와 같이 개인정보를 수집 이용하는데 동의하십니까?</p>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -100,7 +120,7 @@
                                         </button>
                                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#join"
                                                 id="openJoinBtn">
-                                            회원가입
+                                            동의
                                         </button>
                                     </div>
                                 </div>
