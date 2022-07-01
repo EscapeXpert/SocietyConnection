@@ -24,8 +24,12 @@ router.post('/join', csrfProtection, isNotLoggedIn, async (req, res, next) => {
         if (password !== verify_password) {
             return res.send('<script> alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");history.back()</script>');
         }
+        const nicknameRules = /^[\w+]{1,30}$/;
         if (!nickname) {
             return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
+        }
+        if(!nicknameRules.test(nickname)) {
+            return res.send('<script> alert("닉네임은 특수문자 제외 30자까지 가능합니다.");history.back()</script>');
         }
 
         exUser = await User.findOne({where: {nickname}});

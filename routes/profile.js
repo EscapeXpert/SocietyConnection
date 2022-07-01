@@ -157,7 +157,7 @@ router.post('/:user_nickname/edit', csrfProtection, isLoggedIn, upload2.none(), 
         if (!nickname) {
             return res.send('<script> alert("닉네임을 입력해주세요.");history.back()</script>');
         }
-        const nicknameRules = /^(?=.*[a-zA-Z])(?=.*[0-9]).{,30}$/;
+        const nicknameRules = /^[\w+]{1,30}$/;
         const exUser = await User.findOne({where: {nickname: nickname}});
         if (exUser && exUser.nickname !== req.user.nickname) {
             return res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back()</script>');
