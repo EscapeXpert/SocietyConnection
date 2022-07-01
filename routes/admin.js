@@ -10,8 +10,6 @@ const {sequelize} = require("../models");
 const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
-const csrf = require('csurf');
-const csrfProtection = csrf({cookie: true});
 const router = express.Router();
 
 router.get('/', csrfProtection, isLoggedIn, async (req, res) => {
@@ -67,6 +65,10 @@ router.post('/:User_nickname/edit', csrfProtection, isLoggedIn, async (req, res,
         }
         if (exUser && exUser.nickname !== User_nickname) {
             return res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back();</script>');
+        }
+        const nicknameRules = /^(?=.*[a-zA-Z])(?=.*[0-9]).{,30}$/;
+        if(!nicknameRules.test(nickname)) {
+            return res.send('<script> alert("닉네임은 특수문자 제외 30자까지 가능합니다.");history.back()</script>');
         }
         await User.update({
             nickname: nickname,
