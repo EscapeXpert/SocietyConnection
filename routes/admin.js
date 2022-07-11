@@ -64,7 +64,7 @@ router.post('/:User_nickname/edit', csrfProtection, isLoggedIn, async (req, res,
         if (exUser && exUser.nickname !== User_nickname) {
             return res.send('<script> alert("이미 존재하는 닉네임입니다.");history.back();</script>');
         }
-        const nicknameRules = /^[\w+]{1,30}$/;
+        const nicknameRules = /^[A-Za-z0-9가-힣]{1,30}$/;
         if(!nicknameRules.test(nickname)) {
             return res.send('<script> alert("닉네임은 특수문자 제외 30자까지 가능합니다.");history.back()</script>');
         }
